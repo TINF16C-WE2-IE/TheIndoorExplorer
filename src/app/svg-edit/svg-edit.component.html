@@ -1,0 +1,5 @@
+<svg style="border:1px red dotted;width:500px" viewBox="0 0 500 500" (mousemove)="mouseMove($event)"
+     (mouseup)="mouseClick($event)">
+    <svg:line *ngFor="let line of lines" stroke="black" [attr.x1]="line[0][0]" [attr.y1]="line[0][1]"
+              [attr.x2]="line[1][0]" [attr.y2]="line[1][1]"></svg:line>
+</svg>
