@@ -1,5 +1,13 @@
 # IeClient
 
+---
+
+- **TravisCI:** `master` [![Build Status](https://travis-ci.org/TINF16C-WE2-IE/TheIndoorExplorer.svg?branch=master)](https://travis-ci.org/TINF16C-WE2-IE/TheIndoorExplorer)
+- **Waffle.io:** 
+[![Tasks to do](https://badge.waffle.io/TINF16C-WE2-IE/TheIndoorExplorer.png?label=to%20do&title=To%20do)](http://waffle.io/TINF16C-WE2-IE/TheIndoorExplorer)
+[![Tasks in progress](https://badge.waffle.io/TINF16C-WE2-IE/TheIndoorExplorer.png?label=in%20progress&title=In%20progress)](http://waffle.io/TINF16C-WE2-IE/TheIndoorExplorer)
+---
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.4.2.
 
 ## Development server

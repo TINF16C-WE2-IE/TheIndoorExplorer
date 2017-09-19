@@ -1,0 +1,29 @@
+language: node_js
+node_js:
+  - "node"
+  - "8"
+  - "7"
+  - "6"
+
+branches:
+  only: "master"
+
+
+before_script:
+  - "npm run lint"
+
+script:
+  - "npm run build"
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
+  on:
+    branch: master
+    node: "node"
+    
+  local_dir: dist
+  repo: TINF16C-WE2-IE/TINF16C-WE2-IE.github.io
+  target_branch: master
+
