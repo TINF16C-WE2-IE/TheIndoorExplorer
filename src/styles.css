@@ -1,5 +1,46 @@
 /* You can add global styles to this file, and also import other style files */
-html, body {
-    margin: 0;
-    padding: 0;
+
+/* Angular-Material Theme */
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+
+
+body {
+    width: 470px;
+    padding: 5 5 5 5;
+    margin-right: 2em;
+}
+
+.example-card {
+    width: 400px;
+    padding-top: 5px;
+}
+
+.example-icon {
+  padding: 0 14px;
+}
+
+.example-spacer {
+  flex: 1 1 auto;
+}
+
+.example-container {
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+}
+
+.example-header {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  padding-left: 24px;
+  font-size: 20px;
+}
+
+.profile-image {
+  background-size: cover;
+}
+
+.content-image {
+    size: 50%;
 }

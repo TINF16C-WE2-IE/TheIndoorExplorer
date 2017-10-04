@@ -1,0 +1,36 @@
+
+    <md-grid-list cols="1" rows="2" rowHeight="300px">
+        <md-grid-tile colspan="1" rowspan="1">
+            <app-content-login></app-content-login>
+        </md-grid-tile>
+        <md-grid-tile colspan="1" rowspan="2">
+            <app-content-updates></app-content-updates>
+        </md-grid-tile>
+    </md-grid-list>
+
+
+
+<md-card>
+    <md-card-content>
+      <button md-fab [routerLink]="['/editor', '45fad']">Editor</button>
+
+          <md-slide-toggle
+                          class="example-margin"
+                          color="accent"
+                          checked="true"
+                          disabled="false">
+                        Slide me!
+                      </md-slide-toggle>
+  </md-card-content>
+</md-card>
+
+<md-card>
+    <md-card-content>
+        <md-progress-spinner
+          style="margin: 0 10px"
+          [color]="primary"
+          [mode]="determinate"
+          [value]="82">
+      </md-progress-spinner>
+    </md-card-content>
+</md-card>
