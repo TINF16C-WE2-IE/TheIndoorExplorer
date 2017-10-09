@@ -5,8 +5,8 @@
             <svg:circle cx="5" cy="5" r="3" style="stroke: none; fill:#000000;"/>
         </svg:marker>
       </svg:defs>
-    <svg:line *ngFor="let line of structure[layer].lines" stroke="black" [attr.x1]="line.a[0]" [attr.y1]="line.a[1]" [attr.x2]="line.b[0]" [attr.y2]="line.b[1]" marker-end="url(#circle)" marker-start="url(#circle)"></svg:line>
-    <svg:rect *ngFor="let door of structure[layer].doors" stroke="black" fill="none" [attr.x]="door.pos[0]-15" [attr.y]="door.pos[1]-5" width="30" height="10" [attr.transform]="'rotate('+door.rot+' '+door.pos[0]+' '+door.pos[1]+')'"></svg:rect>
+    <svg:line *ngFor="let wall of structure[level].walls" stroke="black" [attr.x1]="wall.a[0]" [attr.y1]="wall.a[1]" [attr.x2]="wall.b[0]" [attr.y2]="wall.b[1]" marker-end="url(#circle)" marker-start="url(#circle)"></svg:line>
+    <svg:rect *ngFor="let door of structure[level].doors" stroke="black" fill="none" [attr.x]="door.pos[0]-15" [attr.y]="door.pos[1]-5" width="30" height="10" [attr.transform]="'rotate('+getRotation(door.pos)+' '+door.pos[0]+' '+door.pos[1]+')'"></svg:rect>
 </svg>
 <button (click)="tool=0">Edit</button>
 <button (click)="tool=1">Move</button>
