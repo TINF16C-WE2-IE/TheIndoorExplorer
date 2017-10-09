@@ -7,9 +7,15 @@ import {Component, OnInit} from '@angular/core';
 })
 export class SvgEditComponent implements OnInit {
 
-    lines = [];
+    structure = [
+        {
+            'lines' : [],
+            'doors' : []
+        }
+    ];
     nowDrawing = false;
     moveStart = [];
+    layer = 0;
     tool = 0;
 
     constructor() {
@@ -26,15 +32,13 @@ export class SvgEditComponent implements OnInit {
         return a[0] === b[0] && a[1] === b[1];
     }
 
-    updateVertex(evt: MouseEvent) {
+    moveVertex(evt: MouseEvent) {
+        const lines = this.structure[this.layer].lines;
         const currentPos = this.gridSnap(evt);
-        if (this.nowDrawing) {
-            this.lines[this.lines.length - 1][1] = currentPos;
-        }
-        else if (evt.buttons) {
+        if (evt.buttons) {
             if (this.moveStart.length && !this.equalsXY(this.moveStart, currentPos)) {
                 console.log(this.moveStart, currentPos);
-                this.lines.forEach(line => {
+                lines.forEach(line => {
                     for (let i = 0; i < 2; i++) {
                         if (this.equalsXY(line[i], this.moveStart)) line[i] = currentPos;
                     }
@@ -47,25 +51,48 @@ export class SvgEditComponent implements OnInit {
         }
     }
 
-    setVertex(evt: MouseEvent) {
-        console.log('cl', evt);
-        if (!this.moveStart.length) {
-            if (!this.nowDrawing) {
-                this.lines.push([this.gridSnap(evt), this.gridSnap(evt)]);
+    endMoveVertex(evt: MouseEvent) {
+        this.moveStart = [];
+    }
+
+    draw(evt: MouseEvent) {
+        const lines = this.structure[this.layer].lines;
+        const currentPos = this.gridSnap(evt);
+        if (evt.buttons) {
+            if (this.moveStart.length) {
+                lines[lines.length - 1][1] = currentPos;
+            } else {
+                lines.push([this.gridSnap(evt), this.gridSnap(evt)]);
             }
-            this.nowDrawing = !this.nowDrawing;
+            this.moveStart = currentPos;
         }
-        else {
+        else if (!evt.buttons) {
             this.moveStart = [];
         }
     }
 
-    mouseClick(evt: MouseEvent) {
-        if (this.tool === 0) this.setVertex(evt);
+    endDraw(evt: MouseEvent) {
+        this.moveStart = [];
+    }
+
+    setDoor(evt: MouseEvent) {
+    }
+
+    doNothing(evt: MouseEvent) {
+        return false;
     }
 
     mouseMove(evt: MouseEvent) {
-        if (this.tool === 0) this.updateVertex(evt);
+        const t = this.tool;
+        if (t === 0) this.draw(evt);
+        else if (t === 1) this.moveVertex(evt);
+        else if (t === 2) this.doNothing(evt);
     }
 
+    mouseUp(evt: MouseEvent) {
+        const t = this.tool;
+        if (t === 0) this.endDraw(evt);
+        else if (t === 1) this.endMoveVertex(evt);
+        else if (t === 2) this.setDoor(evt);
+    }
 }
