@@ -6,6 +6,7 @@ import { HttpModule } from '@angular/http';
 import { RouterModule, Routes } from '@angular/router';
 import { routing } from './app.routing';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { HashLocationStrategy, Location, LocationStrategy } from '@angular/common';
 
 import { AppComponent } from './app.component';
 import { SvgEditComponent } from './svg-edit/svg-edit.component';
@@ -30,7 +31,9 @@ import { MdButtonModule, MdCardModule, MdMenuModule, MdToolbarModule, MdIconModu
       MdSliderModule, MdSlideToggleModule, MdGridListModule, MdFormFieldModule, MdInputModule, MdProgressSpinnerModule,
       FlexLayoutModule
   ],
-  providers: [],
+  providers: [
+      Location, {provide: LocationStrategy, useClass: HashLocationStrategy}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
