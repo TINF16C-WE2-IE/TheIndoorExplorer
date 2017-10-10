@@ -1,6 +1,17 @@
-<svg style="border:1px red dotted;width:500px" viewBox="0 0 500 500" (mousemove)="mouseMove($event)"
-     (mouseup)="mouseClick($event)">
-    <svg:line *ngFor="let line of lines" stroke="black" [attr.x1]="line[0][0]" [attr.y1]="line[0][1]"
-              [attr.x2]="line[1][0]" [attr.y2]="line[1][1]"></svg:line>
+<svg style="border:1px red dotted;width:500px;" viewBox="0 0 500 500" (mousemove)="mouseMove($event)" id="editorCanvas"
+     (mouseup)="mouseUp($event)">
+     <svg:defs>
+        <svg:marker id="circle" markerWidth="8" markerHeight="8" refX="5" refY="5">
+            <svg:circle cx="5" cy="5" r="3" style="stroke: none; fill:#000000;"/>
+        </svg:marker>
+      </svg:defs>
+    <svg:line *ngFor="let wall of structure[level].walls" stroke="black" [attr.x1]="wall.a[0]" [attr.y1]="wall.a[1]" [attr.x2]="wall.b[0]" [attr.y2]="wall.b[1]" marker-end="url(#circle)" marker-start="url(#circle)"></svg:line>
+    <svg:rect *ngFor="let door of structure[level].doors" stroke="black" fill="none" [attr.x]="door.pos[0]-15" [attr.y]="door.pos[1]-5" width="30" height="10" [attr.transform]="'rotate('+getRotation(door.pos)+' '+door.pos[0]+' '+door.pos[1]+')'"></svg:rect>
 </svg>
+<<<<<<< HEAD
 <p>Click on the canvas to start drawing. Click and drag existing vertices to move them around. Desktop only.</p>
+=======
+<button (click)="tool=0">Edit</button>
+<button (click)="tool=1">Move</button>
+<button (click)="tool=2">Door</button>
+>>>>>>> master
