@@ -18,11 +18,14 @@ export class SvgEditComponent implements OnInit {
     currentPos = [];
     level = 0;
     tool = 0;
+    canvasOffset = [];
 
     constructor() {
     }
 
     ngOnInit() {
+        const rect = document.getElementById('editorCanvas').getBoundingClientRect();
+        this.canvasOffset = [rect.left, rect.top];
     }
 
     gridSnap(arr, threshold?: number) {
@@ -31,7 +34,7 @@ export class SvgEditComponent implements OnInit {
     }
 
     mouseGridSnap(evt) {
-        return this.gridSnap([evt.layerX, evt.layerY]);
+        return this.gridSnap([evt.layerX - this.canvasOffset[0], evt.layerY - this.canvasOffset[1]]);
     }
 
     equalsXY(a, b): boolean {
@@ -185,6 +188,7 @@ export class SvgEditComponent implements OnInit {
     }
 
     mouseUp(evt: MouseEvent) {
+        console.log(this.structure);
         const t = this.tool;
         if (t === 0) this.endDraw(evt);
         else if (t === 1) this.endMoveVertex(evt);
