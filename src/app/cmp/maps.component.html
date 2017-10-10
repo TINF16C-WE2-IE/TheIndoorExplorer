@@ -1,0 +1,29 @@
+<md-card>
+    <md-card-header>
+        <md-card-title>Maps List</md-card-title>
+    </md-card-header>
+
+
+    <md-card-content>
+
+        <!-- two line list -->
+        <md-list>
+          <md-list-item *ngFor="let map of modelSvc.mapsList">
+            <table>
+
+            </table>
+            <h3 mdLine> {{map.name}} </h3>
+            <p mdLine>
+              <span> {{map.id}} </span>
+            </p>
+          </md-list-item>
+        </md-list>
+    </md-card-content>
+
+    <md-card-actions>
+    </md-card-actions>
+
+    <md-card-footer>
+
+    </md-card-footer>
+</md-card>

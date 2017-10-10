@@ -43,3 +43,8 @@ body {
 .content-image {
     size: 50%;
 }
+
+.mat-table {
+  overflow: auto;
+  max-height: 500px;
+}
