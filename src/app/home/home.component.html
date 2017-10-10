@@ -1,14 +1,19 @@
 
-    <md-grid-list cols="1" rows="2" rowHeight="300px">
-        <md-grid-tile colspan="1" rowspan="1">
-            <app-content-login></app-content-login>
-        </md-grid-tile>
-        <md-grid-tile colspan="1" rowspan="2">
-            <app-content-updates></app-content-updates>
-        </md-grid-tile>
-    </md-grid-list>
+<div class="container"
+     fxLayout
+     fxLayout.xs="column"
+     fxLayoutAlign="center"
+     fxLayoutGap="10px"
+     fxLayoutGap.xs="10px">
+  <div class="item item-1" fxFlex="50%" align="center">
+      <app-content-login></app-content-login>
+  </div>
+  <div class="item item-2" fxFlex="50%" align="center">
+      <app-content-updates></app-content-updates>
+  </div>
+</div>
 
-
+<br>
 
 <md-card>
     <md-card-content>

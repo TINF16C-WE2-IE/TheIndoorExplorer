@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule, Routes } from '@angular/router';
 import { routing } from './app.routing';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { AppComponent } from './app.component';
 import { SvgEditComponent } from './svg-edit/svg-edit.component';
@@ -26,7 +27,8 @@ import { MdButtonModule, MdCardModule, MdMenuModule, MdToolbarModule, MdIconModu
   imports: [
       BrowserModule, FormsModule, HttpModule, routing,
       BrowserAnimationsModule, MdButtonModule, MdMenuModule, MdCardModule, MdToolbarModule, MdIconModule,
-      MdSliderModule, MdSlideToggleModule, MdGridListModule, MdFormFieldModule, MdInputModule, MdProgressSpinnerModule
+      MdSliderModule, MdSlideToggleModule, MdGridListModule, MdFormFieldModule, MdInputModule, MdProgressSpinnerModule,
+      FlexLayoutModule
   ],
   providers: [],
   bootstrap: [AppComponent]
