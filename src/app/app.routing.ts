@@ -21,7 +21,7 @@ export const routes: Routes = [
         component: MapsComponent,
     },
     {
-        path: 'editor/:buildingId',
+        path: 'editor/:mapId',
         component: SvgEditComponent,
     },
 ];

@@ -1,9 +1,10 @@
 <mat-toolbar color="primary">
-    <span>IeClient</span>
+    <span>Indoor Explorer Client</span>
 
     <span class="example-spacer"></span>
-    <mat-icon class="example-icon">favorite</mat-icon>
-    <mat-icon class="example-icon">delete</mat-icon>
+    <button mat-fab [routerLink]="['/home']">
+        <mat-icon class="example-icon" color="'acccent'">home</mat-icon>
+    </button>
 </mat-toolbar>
 
 <br><br>

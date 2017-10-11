@@ -1,4 +1,8 @@
+import { RequestService } from './../svc/request.service';
+import { ModelService } from './../svc/model.service';
+import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import {Component, OnInit} from '@angular/core';
+import 'rxjs/add/operator/switchMap';
 
 @Component({
     selector: 'app-svg-edit',
@@ -20,10 +24,27 @@ export class SvgEditComponent implements OnInit {
     tool = 0;
     canvasOffset = [];
 
-    constructor() {
+    constructor(private rqstSvc: RequestService, public modelSvc: ModelService,
+                private route: ActivatedRoute, private router: Router) {
     }
 
     ngOnInit() {
+
+        this.route.params.subscribe(
+              params => {
+                return this.rqstSvc.get(RequestService.LIST_MAP_DETAILS + '&mapid=' + params['mapId']).subscribe(
+                    resp => {
+                        console.log('got response map details: ', resp);
+                        if (resp !== null) {
+
+                            // currently, the data is applied directly to the structure.
+                            this.structure = resp.map;
+                        }
+                    }
+                );
+            }
+        );
+
         const rect = document.getElementById('editorCanvas').getBoundingClientRect();
         this.canvasOffset = [rect.left, rect.top];
     }

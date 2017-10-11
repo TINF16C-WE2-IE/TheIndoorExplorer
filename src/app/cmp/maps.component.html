@@ -5,18 +5,40 @@
 
 
     <mat-card-content>
-
-        <!-- two line list -->
         <mat-list>
-          <mat-list-item *ngFor="let map of modelSvc.mapsList">
-            <table>
+            <mat-list-item style="padding-bottom: 10px;">
+                <mat-card>
+                    <mat-card-content>
+                        <table style="width: 100%">
+                            <tr>
 
-            </table>
-            <h3 mdLine> {{map.name}} </h3>
-            <p mdLine>
-              <span> {{map.id}} </span>
-            </p>
-          </mat-list-item>
+                                <td><h3>Id</h3></td>
+                                <td><h3>Name</h3></td>
+                                <td><h3>Actions</h3></td>
+                            </tr>
+                        </table>
+                    </mat-card-content>
+                </mat-card>
+            </mat-list-item>
+
+            <mat-list-item *ngFor="let map of modelSvc.mapsList; let index = i;">
+                <mat-card>
+                    <mat-card-content>
+                        <table style="width: 100%">
+                            <tr>
+
+                                <td>{{map.id}}</td>
+                                <td>{{map.name}}</td>
+                                <td>
+                                    <button mat-fab [routerLink]="['/editor', '' + map.id]">
+                                        <mat-icon class="example-icon" color="'acccent'">build</mat-icon>
+                                    </button>
+                                </td>
+                            </tr>
+                        </table>
+                    </mat-card-content>
+                </mat-card>
+            </mat-list-item>
         </mat-list>
     </mat-card-content>
 
