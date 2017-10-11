@@ -1,44 +1,54 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
-import { RouterModule, Routes } from '@angular/router';
-import { routing } from './app.routing';
-import { FlexLayoutModule } from '@angular/flex-layout';
-import { HashLocationStrategy, Location, LocationStrategy } from '@angular/common';
+import {BrowserModule} from '@angular/platform-browser';
+import {NgModule} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {HttpModule} from '@angular/http';
+import {routing} from './app.routing';
+import {FlexLayoutModule} from '@angular/flex-layout';
+import {HashLocationStrategy, Location, LocationStrategy} from '@angular/common';
 
-import { AppComponent } from './app.component';
-import { SvgEditComponent } from './svg-edit/svg-edit.component';
-import { LoginComponent } from './cmp/login.component';
-import { UpdatesComponent } from './cmp/updates.component';
-import { FooterComponent } from './cmp/footer.component';
-import { HomeComponent } from './cmp/home.component';
-import { MapsComponent } from './cmp/maps.component';
+import {AppComponent} from './app.component';
+import {SvgEditComponent} from './svg-edit/svg-edit.component';
+import {LoginComponent} from './cmp/login.component';
+import {UpdatesComponent} from './cmp/updates.component';
+import {FooterComponent} from './cmp/footer.component';
+import {HomeComponent} from './cmp/home.component';
+import {MapsComponent} from './cmp/maps.component';
 
-import { RequestService } from './svc/request.service';
-import { ModelService } from './svc/model.service';
-
-
+import {RequestService} from './svc/request.service';
+import {ModelService} from './svc/model.service';
 // Angular Material
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MdButtonModule, MdCardModule, MdMenuModule, MdToolbarModule, MdIconModule, MdSliderModule,
-          MdSlideToggleModule, MdGridListModule, MdFormFieldModule, MdInputModule, MdProgressSpinnerModule,
-          MdTableModule } from '@angular/material';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {
+    MatButtonModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatGridListModule,
+    MatIconModule,
+    MatInputModule,
+    MatMenuModule,
+    MatProgressSpinnerModule,
+    MatSliderModule,
+    MatSlideToggleModule,
+    MatTableModule,
+    MatToolbarModule
+} from '@angular/material';
 
 @NgModule({
-  declarations: [
-      AppComponent,
-      SvgEditComponent, LoginComponent, UpdatesComponent, FooterComponent, HomeComponent, MapsComponent
-  ],
-  imports: [
-      BrowserModule, FormsModule, HttpModule, routing,
-      BrowserAnimationsModule, MdButtonModule, MdMenuModule, MdCardModule, MdToolbarModule, MdIconModule,
-      MdSliderModule, MdSlideToggleModule, MdGridListModule, MdFormFieldModule, MdInputModule, MdProgressSpinnerModule,
-      FlexLayoutModule, MdTableModule
-  ],
-  providers: [
-      Location, {provide: LocationStrategy, useClass: HashLocationStrategy}, RequestService, ModelService
-  ],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent,
+        SvgEditComponent, LoginComponent, UpdatesComponent, FooterComponent, HomeComponent, MapsComponent
+    ],
+    imports: [
+        BrowserModule, FormsModule, HttpModule, routing, BrowserAnimationsModule,
+        MatButtonModule, MatCardModule, MatMenuModule, MatToolbarModule, MatIconModule, MatSliderModule,
+        MatSlideToggleModule, MatGridListModule, MatFormFieldModule, MatInputModule, MatProgressSpinnerModule,
+        MatTableModule,
+        FlexLayoutModule
+    ],
+    providers: [
+        Location, {provide: LocationStrategy, useClass: HashLocationStrategy}, RequestService, ModelService
+    ],
+    bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}
