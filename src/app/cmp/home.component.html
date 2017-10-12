@@ -6,36 +6,19 @@
      fxLayoutGap="10px"
      fxLayoutGap.xs="10px">
   <div class="item item-1" fxFlex="50%" align="center">
-      <app-content-login></app-content-login>
+
+      <div>
+          <app-content-login></app-content-login>
+
+          <br>
+          <div style="padding-top: 100px">
+              <button mat-raised-button [routerLink]="['/maps']" color="accent">
+                  Explore Maps
+              </button>
+          </div>
+      </div>
   </div>
   <div class="item item-2" fxFlex="50%" align="center">
       <app-content-updates></app-content-updates>
   </div>
 </div>
-
-<br>
-
-<mat-card>
-    <mat-card-content>
-      <button mat-fab [routerLink]="['/maps']">Maps</button>
-
-          <mat-slide-toggle
-                          class="example-margin"
-                          color="accent"
-                          checked="true"
-                          disabled="false">
-                        Slide me!
-                      </mat-slide-toggle>
-  </mat-card-content>
-</mat-card>
-
-<mat-card>
-    <mat-card-content>
-        <mat-progress-spinner
-          style="margin: 0 10px"
-          [color]="'primary'"
-          [mode]="'determinate'"
-          [value]="82">
-      </mat-progress-spinner>
-    </mat-card-content>
-</mat-card>

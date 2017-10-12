@@ -32,7 +32,9 @@ export class SvgEditComponent implements OnInit {
 
         this.route.params.subscribe(
               params => {
-                return this.rqstSvc.get(RequestService.LIST_MAP_DETAILS + '&mapid=' + params['mapId']).subscribe(
+                return this.rqstSvc.get(
+                    RequestService.LIST_MAP_DETAILS, {'mapid': params['mapId']}
+                ).subscribe(
                     resp => {
                         console.log('got response map details: ', resp);
                         if (resp !== null) {

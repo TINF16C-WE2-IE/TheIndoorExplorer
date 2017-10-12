@@ -12,9 +12,8 @@ export class MapsComponent {
 
     constructor(private rqstSvc: RequestService, public modelSvc: ModelService, private changeRef: ChangeDetectorRef) {
 
-        this.rqstSvc.get(RequestService.LIST_MAPS).subscribe(
+        this.rqstSvc.get(RequestService.LIST_MAPS, {}).subscribe(
             resp => {
-                console.log('got response maps: ', resp);
                 if (resp) {
                     this.modelSvc.mapsList = resp;
                 }

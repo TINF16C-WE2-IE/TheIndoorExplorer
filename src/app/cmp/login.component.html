@@ -1,24 +1,28 @@
 <mat-card class="example-card">
     <mat-card-header>
-        <mat-card-title>Sign In</mat-card-title>
+        <mat-card-title><h3>Sign In</h3></mat-card-title>
     </mat-card-header>
 
 
     <mat-card-content>
-        <table class="example-full-width" cellspacing="0">
+        <table cellspacing="0" style="width: 100%; padding-left: 30px">
+
             <tr>
                 <td>
                     <mat-form-field class="example-full-width">
-                        <input matInput placeholder="Username">
+                        <input matInput placeholder="Username" [(ngModel)]="usrname">
                     </mat-form-field>
                 </td>
             </tr>
             <tr>
                 <td>
                     <mat-form-field class="example-full-width">
-                        <input matInput placeholder="Password">
+                        <input matInput placeholder="Password" [(ngModel)]="psswd">
                     </mat-form-field>
                 </td>
+            </tr>
+            <tr>
+                <button mat-raised-button color="primary">Login</button>
             </tr>
         </table>
   </mat-card-content>

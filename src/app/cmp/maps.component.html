@@ -6,37 +6,46 @@
 
     <mat-card-content>
         <mat-list>
-            <mat-list-item style="padding-bottom: 10px;">
+            <mat-list-item>
+
                 <mat-card>
                     <mat-card-content>
-                        <table style="width: 100%">
-                            <tr>
-
-                                <td><h3>Id</h3></td>
-                                <td><h3>Name</h3></td>
-                                <td><h3>Actions</h3></td>
-                            </tr>
-                        </table>
+                        <div fxLayout="row" fxLayoutAlign="space-evenly center" >
+                            <div class="item item-1" fxFlex="20%" align="center">
+                                <h3>Id</h3>
+                            </div>
+                            <div class="item item-2" fxFlex="20%" align="center">
+                                <h3>Name</h3>
+                            </div>
+                            <div class="item item-3" fxFlex="20%" align="center">
+                                <h3>Actions</h3>
+                            </div>
+                        </div>
                     </mat-card-content>
                 </mat-card>
             </mat-list-item>
 
+            <br><br>
+
             <mat-list-item *ngFor="let map of modelSvc.mapsList; let index = i;">
+
                 <mat-card>
                     <mat-card-content>
-                        <table style="width: 100%">
-                            <tr>
-
-                                <td>{{map.id}}</td>
-                                <td>{{map.name}}</td>
-                                <td>
-                                    <button mat-fab [routerLink]="['/editor', '' + map.id]">
-                                        <mat-icon class="example-icon" color="'acccent'">build</mat-icon>
-                                    </button>
-                                </td>
-                            </tr>
-                        </table>
+                        <div fxLayout="row" fxLayoutAlign="space-evenly center" >
+                            <div class="item item-1" fxFlex="20%" align="center">
+                                {{map.id}}
+                            </div>
+                            <div class="item item-2" fxFlex="20%" align="center">
+                                {{map.name}}
+                            </div>
+                            <div class="item item-3" fxFlex="20%" align="center">
+                                <button mat-raised-button [routerLink]="['/editor', '' + map.id]" color="primary">
+                                    Edit
+                                </button>
+                            </div>
+                        </div>
                     </mat-card-content>
+
                 </mat-card>
             </mat-list-item>
         </mat-list>
