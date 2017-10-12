@@ -6,8 +6,8 @@ import { Component } from '@angular/core';
 })
 export class LoginComponent {
 
-    private usrname = '';
-    private psswd = '';
+    public usrname = '';
+    public psswd = '';
 
     constructor() {
 
