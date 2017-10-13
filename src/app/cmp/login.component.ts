@@ -12,7 +12,7 @@ export class LoginComponent {
 
     }
 
-    private performLogin(provider: string): void {
+    public performLogin(provider: string): void {
         window.location.href = RequestService.URL_LOGIN_ENDPOINT + this.rqstSvc.uriEncodeObject({'providerId': provider});
     }
 }
