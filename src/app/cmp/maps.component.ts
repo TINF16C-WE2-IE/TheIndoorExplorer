@@ -1,3 +1,4 @@
+import { MessageService } from './../svc/message.service';
 import {ChangeDetectorRef, Component} from '@angular/core';
 import 'rxjs/add/observable/of';
 
@@ -10,7 +11,8 @@ import {RequestService} from '../svc/request.service';
 })
 export class MapsComponent {
 
-    constructor(private rqstSvc: RequestService, public modelSvc: ModelService, private changeRef: ChangeDetectorRef) {
+    constructor(private msgSvc: MessageService, private rqstSvc: RequestService, public modelSvc: ModelService,
+                private changeRef: ChangeDetectorRef) {
 
         this.rqstSvc.get(RequestService.LIST_MAPS, {}).subscribe(
             resp => {
@@ -22,7 +24,7 @@ export class MapsComponent {
     }
 
     public setFavorite(mapId: string): void {
-        console.log('TODO: set favorite map. Send request to server.');
+        this.msgSvc.notify('TODO: set favorite map. Send request to server.');
 
         const selectedMap = this.modelSvc.mapsList.find(element => element.id === mapId);
         if (selectedMap !== undefined) {

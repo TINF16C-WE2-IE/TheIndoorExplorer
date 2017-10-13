@@ -31,7 +31,8 @@ import {
     MatSliderModule,
     MatSlideToggleModule,
     MatTableModule,
-    MatToolbarModule
+    MatToolbarModule,
+    MatSnackBarModule
 } from '@angular/material';
 
 @NgModule({
@@ -43,7 +44,7 @@ import {
         BrowserModule, FormsModule, HttpModule, routing, BrowserAnimationsModule,
         MatButtonModule, MatCardModule, MatMenuModule, MatToolbarModule, MatIconModule, MatSliderModule,
         MatSlideToggleModule, MatGridListModule, MatFormFieldModule, MatInputModule, MatProgressSpinnerModule,
-        MatTableModule,
+        MatTableModule, MatSnackBarModule,
         FlexLayoutModule
     ],
     providers: [
