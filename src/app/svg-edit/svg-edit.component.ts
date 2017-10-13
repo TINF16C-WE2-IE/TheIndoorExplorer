@@ -11,16 +11,9 @@ import 'rxjs/add/operator/switchMap';
 })
 export class SvgEditComponent implements OnInit {
 
-    structure = [
-        {
-            'walls' : [],
-            'doors' : []
-        }
-    ];
     moveStart = [];
     movingObjects = [];
     currentPos = [];
-    level = 0;
     tool = 0;
     canvasOffset = [];
 
@@ -39,8 +32,8 @@ export class SvgEditComponent implements OnInit {
                         console.log('got response map details: ', resp);
                         if (resp !== null) {
 
-                            // currently, the data is applied directly to the structure.
-                            this.structure = resp.map;
+                            // currently, the data is applied directly to the model data
+                            this.modelSvc.curEditMap = resp;
                         }
                     }
                 );
@@ -66,7 +59,7 @@ export class SvgEditComponent implements OnInit {
 
     getWallsAtVertex(pos) {
         const wallsAtVertex = [];
-        this.structure[this.level].walls.forEach(wall => {
+        this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls.forEach(wall => {
             if (this.equalsXY(wall.a, pos)) wallsAtVertex.push(wall);
             if (this.equalsXY(wall.b, pos)) wallsAtVertex.push(wall);
         });
@@ -100,13 +93,13 @@ export class SvgEditComponent implements OnInit {
     splitLine(wall, splitPos) {
         const a = wall.a;
         wall.a = splitPos;
-        this.structure[this.level].walls.push({'a': a, 'b': splitPos});
-        console.log(this.structure[this.level].walls);
+        this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls.push({'a': a, 'b': splitPos});
+        console.log(this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls);
     }
 
     getNearbyLine(pos) {
         let foundLine = null;
-        this.structure[this.level].walls.forEach(wall => {
+        this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls.forEach(wall => {
             if (!this.equalsXY(wall.a, wall.b)) {
                 const xdiff = wall.b[0] - wall.a[0];
                 const ydiff = wall.b[1] - wall.a[1];
@@ -132,8 +125,8 @@ export class SvgEditComponent implements OnInit {
     }
 
     moveVertex(evt: MouseEvent) {
-        const walls = this.structure[this.level].walls;
-        const doors = this.structure[this.level].doors;
+        const walls = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls;
+        const doors = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].doors;
         if (evt.buttons) {
             if (this.moveStart.length) {
                 this.movingObjects.forEach(obj => {
@@ -168,7 +161,7 @@ export class SvgEditComponent implements OnInit {
     }
 
     draw(evt: MouseEvent) {
-        const walls = this.structure[this.level].walls;
+        const walls = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls;
         if (evt.buttons) {
             if (this.moveStart.length) {
                 walls[walls.length - 1].b = this.currentPos;
@@ -187,8 +180,8 @@ export class SvgEditComponent implements OnInit {
     }
 
     setDoor(evt: MouseEvent) {
-        const walls = this.structure[this.level].walls;
-        const doors = this.structure[this.level].doors;
+        const walls = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls;
+        const doors = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].doors;
 
         let wall = null;
         if (this.isExistingVertex(this.currentPos) || (wall = this.getNearbyLine(this.currentPos))) {
@@ -211,10 +204,23 @@ export class SvgEditComponent implements OnInit {
     }
 
     mouseUp(evt: MouseEvent) {
-        console.log(this.structure);
         const t = this.tool;
         if (t === 0) this.endDraw(evt);
         else if (t === 1) this.endMoveVertex(evt);
         else if (t === 2) this.setDoor(evt);
+    }
+
+    private saveCurrentMap() {
+        this.rqstSvc.post(
+            RequestService.LIST_MAP_SAVE, {'map': this.modelSvc.curEditMap}
+        ).subscribe(
+            resp => {
+                console.log('got response map-save: ', resp);
+                if (resp !== null) {
+
+                    // TODO
+                }
+            }
+        );
     }
 }

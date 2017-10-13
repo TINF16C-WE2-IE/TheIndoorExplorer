@@ -16,6 +16,7 @@ import {MapsComponent} from './cmp/maps.component';
 
 import {RequestService} from './svc/request.service';
 import {ModelService} from './svc/model.service';
+import {MessageService} from './svc/message.service';
 // Angular Material
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {
@@ -46,7 +47,8 @@ import {
         FlexLayoutModule
     ],
     providers: [
-        Location, {provide: LocationStrategy, useClass: HashLocationStrategy}, RequestService, ModelService
+        Location, {provide: LocationStrategy, useClass: HashLocationStrategy}, RequestService, ModelService,
+        MessageService
     ],
     bootstrap: [AppComponent]
 })

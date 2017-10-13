@@ -1,3 +1,4 @@
+import { MessageService } from './../svc/message.service';
 import { Component } from '@angular/core';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
@@ -8,13 +9,7 @@ import 'rxjs/add/operator/map';
 })
 export class HomeComponent {
 
-    myData: Array<any>;
-
-    constructor(private http: Http) {
-
-      this.http.get('https://jsonplaceholder.typicode.com/photos')
-        .map(response => response.json())
-        .subscribe(res => this.myData = res);
+    constructor(private msgSvc: MessageService, private http: Http) {
 
     }
 }

@@ -20,4 +20,13 @@ export class MapsComponent {
             }
         );
     }
+
+    private setFavorite(mapId: string): void {
+        console.log('TODO: set favorite map. Send request to server.');
+
+        const selectedMap = this.modelSvc.mapsList.find(element => element.id === mapId);
+        if (selectedMap !== undefined) {
+            // TODO.
+        }
+    }
 }

@@ -1,3 +1,5 @@
+import { RequestService } from './../svc/request.service';
+import { ModelService } from './../svc/model.service';
 import { Component } from '@angular/core';
 
 @Component({
@@ -6,12 +8,11 @@ import { Component } from '@angular/core';
 })
 export class LoginComponent {
 
-    public usrname = '';
-    public psswd = '';
-
-    constructor() {
+    constructor(private rqstSvc: RequestService, public modelSvc: ModelService) {
 
     }
 
-
+    private performLogin(provider: string): void {
+        window.location.href = RequestService.URL_LOGIN_ENDPOINT + this.rqstSvc.uriEncodeObject({'providerId': provider});
+    }
 }
