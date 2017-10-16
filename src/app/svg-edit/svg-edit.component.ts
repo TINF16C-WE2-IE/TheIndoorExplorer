@@ -1,6 +1,6 @@
-import { RequestService } from './../svc/request.service';
-import { ModelService } from './../svc/model.service';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import {RequestService} from '../svc/request.service';
+import {ModelService} from '../svc/model.service';
+import {ActivatedRoute, Router} from '@angular/router';
 import {Component, OnInit} from '@angular/core';
 import 'rxjs/add/operator/switchMap';
 
@@ -24,7 +24,7 @@ export class SvgEditComponent implements OnInit {
     ngOnInit() {
 
         this.route.params.subscribe(
-              params => {
+            params => {
                 return this.rqstSvc.get(
                     RequestService.LIST_MAP_DETAILS, {'mapid': params['mapId']}
                 ).subscribe(
@@ -44,18 +44,11 @@ export class SvgEditComponent implements OnInit {
         this.canvasOffset = [rect.left, rect.top];
     }
 
-    gridSnap(arr, threshold?: number) {
-        if (!threshold) threshold = 10;
-        return [Math.round(arr[0] / threshold) * threshold, Math.round(arr[1] / threshold) * threshold];
-    }
 
     mouseGridSnap(evt) {
         return this.gridSnap([evt.layerX - this.canvasOffset[0], evt.layerY - this.canvasOffset[1]]);
     }
 
-    equalsXY(a, b): boolean {
-        return a[0] === b[0] && a[1] === b[1];
-    }
 
     getWallsAtVertex(pos) {
         const wallsAtVertex = [];
@@ -68,26 +61,6 @@ export class SvgEditComponent implements OnInit {
 
     isExistingVertex(pos): boolean {
         return this.getWallsAtVertex(pos).length !== 0;
-    }
-
-    getRotation(pos): number {
-        const walls = this.getWallsAtVertex(pos);
-        let rotations = 0;
-        walls.forEach(wall => {
-            if (!this.equalsXY(wall.a, wall.b)) {
-                const xdiff = wall.b[0] - wall.a[0];
-                const ydiff = wall.b[1] - wall.a[1];
-
-                if (xdiff === 0) {
-                    rotations += 90;
-                }
-                else {
-                    const rotation = Math.atan(ydiff / xdiff) / Math.PI * 180;
-                    rotations += rotation;
-                }
-            }
-        });
-        return rotations / walls.length;
     }
 
     splitLine(wall, splitPos) {
@@ -106,7 +79,7 @@ export class SvgEditComponent implements OnInit {
 
                 if (xdiff === 0) {
                     const shift = (this.currentPos[1] - wall.a[1]) / ydiff;
-                    if (this.currentPos[0] === wall.a[0] &&  shift >= 0 && shift <= 1) {
+                    if (this.currentPos[0] === wall.a[0] && shift >= 0 && shift <= 1) {
                         foundLine = wall;
                     }
                 }
@@ -191,9 +164,6 @@ export class SvgEditComponent implements OnInit {
         console.log(doors);
     }
 
-    doNothing(evt: MouseEvent) {
-        return false;
-    }
 
     mouseMove(evt: MouseEvent) {
         this.currentPos = this.mouseGridSnap(evt);
@@ -207,7 +177,6 @@ export class SvgEditComponent implements OnInit {
         const t = this.tool;
         if (t === 0) this.endDraw(evt);
         else if (t === 1) this.endMoveVertex(evt);
-        else if (t === 2) this.setDoor(evt);
     }
 
     private saveCurrentMap() {
