@@ -1,3 +1,7 @@
+import { Map } from './../model/map.class';
+import { Vertex } from './Vertex.class';
+import { Wall } from './Wall.class';
+import { Door } from './Door.class';
 import { RequestService } from './../svc/request.service';
 import { ModelService } from './../svc/model.service';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -11,9 +15,8 @@ import 'rxjs/add/operator/switchMap';
 })
 export class SvgEditComponent implements OnInit {
 
-    moveStart = [];
-    movingObjects = [];
-    currentPos = [];
+    movingVertex: Vertex = null;
+    currentPos: Vertex = new Vertex(0, 0);
     tool = 0;
     canvasOffset = [];
 
@@ -44,77 +47,54 @@ export class SvgEditComponent implements OnInit {
         this.canvasOffset = [rect.left, rect.top];
     }
 
-    gridSnap(arr, threshold?: number) {
-        if (!threshold) threshold = 10;
-        return [Math.round(arr[0] / threshold) * threshold, Math.round(arr[1] / threshold) * threshold];
+    deserialize(from) {
+        const to = this.modelSvc.curEditMap;
+        this.deserializeWallType(from, to, 'walls');
+        this.deserializeWallType(from, to, 'doors');
     }
 
-    mouseGridSnap(evt) {
-        return this.gridSnap([evt.layerX - this.canvasOffset[0], evt.layerY - this.canvasOffset[1]]);
-    }
-
-    equalsXY(a, b): boolean {
-        return a[0] === b[0] && a[1] === b[1];
-    }
-
-    getWallsAtVertex(pos) {
-        const wallsAtVertex = [];
-        this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls.forEach(wall => {
-            if (this.equalsXY(wall.a, pos)) wallsAtVertex.push(wall);
-            if (this.equalsXY(wall.b, pos)) wallsAtVertex.push(wall);
-        });
-        return wallsAtVertex;
-    }
-
-    isExistingVertex(pos): boolean {
-        return this.getWallsAtVertex(pos).length !== 0;
-    }
-
-    getRotation(pos): number {
-        const walls = this.getWallsAtVertex(pos);
-        let rotations = 0;
-        walls.forEach(wall => {
-            if (!this.equalsXY(wall.a, wall.b)) {
-                const xdiff = wall.b[0] - wall.a[0];
-                const ydiff = wall.b[1] - wall.a[1];
-
-                if (xdiff === 0) {
-                    rotations += 90;
-                }
-                else {
-                    const rotation = Math.atan(ydiff / xdiff) / Math.PI * 180;
-                    rotations += rotation;
-                }
+    deserializeWallType(from, to: Map, type: string) {
+        from[type].forEach(wall => {
+            let obj = wall;
+            if (type === 'walls') {
+                obj = new Wall(new Vertex(wall.a.x, wall.a.y).getExistingOrMe(from), new Vertex(wall.b.x, wall.b.y));
+            }
+            else if (type === 'doors') {
+                obj = new Door(new Vertex(wall.a.x, wall.a.y), new Vertex(wall.b.x, wall.b.y));
+                obj.label = wall.label;
             }
         });
-        return rotations / walls.length;
     }
 
-    splitLine(wall, splitPos) {
+    // not tested
+    splitLine(wall: Wall, splitPos: Vertex) {
         const a = wall.a;
         wall.a = splitPos;
-        this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls.push({'a': a, 'b': splitPos});
+        this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls.push(new Wall(a, splitPos));
         console.log(this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls);
     }
 
-    getNearbyLine(pos) {
+    // not tested
+    getNearbyWall(pos) {
         let foundLine = null;
         this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls.forEach(wall => {
-            if (!this.equalsXY(wall.a, wall.b)) {
-                const xdiff = wall.b[0] - wall.a[0];
-                const ydiff = wall.b[1] - wall.a[1];
+            if (!wall.a.equals(wall.b)) {
+                const xdiff = wall.b.x - wall.a.y;
+                const ydiff = wall.b.y - wall.a.y;
 
                 if (xdiff === 0) {
-                    const shift = (this.currentPos[1] - wall.a[1]) / ydiff;
-                    if (this.currentPos[0] === wall.a[0] &&  shift >= 0 && shift <= 1) {
+                    const shift = (this.currentPos.y - wall.a.y) / ydiff;
+                    if (this.currentPos.x === wall.a.x &&  shift >= 0 && shift <= 1) {
                         foundLine = wall;
                     }
                 }
                 else {
-                    const shift = (this.currentPos[0] - wall.a[0]) / xdiff;
+                    const shift = (this.currentPos.x - wall.a.x) / xdiff;
                     if (shift >= 0 && shift <= 1) {
-                        const deducedY = ydiff * shift + wall.a[1];
-                        if (this.equalsXY(this.gridSnap([this.currentPos[0], deducedY], 20), this.gridSnap(this.currentPos, 20))) {
+                        const deducedY = ydiff * shift + wall.a.y;
+                        const v1: Vertex = new Vertex(0, 0).gridSnap([this.currentPos.x, this.currentPos.y], 20);
+                        const v2: Vertex = new Vertex(0, 0).gridSnap([this.currentPos.x, deducedY], 20);
+                        if (v1.equals(v2)) {
                             foundLine = wall;
                         }
                     }
@@ -125,70 +105,38 @@ export class SvgEditComponent implements OnInit {
     }
 
     moveVertex(evt: MouseEvent) {
-        const walls = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls;
-        const doors = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].doors;
+        const struct = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel];
         if (evt.buttons) {
-            if (this.moveStart.length) {
-                this.movingObjects.forEach(obj => {
-                    if (obj.pos) obj.pos = this.currentPos;
-                    if (obj.a) {
-                        if (this.equalsXY(obj.a, this.moveStart)) obj.a = this.currentPos;
-                        if (this.equalsXY(obj.b, this.moveStart)) obj.b = this.currentPos;
-                    }
-                });
+            if (this.movingVertex) {
+                this.movingVertex.fromArray(this.currentPos.toArray());
             }
             else {
-                walls.forEach(wall => {
-                    if (this.equalsXY(wall.a, this.currentPos) || this.equalsXY(wall.b, this.currentPos)) {
-                        this.movingObjects.push(wall);
-                    }
-                });
-                doors.forEach(door => {
-                    if (this.equalsXY(door.pos, this.currentPos)) this.movingObjects.push(door);
-                });
+                this.movingVertex = this.currentPos.getExisting(struct);
             }
-            this.moveStart = this.currentPos;
-        }
-        else {
-            this.moveStart = [];
-            this.movingObjects = [];
         }
     }
 
     endMoveVertex(evt: MouseEvent) {
-        this.moveStart = [];
-        this.movingObjects = [];
+        this.movingVertex = null;
     }
 
-    draw(evt: MouseEvent) {
-        const walls = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls;
+    draw(evt: MouseEvent, type: string) {
+        const struct = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel];
+        const list = struct[type];
         if (evt.buttons) {
-            if (this.moveStart.length) {
-                walls[walls.length - 1].b = this.currentPos;
-            } else {
-                walls.push({'a': this.currentPos, 'b': this.currentPos});
-                this.moveStart = this.currentPos;
+            if (!this.movingVertex) {
+                let wall;
+                if (type === 'walls') wall = new Wall(this.currentPos.getExistingOrClone(struct), this.currentPos);
+                else if (type === 'doors') wall = new Door(this.currentPos.getExistingOrClone(struct), this.currentPos);
+                list.push(wall);
             }
         }
-        else {
-            this.moveStart = [];
-        }
     }
 
-    endDraw(evt: MouseEvent) {
-        this.moveStart = [];
-    }
-
-    setDoor(evt: MouseEvent) {
-        const walls = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls;
-        const doors = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].doors;
-
-        let wall = null;
-        if (this.isExistingVertex(this.currentPos) || (wall = this.getNearbyLine(this.currentPos))) {
-            if (wall) this.splitLine(wall, this.currentPos);
-            doors.push({'pos': this.currentPos, 'id': doors.length, 'label': 'Door'});
-        }
-        console.log(doors);
+    endDraw(evt: MouseEvent, type: string) {
+        const struct = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel];
+        const list = struct[type];
+        list[list.length - 1].b = list[list.length - 1].b.getExistingOrClone(struct);
     }
 
     doNothing(evt: MouseEvent) {
@@ -196,18 +144,18 @@ export class SvgEditComponent implements OnInit {
     }
 
     mouseMove(evt: MouseEvent) {
-        this.currentPos = this.mouseGridSnap(evt);
+        this.currentPos.mouseGridSnap(evt, this.canvasOffset);
         const t = this.tool;
-        if (t === 0) this.draw(evt);
+        if (t === 0) this.draw(evt, 'walls');
         else if (t === 1) this.moveVertex(evt);
-        else if (t === 2) this.doNothing(evt);
+        else if (t === 2) this.draw(evt, 'doors');
     }
 
     mouseUp(evt: MouseEvent) {
         const t = this.tool;
-        if (t === 0) this.endDraw(evt);
+        if (t === 0) this.endDraw(evt, 'walls');
         else if (t === 1) this.endMoveVertex(evt);
-        else if (t === 2) this.setDoor(evt);
+        else if (t === 2) this.endDraw(evt, 'doors');
     }
 
     private saveCurrentMap() {
