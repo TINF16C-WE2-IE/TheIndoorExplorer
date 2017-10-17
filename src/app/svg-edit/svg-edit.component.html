@@ -8,7 +8,7 @@
     <svg:line *ngFor="let wall of modelSvc.curEditMap.map[modelSvc.curEditMapLevel].walls" stroke="black"
               [attr.x1]="wall.a[0]" [attr.y1]="wall.a[1]" [attr.x2]="wall.b[0]" [attr.y2]="wall.b[1]"
               marker-end="url(#circle)" marker-start="url(#circle)" />
-    <svg:rect *ngFor="let door of modelSvc.curEditMap.map[modelSvc.curEditMapLevel].doors" stroke="black" fill="none"
+    <svg:rect *ngFor="let door of modelSvc.curEditMap.map[modelSvc.curEditMapLevel].portals" stroke="black" fill="none"
               [attr.x]="door.pos[0]-15" [attr.y]="door.pos[1]-5" width="30" height="10"
               [attr.transform]="'rotate('+getRotation(door.pos)+' '+door.pos[0]+' '+door.pos[1]+')'" />
 </svg>

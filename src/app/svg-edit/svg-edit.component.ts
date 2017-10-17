@@ -1,8 +1,9 @@
-import {RequestService} from '../svc/request.service';
-import {ModelService} from '../svc/model.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import {Component, OnInit} from '@angular/core';
+import { RequestService } from '../svc/request.service';
+import { ModelService } from '../svc/model.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import 'rxjs/add/operator/switchMap';
+import { Tool } from './tool.enum';
 
 @Component({
     selector: 'app-svg-edit',
@@ -14,29 +15,16 @@ export class SvgEditComponent implements OnInit {
     moveStart = [];
     movingObjects = [];
     currentPos = [];
-    tool = 0;
+    tool = Tool.CREATE_WALL;
     canvasOffset = [];
 
-    constructor(private rqstSvc: RequestService, public modelSvc: ModelService,
-                private route: ActivatedRoute, private router: Router) {
+    constructor(public modelSvc: ModelService, private route: ActivatedRoute, private router: Router) {
     }
 
     ngOnInit() {
-
         this.route.params.subscribe(
             params => {
-                return this.rqstSvc.get(
-                    RequestService.LIST_MAP_DETAILS, {'mapid': params['mapId']}
-                ).subscribe(
-                    resp => {
-                        console.log('got response map details: ', resp);
-                        if (resp !== null) {
-
-                            // currently, the data is applied directly to the model data
-                            this.modelSvc.curEditMap = resp;
-                        }
-                    }
-                );
+                this.modelSvc.load(params['mapId']);
             }
         );
 
@@ -47,20 +35,6 @@ export class SvgEditComponent implements OnInit {
 
     mouseGridSnap(evt) {
         return this.gridSnap([evt.layerX - this.canvasOffset[0], evt.layerY - this.canvasOffset[1]]);
-    }
-
-
-    getWallsAtVertex(pos) {
-        const wallsAtVertex = [];
-        this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls.forEach(wall => {
-            if (this.equalsXY(wall.a, pos)) wallsAtVertex.push(wall);
-            if (this.equalsXY(wall.b, pos)) wallsAtVertex.push(wall);
-        });
-        return wallsAtVertex;
-    }
-
-    isExistingVertex(pos): boolean {
-        return this.getWallsAtVertex(pos).length !== 0;
     }
 
     splitLine(wall, splitPos) {
@@ -99,7 +73,7 @@ export class SvgEditComponent implements OnInit {
 
     moveVertex(evt: MouseEvent) {
         const walls = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls;
-        const doors = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].doors;
+        const doors = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].portals;
         if (evt.buttons) {
             if (this.moveStart.length) {
                 this.movingObjects.forEach(obj => {
@@ -154,7 +128,7 @@ export class SvgEditComponent implements OnInit {
 
     setDoor(evt: MouseEvent) {
         const walls = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls;
-        const doors = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].doors;
+        const doors = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].portals;
 
         let wall = null;
         if (this.isExistingVertex(this.currentPos) || (wall = this.getNearbyLine(this.currentPos))) {
@@ -170,7 +144,6 @@ export class SvgEditComponent implements OnInit {
         const t = this.tool;
         if (t === 0) this.draw(evt);
         else if (t === 1) this.moveVertex(evt);
-        else if (t === 2) this.doNothing(evt);
     }
 
     mouseUp(evt: MouseEvent) {
@@ -179,17 +152,5 @@ export class SvgEditComponent implements OnInit {
         else if (t === 1) this.endMoveVertex(evt);
     }
 
-    private saveCurrentMap() {
-        this.rqstSvc.post(
-            RequestService.LIST_MAP_SAVE, {'map': this.modelSvc.curEditMap}
-        ).subscribe(
-            resp => {
-                console.log('got response map-save: ', resp);
-                if (resp !== null) {
 
-                    // TODO
-                }
-            }
-        );
-    }
 }
