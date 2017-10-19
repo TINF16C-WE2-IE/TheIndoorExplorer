@@ -1,3 +1,4 @@
+import { Pathfinder } from './../lib/pathfinder.class';
 import { Map } from './../model/map.class';
 import { Injectable } from '@angular/core';
 
@@ -13,5 +14,9 @@ export class ModelService {
         this.curEditMapLevel = 0;
         this.curEditMap = new Map(false, '', '', 0, [{walls: [], doors: []}]);
         this.mapsList = [];
+
+        // Pathfinding debug test
+        const p = new Pathfinder();
+        p.debugTest();
     }
 }
