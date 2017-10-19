@@ -22,7 +22,7 @@ export class ModelService {
 
 
     constructor(private rqstSvc: RequestService) {
-        this.mapsList = [new Map(false, '', '', 0, [new Floor([], [])])];
+        this.mapsList = []; //[new Map(false, '', '', 0, [new Floor([], [])])];
         this.curEditMapId = 0;
         this.curEditMapLevel = 0;
     }
@@ -33,6 +33,7 @@ export class ModelService {
                 console.log('got response map details: ', resp);
                 if (resp !== null) {
                     this.curEditMap = resp;
+                    console.log(this.curEditMap);
                 }
             });
     }
@@ -46,4 +47,5 @@ export class ModelService {
                 }
             });
     }
+
 }

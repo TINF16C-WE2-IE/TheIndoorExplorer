@@ -6,20 +6,29 @@ export class Floor {
     public portals: Portal[];
     public walls: Wall[];
 
-    constructor(walls: Wall[], portals: Portal[]) {
+    constructor(walls: Wall[], doors: Portal[]) {
         this.walls = walls;
-        this.portals = portals;
+        this.portals = doors;
     }
 
-    // public getAllPoints(): Set<Point> {
-    //     return new Set<Point>(
-    //         this.walls.map(wall => wall.getPoints())
-    //             .reduce((prev, current) => prev.concat(current))
-    //             .concat(
-    //                 this.walls.map(wall => wall.getPoints())
-    //                     .reduce((prev, current) => prev.concat(current)))
-    //     );
-    // }
+    public getWalls() {
+        console.log(this.walls);
+        return this.walls;
+    }
+
+    public getAllPoints(): Point[] {
+        return [...this.walls, ...this.portals]
+            .map(line => line.getPoints())
+            .reduce((prev, current) => prev.concat(current));
+    }
+
+    public getExistingPoint(p: Point) {
+        const points: Point[] = this.getAllPoints().filter(point => point.equals(p));
+        if (points.length > 1) {
+            console.log('ERR! Twin points found!', points);
+        }
+        return points.length > 0 ? points[0] : p;
+    }
 
     public joinPoints(master: Point, slave: Point) {
         [...this.walls, ...this.portals].filter(line => {
