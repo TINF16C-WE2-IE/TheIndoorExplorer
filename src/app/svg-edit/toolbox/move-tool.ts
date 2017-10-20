@@ -3,7 +3,7 @@ import { Point } from '../../model/point.class';
 
 export class MoveTool extends Tool {
     private point: Point = null;
-
+    public readonly name = 'Move';
 
     public onMouseDown(evt: MouseEvent) {
         // grab point below cursor

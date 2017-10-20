@@ -1,6 +1,5 @@
 import { Map } from '../model/map.class';
 import { Injectable } from '@angular/core';
-import { Floor } from '../model/floor.class';
 import { RequestService } from './request.service';
 
 
@@ -8,23 +7,31 @@ import { RequestService } from './request.service';
 export class ModelService {
 
     public mapsList: Map[];
-    public curEditMapId: number;
-    public curEditMapLevel: number;
+    public currentMapId: number;
+    public currentFloorId: number;
 
-    public get curEditMap(): Map {
-        return this.mapsList[this.curEditMapId];
+    public get currentMap(): Map {
+        return this.mapsList[this.currentMapId];
     }
 
-    public set curEditMap(value: Map) {
+    public set currentMap(value: Map) {
         this.mapsList.push(value);
-        this.curEditMapId = this.mapsList.length - 1;
+        this.currentMapId = this.mapsList.length - 1;
     }
 
+    public get currentFloor() {
+        if (this.currentMap) {
+            return this.currentMap.floors[this.currentFloorId];
+        }
+        else {
+            return null;
+        }
+    }
 
     constructor(private rqstSvc: RequestService) {
-        this.mapsList = []; //[new Map(false, '', '', 0, [new Floor([], [])])];
-        this.curEditMapId = 0;
-        this.curEditMapLevel = 0;
+        this.mapsList = [];
+        this.currentMapId = 0;
+        this.currentFloorId = 0;
     }
 
     public loadMap(mapId: string) {
@@ -32,14 +39,13 @@ export class ModelService {
             .subscribe(resp => {
                 console.log('got response map details: ', resp);
                 if (resp !== null) {
-                    this.curEditMap = resp;
-                    console.log(this.curEditMap);
+                    this.currentMap = new Map(resp);
                 }
             });
     }
 
     public saveMap() {
-        this.rqstSvc.post(RequestService.LIST_MAP_SAVE, {'map': this.curEditMap})
+        this.rqstSvc.post(RequestService.LIST_MAP_SAVE, {'map': this.currentMap})
             .subscribe(resp => {
                 console.log('got response map-save: ', resp);
                 if (resp !== null) {

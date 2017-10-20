@@ -1,28 +1,23 @@
 import { Floor } from './floor.class';
-import { Serializable } from './serializable.interface';
 
-
-export class Map implements Serializable<Map>{
-    public favorite: boolean;
-    public name: string;
+export class Map {
     public id: string;
-    public map: Floor[];
+    public name: string;
+    public floors: Floor[];
+    public favorite: boolean;
     public permission: number;
-
-    constructor(favorite: boolean, name: string, id: string, permission: number, map: Floor[]) {
-        this.name = name;
-        this.id = id;
-        this.map = map;
-        this.favorite = favorite;
-        this.permission = permission;
-    }
+    public visibility: number;
 
 
-    fromObject(obj: {favorite: boolean, name: string, id: string, permission: number, map: any[]}): Map {
-        return null;
-    }
-
-    toJson(): string {
-        return null;
+    constructor(obj: {
+        id: string, name: string, floors: any[],
+        favorite: boolean, permission: number, visibility: number
+    }) {
+        this.id = obj.id;
+        this.name = obj.name;
+        this.floors = obj.floors.map(floor_obj => new Floor(floor_obj));
+        this.favorite = obj.favorite;
+        this.permission = obj.permission;
+        this.visibility = obj.visibility;
     }
 }

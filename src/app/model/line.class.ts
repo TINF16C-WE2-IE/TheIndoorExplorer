@@ -1,5 +1,12 @@
 import { Point } from './point.class';
 
+export class LineEndpointsEqualError extends Error {
+    constructor(public line: Line) {
+        super('This line has the same point at both ends: ' + line);
+    }
+}
+
+
 export class Line {
 
     public p1: Point;
@@ -29,12 +36,5 @@ export class Line {
         if (this.p1.equals(this.p2)) {
             throw new LineEndpointsEqualError(this);
         }
-    }
-}
-
-
-export class LineEndpointsEqualError extends Error {
-    constructor(public line: Line) {
-        super('This line has the same point at both ends: ' + line);
     }
 }

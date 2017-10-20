@@ -1,10 +1,15 @@
 import { Mouse } from '../mouse.class';
-import { Floor } from '../../model/floor.class';
 import { Point } from '../../model/point.class';
+import { ModelService } from '../../svc/model.service';
 
 export abstract class Tool {
+    public readonly name;
 
-    constructor(protected floor: Floor, protected mouse: Mouse) {
+    protected get floor() {
+        return this.modelSvc.currentFloor;
+    }
+
+    constructor(protected mouse: Mouse, private modelSvc: ModelService) {
     }
 
 
