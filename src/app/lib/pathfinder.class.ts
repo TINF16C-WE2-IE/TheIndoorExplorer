@@ -25,11 +25,16 @@ export class Pathfinder {
         }
 
         closedList.push(from);
-        return this.findPath(nodes, costs, openList, closedList, to);
+        this.calculateCosts(nodes, costs, openList, closedList, to);
+
+        // todo. based on costs, search for optimal path.
+
+        return null;
     }
 
-    private findPath(nodes: PathNode[], costs: number[], openList: PathNode[], closedList: PathNode[], end: PathNode) {
-        console.log('at the beginning of the findpath: (nodes, costs, open, closed, end)', nodes, costs, openList, closedList, end);
+    private calculateCosts(nodes: PathNode[], costs: number[], openList: PathNode[], closedList: PathNode[], end: PathNode): number[] {
+        console.log('at the beginning of the findpath: (nodes, costs, open, closed, end)',
+                      nodes, costs, openList, closedList, end);
 
         let min = Number.MAX_VALUE;
         let curCost = min;
@@ -37,16 +42,30 @@ export class Pathfinder {
         let minLinkIndex = -1;
         for (const cl of closedList) {
             for (let j = 0; j < cl.links.length; j++) {
-                if (closedList.indexOf(cl.links[j]) < 0) {
-                    openList.push(cl.links[j]);
-                    curCost = costs[nodes.indexOf(cl)] + cl.costs[j];
 
+
+                // calculate cost
+                curCost = costs[nodes.indexOf(cl)] + cl.costs[j];
+
+                // take over the minimal cost
+                if (curCost < costs[nodes.indexOf(cl.links[j])]) {
+                    costs[nodes.indexOf(cl.links[j])] = curCost;
+                }
+
+
+                if (closedList.indexOf(cl.links[j]) < 0) {
+
+                    // add node to openlist, if necessary
+                    if (openList.indexOf(cl.links[j]) < 0) {
+                        openList.push(cl.links[j]);
+                    }
+
+                    // select the global path with minimal cost DEPRECTAED maybe
                     if (curCost < min) {
                         min = curCost;
                         minClNode = cl;
                         minLinkIndex = j;
                     }
-                    costs[nodes.indexOf(cl.links[j])] = curCost;
 
                     console.log('available next node: from ', cl.x, '/', cl.y, ' to ', cl.links[j].x,
                                   '/', cl.links[j].y, ' cost: ', curCost);
@@ -54,26 +73,32 @@ export class Pathfinder {
             }
         }
 
-        openList = openList.splice(minClNode.links[minLinkIndex]);
+        console.log('before: (open, closed)', openList, closedList);
+        openList = openList.splice(openList.indexOf(minClNode.links[minLinkIndex]), 1);
         closedList.push(minClNode.links[minLinkIndex]);
+        console.log('after: (open, closed)', openList, closedList);
 
-        this.findPath(nodes, costs, openList, closedList, end);
+        if (openList.length > 0 && closedList.indexOf(end) < 0) {
+            this.calculateCosts(nodes, costs, openList, closedList, end);
+        } else {
+            console.log('got your cost calculation. (nodes, costs, closed, open, end)', nodes, costs, closedList, openList, end);
+        }
         // now we got all costs.
 
-        return null;
+        return costs;
     }
 
     public debugTest(): void {
         const n1 = new PathNode(100, 100);
-        const n2 = new PathNode(120, 100);
-        const n3 = new PathNode(240, 200);
-        const n4 = new PathNode(100, 360);
-        const n5 = new PathNode(110, 370);
-        const n6 = new PathNode(346, 600);
-        const n7 = new PathNode(300, 550);
-        const n8 = new PathNode(500, 440);
-        const n9 = new PathNode(550, 200);
-        const n10 = new PathNode(600, 100);
+        const n2 = new PathNode(200, 200);
+        const n3 = new PathNode(300, 300);
+        const n4 = new PathNode(400, 400);
+        const n5 = new PathNode(500, 500);
+        const n6 = new PathNode(600, 600);
+        const n7 = new PathNode(700, 700);
+        const n8 = new PathNode(800, 800);
+        const n9 = new PathNode(900, 900);
+        const n10 = new PathNode(1000, 1000);
 
         const link = (nn1: PathNode, nn2: PathNode) => {
             const dist = Math.sqrt((nn1.x - nn2.x) * (nn1.x - nn2.x) + (nn1.y - nn2.y) * (nn1.y - nn2.y));
