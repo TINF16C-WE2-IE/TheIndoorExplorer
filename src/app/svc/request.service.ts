@@ -6,11 +6,12 @@ import {Observable} from 'rxjs/Observable';
 export class RequestService {
 
 
-    private static readonly URL_API = 'https://bin.nubenum.de/ie/api/api.php?';
     public static readonly URL_LOGIN_ENDPOINT = 'https://bin.nubenum.de/ie/auth.php?action=login';
+    private static readonly URL_API = 'https://bin.nubenum.de/ie/api/api.php?';
     public static readonly LIST_MAPS = 'maplist';
     public static readonly LIST_MAP_DETAILS = 'jsonmap';
     public static readonly LIST_MAP_SAVE = 'savemap';
+    public static readonly INFO_USER = 'userinfo';
 
     private options: RequestOptions;
 
