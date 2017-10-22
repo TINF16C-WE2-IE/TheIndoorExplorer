@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Http, RequestOptions } from '@angular/http';
-import {Observable} from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class RequestService {
@@ -48,7 +48,7 @@ export class RequestService {
     public uriEncodeObject(obj: any): string {
         let str = '';
         for (const key in obj) {
-            if ( obj.hasOwnProperty(key) ) {
+            if (obj.hasOwnProperty(key)) {
                 str += '&' + encodeURI(key) + '=' + encodeURIComponent(obj[key]);
             }
         }

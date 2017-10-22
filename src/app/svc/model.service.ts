@@ -35,13 +35,28 @@ export class ModelService {
     }
 
     public loadMap(mapId: string) {
-        this.rqstSvc.get(RequestService.LIST_MAP_DETAILS, {'mapid': mapId})
-            .subscribe(resp => {
-                console.log('got response map details: ', resp);
-                if (resp !== null) {
-                    this.currentMap = new Map(resp);
-                }
+        if (mapId === '-1') {
+            this.currentMap = new Map({
+                id: '-1',
+                name: 'New Map',
+                floors: [{
+                    walls: [{p1: {x: 50, y: 50}, p2: {x: 250, y: 50}}],
+                    portals: [{id: 1, label: 'main door', p1: {x: 100, y: 100}, p2: {x: 250, y: 250}}]
+                }],
+                favorite: false,
+                permission: 0,
+                visibility: 0
             });
+        }
+        else {
+            this.rqstSvc.get(RequestService.LIST_MAP_DETAILS, {'mapid': mapId})
+                .subscribe(resp => {
+                    console.log('got response map details: ', resp);
+                    if (resp !== null) {
+                        this.currentMap = new Map(resp);
+                    }
+                });
+        }
     }
 
     public saveMap() {

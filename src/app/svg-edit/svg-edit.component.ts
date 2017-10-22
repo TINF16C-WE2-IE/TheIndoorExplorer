@@ -3,8 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import 'rxjs/add/operator/switchMap';
 import { Mouse } from './mouse.class';
-import { Point } from '../model/point.class';
-import { MoveTool } from './toolbox/move-tool';
+import { MoveTool } from './toolbox/move-tool.class';
+import { LineTool } from './toolbox/line-tool.class';
 
 @Component({
     selector: 'app-svg-edit',
@@ -28,13 +28,15 @@ export class SvgEditComponent implements OnInit {
             }
         );
 
-        const rect = document.getElementById('editorCanvas').getBoundingClientRect();
-        const canvasOffset = new Point(rect.left, rect.top);
-        this.mouse = new Mouse(canvasOffset);
+        this.mouse = new Mouse();
         this.selectMoveTool();
     }
 
     selectMoveTool() {
         this.mouse.tool = new MoveTool(this.mouse, this.modelSvc);
+    }
+
+    selectLineTool() {
+        this.mouse.tool = new LineTool(this.mouse, this.modelSvc);
     }
 }

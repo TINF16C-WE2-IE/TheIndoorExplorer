@@ -1,24 +1,24 @@
-import {BrowserModule} from '@angular/platform-browser';
-import {NgModule} from '@angular/core';
-import {FormsModule} from '@angular/forms';
-import {HttpModule} from '@angular/http';
-import {routing} from './app.routing';
-import {FlexLayoutModule} from '@angular/flex-layout';
-import {HashLocationStrategy, Location, LocationStrategy} from '@angular/common';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { HttpModule } from '@angular/http';
+import { routing } from './app.routing';
+import { FlexLayoutModule } from '@angular/flex-layout';
+import { HashLocationStrategy, Location, LocationStrategy } from '@angular/common';
 
-import {AppComponent} from './app.component';
-import {SvgEditComponent} from './svg-edit/svg-edit.component';
-import {LoginComponent} from './cmp/login.component';
-import {UpdatesComponent} from './cmp/updates.component';
-import {FooterComponent} from './cmp/footer.component';
-import {HomeComponent} from './cmp/home.component';
-import {MapsComponent} from './cmp/maps.component';
+import { AppComponent } from './app.component';
+import { SvgEditComponent } from './svg-edit/svg-edit.component';
+import { LoginComponent } from './cmp/login.component';
+import { UpdatesComponent } from './cmp/updates.component';
+import { FooterComponent } from './cmp/footer.component';
+import { HomeComponent } from './cmp/home.component';
+import { MapsComponent } from './cmp/maps.component';
 
-import {RequestService} from './svc/request.service';
-import {ModelService} from './svc/model.service';
-import {MessageService} from './svc/message.service';
+import { RequestService } from './svc/request.service';
+import { ModelService } from './svc/model.service';
+import { MessageService } from './svc/message.service';
 // Angular Material
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
     MatButtonModule,
     MatCardModule,
@@ -30,9 +30,9 @@ import {
     MatProgressSpinnerModule,
     MatSliderModule,
     MatSlideToggleModule,
+    MatSnackBarModule,
     MatTableModule,
-    MatToolbarModule,
-    MatSnackBarModule
+    MatToolbarModule
 } from '@angular/material';
 
 @NgModule({

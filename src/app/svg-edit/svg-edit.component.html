@@ -1,11 +1,12 @@
-<svg style="border:1px red dotted;width:500px;" viewBox="0 0 500 500" id="editorCanvas"
-     (mouseup)="mouse.onMouseUp($event)" (mousedown)="mouse.onMouseDown($event)" (mousemove)="mouse.onMouseMove($event)"
+<svg id="editorCanvas" viewBox="0 0 500 500"
+     (mouseup)="mouse.onMouseUp($event)" (mousedown)="mouse.onMouseDown($event)"
+     (mousemove)="mouse.onMouseMove($event)" (mouseleave)="mouse.onMouseLeave($event)"
      xmlns:svg="http://www.w3.org/2000/svg" version="1.2">
 
     <svg:g *ngIf="floor">
         <svg:defs>
-            <svg:marker id="circle" markerWidth="8" markerHeight="8" refX="5" refY="5">
-                <svg:circle cx="5" cy="5" r="3" style="stroke: none; fill:#000000;"/>
+            <svg:marker id="circle" markerWidth="10" markerHeight="10" refX="5" refY="5" markerUnits="userSpaceOnUse">
+                <svg:circle cx="5" cy="5" r="4" style="stroke: none; fill:#000000;"/>
             </svg:marker>
         </svg:defs>
 
@@ -15,6 +16,9 @@
         <svg:line *ngFor="let portal of floor.portals" stroke="green" stroke-width="5"
                   [attr.x1]="portal.p1.x" [attr.y1]="portal.p1.y" [attr.x2]="portal.p2.x" [attr.y2]="portal.p2.y"
                   marker-end="url(#circle)" marker-start="url(#circle)"/>
+
+        <svg:circle *ngIf="mouse.xs !== null && mouse.ys !== null"
+                    [attr.cx]="mouse.xs" [attr.cy]="mouse.ys" r="5" style="stroke:red; fill:none"/>
     </svg:g>
 
     <text *ngIf="!floor" x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" font-size="40">
@@ -23,12 +27,13 @@
 
 </svg>
 
-<div>
+<div id="toolbox">
     <h3>Toolbox</h3>
-    <!--<button (click)="tool=0">Edit</button>-->
     <button (click)="selectMoveTool()">Move</button>
+    <button (click)="selectLineTool()">Edit</button>
     <!--<button (click)="tool=2">Door</button>-->
     <!--<button (click)="saveCurrentMap()">Save</button>-->
-    <p>Selected: {{mouse.tool.name}}</p>
+    <p>Selected: {{mouse.tool.name}} ({{mouse.x}} | {{mouse.y}})</p>
+    <p>Stats: {{floor.walls.length}} Walls, {{floor.portals.length}} Portals, {{floor.getAllPoints().length}} Points</p>
 </div>
 

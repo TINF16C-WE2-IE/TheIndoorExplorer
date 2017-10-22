@@ -1,6 +1,7 @@
 import { Portal } from './portal.class';
 import { Wall } from './wall.class';
 import { Point } from './point.class';
+import { Line } from './line.class';
 
 export class Floor {
 
@@ -33,8 +34,10 @@ export class Floor {
         ));
     }
 
-    public getExistingPoint(p: Point) {
-        const points: Point[] = this.getAllPoints().filter(point => point.equals(p));
+    public getExistingPoint(p: Point, exclude: Point[] = []) {
+        const points: Point[] = this.getAllPoints().filter(
+            point => point.equals(p) && exclude.indexOf(point) === -1
+        );
         if (points.length > 1) {
             console.log('WARNING! Twin points found!', JSON.stringify(points));
         }
@@ -42,15 +45,63 @@ export class Floor {
     }
 
     public joinPoints(master: Point, slave: Point) {
-        [...this.walls, ...this.portals].filter(line => {
-            try {
-                // replace slave Point instance with master instance, if possible
-                line.replacePoint(slave, master);
-                return true;
-            } catch (LineEndpointsEqualError) {
-                // delete line if its endpoints collide
-                return false;
+        const lines = [...this.walls, ...this.portals] as Line[];
+        for (const line of lines) {
+            line.replacePoint(slave, master);
+            if (line.isValid()) {
+                if (
+                    this.walls.find(w => !w.deleted && line !== w && line.equals(w)) ||
+                    this.portals.find(p => !p.deleted && line !== p && line.equals(p))
+                ) {
+                    console.log('Deleting invalid line (duplicate):', JSON.stringify(line));
+                    line.deleted = true;
+                }
             }
-        });
+            else {
+                console.log('Deleting invalid line (start=end):', JSON.stringify(line));
+                line.deleted = true;
+            }
+        }
+        this.walls = this.walls.filter(wall => !wall.deleted);
+        this.portals = this.portals.filter(portal => !portal.deleted);
+
+        //
+        // if (1 == 1) return;
+        // this.walls = this.walls.filter(wall => {
+        //     // replace slave Point instance with master instance, if possible
+        //     wall.replacePoint(slave, master);
+        //     if (wall.isValid()) {
+        //         if (
+        //             this.walls.find(w => wall !== w && wall.equals(w)) ||
+        //             this.portals.find(p => wall.equals(p))
+        //         ) {
+        //             console.log('Deleting invalid wall (duplicate):', JSON.stringify(wall));
+        //             wall.p1 = null;  // to avoid deleting the other equal wall later
+        //             return false;
+        //         }
+        //         else return true;
+        //     }
+        //     else {
+        //         console.log('Deleting invalid wall (start=end):', JSON.stringify(wall));
+        //         return false;
+        //     }
+        // });
+        //
+        // this.portals = this.portals.filter(portal => {
+        //     // replace slave Point instance with master instance, if possible
+        //     portal.replacePoint(slave, master);
+        //     if (portal.isValid()) {
+        //         if (this.walls.find(p => portal !== p && portal.equals(p))) {
+        //             console.log('Deleting invalid portal (duplicate):', JSON.stringify(portal));
+        //             portal.p1 = null;  // to avoid deleting the other equal portal later
+        //             return false;
+        //         }
+        //         else return true;
+        //     }
+        //     else {
+        //         console.log('Deleting invalid portal (start=end):', JSON.stringify(portal));
+        //         return false;
+        //     }
+        // });
     }
 }

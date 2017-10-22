@@ -1,21 +1,16 @@
 import { Point } from './point.class';
 
-export class LineEndpointsEqualError extends Error {
-    constructor(public line: Line) {
-        super('This line has the same point at both ends: ' + line);
-    }
-}
-
-
 export class Line {
 
     public p1: Point;
     public p2: Point;
 
+    public deleted: boolean;
+
     constructor(p1: Point, p2: Point) {
         this.p1 = p1;
         this.p2 = p2;
-        this.validate();
+        this.deleted = false;
     }
 
     public getPoints() {
@@ -29,12 +24,17 @@ export class Line {
         if (candidate === this.p2) {
             this.p2 = replacement;
         }
-        this.validate();
     }
 
-    private validate() {
-        if (this.p1.equals(this.p2)) {
-            throw new LineEndpointsEqualError(this);
-        }
+    public isValid() {
+        return !this.p1.equals(this.p2);
+    }
+
+    public equals(other: Line) {
+        return (
+            this.p1.equals(other.p1) && this.p2.equals(other.p2)
+        ) || (
+            this.p1.equals(other.p2) && this.p2.equals(other.p1)
+        );
     }
 }

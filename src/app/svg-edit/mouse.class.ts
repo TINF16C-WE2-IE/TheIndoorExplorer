@@ -1,9 +1,10 @@
-import { Point } from '../model/point.class';
-import { Tool } from './toolbox/tool.class';
+import {Tool} from './toolbox/tool.class';
+import {Point} from '../model/point.class';
 
 export class Mouse {
-    private _x: number;
-    private _y: number;
+    private _x: number = null;
+    private _y: number = null;
+    private canvas;
     public tool: Tool;
 
     get x(): number {
@@ -14,8 +15,17 @@ export class Mouse {
         return this._y;
     }
 
+    get xs(): number | null {
+        return this.x !== null && this.y !== null ? Point.snapCoords(this._x, this._y).x : null;
+    }
 
-    constructor(private canvasOffset: Point) {
+    get ys(): number | null {
+        return this.x !== null && this.y !== null ? Point.snapCoords(this._x, this._y).y : null;
+    }
+
+
+    constructor() {
+        this.canvas = document.getElementById('editorCanvas');
     }
 
 
@@ -32,11 +42,17 @@ export class Mouse {
     }
 
     public onMouseMove(evt: MouseEvent) {
-        this._x = evt.layerX - this.canvasOffset.x;
-        this._y = evt.layerY - this.canvasOffset.y;
+        const offset = this.canvas.getBoundingClientRect();
+        this._x = Math.round(evt.x - offset.x);
+        this._y = Math.round(evt.y - offset.y);
 
         if (this.tool) {
             this.tool.onMouseMove(evt);
         }
+    }
+
+    public onMouseLeave(evt: MouseEvent) {
+        this._x = null;
+        this._y = null;
     }
 }

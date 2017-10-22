@@ -3,7 +3,9 @@ import { Point } from '../../model/point.class';
 import { ModelService } from '../../svc/model.service';
 
 export abstract class Tool {
-    public readonly name;
+    public get name() {
+        return 'Generic Tool';
+    }
 
     protected get floor() {
         return this.modelSvc.currentFloor;
@@ -20,7 +22,7 @@ export abstract class Tool {
     public abstract onMouseMove(evt: MouseEvent);
 
 
-    protected getFloorPointBelowCursor(): Point {
-        return this.floor.getExistingPoint(new Point(this.mouse.x, this.mouse.y));
+    protected getFloorPointBelowCursor(exclude?: Point[]): Point {
+        return this.floor.getExistingPoint(new Point(this.mouse.x, this.mouse.y), exclude);
     }
 }

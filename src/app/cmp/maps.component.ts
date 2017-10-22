@@ -1,9 +1,9 @@
 import { MessageService } from './../svc/message.service';
-import {ChangeDetectorRef, Component} from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import 'rxjs/add/observable/of';
 
-import {ModelService} from '../svc/model.service';
-import {RequestService} from '../svc/request.service';
+import { ModelService } from '../svc/model.service';
+import { RequestService } from '../svc/request.service';
 
 @Component({
     selector: 'app-content-maps',
