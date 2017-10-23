@@ -1,8 +1,12 @@
-import { RequestService } from './../svc/request.service';
-import { ModelService } from './../svc/model.service';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-import {Component, OnInit} from '@angular/core';
+import { ModelService } from '../svc/model.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import 'rxjs/add/operator/switchMap';
+import { Mouse } from './mouse.class';
+import { MoveTool } from './toolbox/move-tool.class';
+import { LineTool } from './toolbox/line-tool.class';
+import { Wall } from '../model/wall.class';
+import { Portal } from '../model/portal.class';
 
 @Component({
     selector: 'app-svg-edit',
@@ -10,217 +14,35 @@ import 'rxjs/add/operator/switchMap';
     styleUrls: ['./svg-edit.component.css']
 })
 export class SvgEditComponent implements OnInit {
+    mouse: Mouse;
 
-    moveStart = [];
-    movingObjects = [];
-    currentPos = [];
-    tool = 0;
-    canvasOffset = [];
+    get floor() {
+        return this.modelSvc.currentFloor;
+    }
 
-    constructor(private rqstSvc: RequestService, public modelSvc: ModelService,
-                private route: ActivatedRoute, private router: Router) {
+    constructor(private modelSvc: ModelService, private route: ActivatedRoute, private router: Router) {
     }
 
     ngOnInit() {
-
         this.route.params.subscribe(
-              params => {
-                return this.rqstSvc.get(
-                    RequestService.LIST_MAP_DETAILS, {'mapid': params['mapId']}
-                ).subscribe(
-                    resp => {
-                        console.log('got response map details: ', resp);
-                        if (resp !== null) {
-
-                            // currently, the data is applied directly to the model data
-                            this.modelSvc.curEditMap = resp;
-                        }
-                    }
-                );
+            params => {
+                this.modelSvc.loadMap(Number.parseInt(params['mapId']));
             }
         );
 
-        const rect = document.getElementById('editorCanvas').getBoundingClientRect();
-        this.canvasOffset = [rect.left, rect.top];
+        this.mouse = new Mouse();
+        this.selectMoveTool();
     }
 
-    gridSnap(arr, threshold?: number) {
-        if (!threshold) threshold = 10;
-        return [Math.round(arr[0] / threshold) * threshold, Math.round(arr[1] / threshold) * threshold];
+    selectMoveTool() {
+        this.mouse.tool = new MoveTool(this.mouse, this.modelSvc);
     }
 
-    mouseGridSnap(evt) {
-        return this.gridSnap([evt.layerX - this.canvasOffset[0], evt.layerY - this.canvasOffset[1]]);
+    selectWallDrawTool() {
+        this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Wall});
     }
 
-    equalsXY(a, b): boolean {
-        return a[0] === b[0] && a[1] === b[1];
-    }
-
-    getWallsAtVertex(pos) {
-        const wallsAtVertex = [];
-        this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls.forEach(wall => {
-            if (this.equalsXY(wall.a, pos)) wallsAtVertex.push(wall);
-            if (this.equalsXY(wall.b, pos)) wallsAtVertex.push(wall);
-        });
-        return wallsAtVertex;
-    }
-
-    isExistingVertex(pos): boolean {
-        return this.getWallsAtVertex(pos).length !== 0;
-    }
-
-    getRotation(pos): number {
-        const walls = this.getWallsAtVertex(pos);
-        let rotations = 0;
-        walls.forEach(wall => {
-            if (!this.equalsXY(wall.a, wall.b)) {
-                const xdiff = wall.b[0] - wall.a[0];
-                const ydiff = wall.b[1] - wall.a[1];
-
-                if (xdiff === 0) {
-                    rotations += 90;
-                }
-                else {
-                    const rotation = Math.atan(ydiff / xdiff) / Math.PI * 180;
-                    rotations += rotation;
-                }
-            }
-        });
-        return rotations / walls.length;
-    }
-
-    splitLine(wall, splitPos) {
-        const a = wall.a;
-        wall.a = splitPos;
-        this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls.push({'a': a, 'b': splitPos});
-        console.log(this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls);
-    }
-
-    getNearbyLine(pos) {
-        let foundLine = null;
-        this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls.forEach(wall => {
-            if (!this.equalsXY(wall.a, wall.b)) {
-                const xdiff = wall.b[0] - wall.a[0];
-                const ydiff = wall.b[1] - wall.a[1];
-
-                if (xdiff === 0) {
-                    const shift = (this.currentPos[1] - wall.a[1]) / ydiff;
-                    if (this.currentPos[0] === wall.a[0] &&  shift >= 0 && shift <= 1) {
-                        foundLine = wall;
-                    }
-                }
-                else {
-                    const shift = (this.currentPos[0] - wall.a[0]) / xdiff;
-                    if (shift >= 0 && shift <= 1) {
-                        const deducedY = ydiff * shift + wall.a[1];
-                        if (this.equalsXY(this.gridSnap([this.currentPos[0], deducedY], 20), this.gridSnap(this.currentPos, 20))) {
-                            foundLine = wall;
-                        }
-                    }
-                }
-            }
-        });
-        return foundLine;
-    }
-
-    moveVertex(evt: MouseEvent) {
-        const walls = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls;
-        const doors = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].doors;
-        if (evt.buttons) {
-            if (this.moveStart.length) {
-                this.movingObjects.forEach(obj => {
-                    if (obj.pos) obj.pos = this.currentPos;
-                    if (obj.a) {
-                        if (this.equalsXY(obj.a, this.moveStart)) obj.a = this.currentPos;
-                        if (this.equalsXY(obj.b, this.moveStart)) obj.b = this.currentPos;
-                    }
-                });
-            }
-            else {
-                walls.forEach(wall => {
-                    if (this.equalsXY(wall.a, this.currentPos) || this.equalsXY(wall.b, this.currentPos)) {
-                        this.movingObjects.push(wall);
-                    }
-                });
-                doors.forEach(door => {
-                    if (this.equalsXY(door.pos, this.currentPos)) this.movingObjects.push(door);
-                });
-            }
-            this.moveStart = this.currentPos;
-        }
-        else {
-            this.moveStart = [];
-            this.movingObjects = [];
-        }
-    }
-
-    endMoveVertex(evt: MouseEvent) {
-        this.moveStart = [];
-        this.movingObjects = [];
-    }
-
-    draw(evt: MouseEvent) {
-        const walls = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls;
-        if (evt.buttons) {
-            if (this.moveStart.length) {
-                walls[walls.length - 1].b = this.currentPos;
-            } else {
-                walls.push({'a': this.currentPos, 'b': this.currentPos});
-                this.moveStart = this.currentPos;
-            }
-        }
-        else {
-            this.moveStart = [];
-        }
-    }
-
-    endDraw(evt: MouseEvent) {
-        this.moveStart = [];
-    }
-
-    setDoor(evt: MouseEvent) {
-        const walls = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].walls;
-        const doors = this.modelSvc.curEditMap.map[this.modelSvc.curEditMapLevel].doors;
-
-        let wall = null;
-        if (this.isExistingVertex(this.currentPos) || (wall = this.getNearbyLine(this.currentPos))) {
-            if (wall) this.splitLine(wall, this.currentPos);
-            doors.push({'pos': this.currentPos, 'id': doors.length, 'label': 'Door'});
-        }
-        console.log(doors);
-    }
-
-    doNothing(evt: MouseEvent) {
-        return false;
-    }
-
-    mouseMove(evt: MouseEvent) {
-        this.currentPos = this.mouseGridSnap(evt);
-        const t = this.tool;
-        if (t === 0) this.draw(evt);
-        else if (t === 1) this.moveVertex(evt);
-        else if (t === 2) this.doNothing(evt);
-    }
-
-    mouseUp(evt: MouseEvent) {
-        const t = this.tool;
-        if (t === 0) this.endDraw(evt);
-        else if (t === 1) this.endMoveVertex(evt);
-        else if (t === 2) this.setDoor(evt);
-    }
-
-    private saveCurrentMap() {
-        this.rqstSvc.post(
-            RequestService.LIST_MAP_SAVE, {'map': this.modelSvc.curEditMap}
-        ).subscribe(
-            resp => {
-                console.log('got response map-save: ', resp);
-                if (resp !== null) {
-
-                    // TODO
-                }
-            }
-        );
+    selectPortalDrawTool() {
+        this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Portal});
     }
 }

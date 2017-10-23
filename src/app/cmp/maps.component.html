@@ -10,7 +10,7 @@
 
                 <mat-card>
                     <mat-card-content>
-                        <div fxLayout="row" fxLayoutAlign="space-evenly center" >
+                        <div fxLayout="row" fxLayoutAlign="space-evenly center">
                             <div class="item item-1" fxFlex="20%" align="center">
                                 <h3>Id</h3>
                             </div>
@@ -30,11 +30,11 @@
 
             <br><br>
 
-            <mat-list-item *ngFor="let map of modelSvc.mapsList; let index = i;">
+            <mat-list-item *ngFor="let map of maps">
 
                 <mat-card>
                     <mat-card-content>
-                        <div fxLayout="row" fxLayoutAlign="space-evenly center" >
+                        <div fxLayout="row" fxLayoutAlign="space-evenly center">
                             <div class="item item-1" fxFlex="20%" align="center">
                                 {{map.id}}
                             </div>
@@ -47,9 +47,10 @@
                                 </button>
                             </div>
                             <div class="item item-4" fxFlex="20%" align="center">
-                                <button mat-icon-button (click)="setFavorite(map.id)" [ngClass]="'mat-icon-button' + (map.favorite? ' mat-accent' : '')">
-                                  <mat-icon class="example-icon">favorite</mat-icon>
-                              </button>
+                                <button mat-icon-button (click)="setFavorite(map.id)"
+                                        [ngClass]="'mat-icon-button' + (map.favorite? ' mat-accent' : '')">
+                                    <mat-icon class="example-icon">favorite</mat-icon>
+                                </button>
                             </div>
                         </div>
                     </mat-card-content>

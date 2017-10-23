@@ -1,15 +1,51 @@
-<svg style="border:1px red dotted;width:500px;" viewBox="0 0 500 500" (mousemove)="mouseMove($event)" id="editorCanvas"
-     (mouseup)="mouseUp($event)">
-     <svg:defs>
-        <svg:marker id="circle" markerWidth="8" markerHeight="8" refX="5" refY="5">
-            <svg:circle cx="5" cy="5" r="3" style="stroke: none; fill:#000000;"/>
-        </svg:marker>
-      </svg:defs>
-    <svg:line *ngFor="let wall of modelSvc.curEditMap.map[modelSvc.curEditMapLevel].walls" stroke="black" [attr.x1]="wall.a[0]" [attr.y1]="wall.a[1]" [attr.x2]="wall.b[0]" [attr.y2]="wall.b[1]" marker-end="url(#circle)" marker-start="url(#circle)"></svg:line>
-    <svg:rect *ngFor="let door of modelSvc.curEditMap.map[modelSvc.curEditMapLevel].doors" stroke="black" fill="none" [attr.x]="door.pos[0]-15" [attr.y]="door.pos[1]-5" width="30" height="10" [attr.transform]="'rotate('+getRotation(door.pos)+' '+door.pos[0]+' '+door.pos[1]+')'"></svg:rect>
+<svg id="editorCanvas" viewBox="0 0 500 500"
+     (mouseup)="mouse.onMouseUp($event)" (mousedown)="mouse.onMouseDown($event)"
+     (mousemove)="mouse.onMouseMove($event)" (mouseleave)="mouse.onMouseLeave($event)"
+     xmlns:svg="http://www.w3.org/2000/svg" version="1.2">
+
+    <svg:g *ngIf="floor">
+        <svg:defs>
+            <svg:marker id="circle" markerWidth="10" markerHeight="10" refX="5" refY="5" markerUnits="userSpaceOnUse">
+                <svg:circle cx="5" cy="5" r="4" style="stroke: none; fill:#000000;"/>
+            </svg:marker>
+        </svg:defs>
+
+        <svg:line *ngFor="let wall of floor.walls" stroke="black"
+                  [attr.x1]="wall.p1.x" [attr.y1]="wall.p1.y" [attr.x2]="wall.p2.x" [attr.y2]="wall.p2.y"
+                  marker-end="url(#circle)" marker-start="url(#circle)"/>
+        <svg:line *ngFor="let portal of floor.portals" stroke="green" stroke-width="5"
+                  [attr.x1]="portal.p1.x" [attr.y1]="portal.p1.y" [attr.x2]="portal.p2.x" [attr.y2]="portal.p2.y"
+                  marker-end="url(#circle)" marker-start="url(#circle)"/>
+
+        <svg:circle *ngIf="mouse.xs !== null && mouse.ys !== null"
+                    [attr.cx]="mouse.xs" [attr.cy]="mouse.ys" r="5" style="stroke:red; fill:none"/>
+    </svg:g>
+
+    <text *ngIf="!floor" x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" font-size="40">
+        Bitte warten...
+    </text>
+
 </svg>
 
-<button (click)="tool=0">Edit</button>
-<button (click)="tool=1">Move</button>
-<button (click)="tool=2">Door</button>
-<button (click)="saveCurrentMap()">Save</button>
+<form #toolbox id="toolbox">
+    <h3>Toolbox</h3>
+    <button class="toolbutton" [style.background-color]="mouse.tool.name=='Move Point' ? 'cyan' : ''"
+            (click)="selectMoveTool()">Move
+    </button>
+    <button class="toolbutton" [style.background-color]="mouse.tool.name=='Draw Wall' ? 'cyan' : ''"
+            (click)="selectWallDrawTool()">Wall
+    </button>
+    <button class="toolbutton" [style.background-color]="mouse.tool.name=='Draw Portal' ? 'cyan' : ''"
+            (click)="selectPortalDrawTool()">Portal
+    </button>
+    <!--<button (click)="saveCurrentMap()">Save</button>-->
+    <p>Selected: {{mouse.tool.name}} ({{mouse.x}} | {{mouse.y}})</p>
+    <p>
+        Stats:
+        {{floor?.walls.length || 0}} Walls,
+        {{floor?.portals.length || 0}} Portals,
+        {{floor?.getAllPoints().length || 0}} Points
+    </p>
+    <pre>{{this?.floor | json}}</pre>
+</form>
+

@@ -1,5 +1,4 @@
-
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 
 import { HomeComponent } from './cmp/home.component';
 import { MapsComponent } from './cmp/maps.component';
@@ -14,16 +13,16 @@ export const routes: Routes = [
     },
     {
         path: 'home',
-        component: HomeComponent,
+        component: HomeComponent
     },
     {
         path: 'maps',
-        component: MapsComponent,
+        component: MapsComponent
     },
     {
         path: 'editor/:mapId',
-        component: SvgEditComponent,
-    },
+        component: SvgEditComponent
+    }
 ];
 
 
