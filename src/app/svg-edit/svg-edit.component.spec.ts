@@ -1,6 +1,6 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import {SvgEditComponent} from './svg-edit.component';
+import { SvgEditComponent } from './svg-edit.component';
 
 describe('SvgEditComponent', () => {
     let component: SvgEditComponent;
@@ -10,7 +10,7 @@ describe('SvgEditComponent', () => {
         TestBed.configureTestingModule({
             declarations: [SvgEditComponent]
         })
-            .compileComponents();
+               .compileComponents();
     }));
 
     beforeEach(() => {

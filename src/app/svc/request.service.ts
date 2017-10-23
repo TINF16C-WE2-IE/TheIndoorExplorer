@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Http, RequestOptions } from '@angular/http';
-import {Observable} from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class RequestService {
@@ -21,13 +21,14 @@ export class RequestService {
 
     public get(endpoint: string, paramsObj: any): Observable<any> {
         return this.http.get(
-            encodeURI(RequestService.URL_API + endpoint + this.uriEncodeObject(paramsObj))
+            encodeURI(RequestService.URL_API + endpoint + this.uriEncodeObject(paramsObj)),
+            {withCredentials: true}
         ).map(res => this.handleResponse(res));
     }
 
     public post(endpoint: string, obj: any): Observable<any> {
         return this.http.post(
-            encodeURI(RequestService.URL_API + endpoint), obj
+            encodeURI(RequestService.URL_API + endpoint), obj, {withCredentials: true}
         ).map(res => this.handleResponse(res));
     }
 
@@ -49,7 +50,7 @@ export class RequestService {
     public uriEncodeObject(obj: any): string {
         let str = '';
         for (const key in obj) {
-            if ( obj.hasOwnProperty(key) ) {
+            if (obj.hasOwnProperty(key)) {
                 str += '&' + encodeURI(key) + '=' + encodeURIComponent(obj[key]);
             }
         }

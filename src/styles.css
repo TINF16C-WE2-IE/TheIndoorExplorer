@@ -1,8 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
-
 /* Angular-Material Theme */
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 
+* {
+    box-sizing: border-box;
+}
 
 body {
     padding: 5px 5px 5px 5px;
@@ -15,29 +17,29 @@ body {
 }
 
 .example-icon {
-  padding: 0 14px;
+    padding: 0 14px;
 }
 
 .example-spacer {
-  flex: 1 1 auto;
+    flex: 1 1 auto;
 }
 
 .example-container {
-  display: flex;
-  flex-direction: column;
-  min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
 }
 
 .example-header {
-  min-height: 64px;
-  display: flex;
-  align-items: center;
-  padding-left: 24px;
-  font-size: 20px;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    padding-left: 24px;
+    font-size: 20px;
 }
 
 .profile-image {
-  background-size: cover;
+    background-size: cover;
 }
 
 .content-image {
@@ -45,6 +47,6 @@ body {
 }
 
 .mat-table {
-  overflow: auto;
-  max-height: 500px;
+    overflow: auto;
+    max-height: 500px;
 }

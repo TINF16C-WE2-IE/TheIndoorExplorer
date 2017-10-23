@@ -1,32 +1,33 @@
-import { MessageService } from './../svc/message.service';
-import {ChangeDetectorRef, Component} from '@angular/core';
+import { MessageService } from '../svc/message.service';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import 'rxjs/add/observable/of';
 
-import {ModelService} from '../svc/model.service';
-import {RequestService} from '../svc/request.service';
+import { ModelService } from '../svc/model.service';
+import { RequestService } from '../svc/request.service';
+import { Map } from '../model/map.class';
 
 @Component({
     selector: 'app-content-maps',
     templateUrl: 'maps.component.html'
 })
-export class MapsComponent {
+export class MapsComponent implements OnInit {
 
-    constructor(private msgSvc: MessageService, private rqstSvc: RequestService, public modelSvc: ModelService,
+    public get maps(): Map[] {
+        return Object.keys(this.modelSvc.maps).map(key => this.modelSvc.maps[key]);
+    }
+
+    constructor(private msgSvc: MessageService, private rqstSvc: RequestService, private modelSvc: ModelService,
                 private changeRef: ChangeDetectorRef) {
+    }
 
-        this.rqstSvc.get(RequestService.LIST_MAPS, {}).subscribe(
-            resp => {
-                if (resp) {
-                    this.modelSvc.mapsList = resp;
-                }
-            }
-        );
+    ngOnInit() {
+        this.modelSvc.loadMapList();
     }
 
     public setFavorite(mapId: string): void {
         this.msgSvc.notify('TODO: set favorite map. Send request to server.');
 
-        const selectedMap = this.modelSvc.mapsList.find(element => element.id === mapId);
+        const selectedMap = this.maps[Number.parseInt(mapId)];
         if (selectedMap !== undefined) {
             // TODO.
         }
