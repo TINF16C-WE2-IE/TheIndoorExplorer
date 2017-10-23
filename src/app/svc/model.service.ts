@@ -9,8 +9,9 @@ export class ModelService {
     public maps: {[id: number]: Map};
     public currentMapId: number;
     public currentFloorId: number;
+    public userInfo: any;
 
-    public get currentMap(): Map {
+    public get currentMap() {
         return this.maps[this.currentMapId];
     }
 
@@ -32,6 +33,7 @@ export class ModelService {
         this.maps = {};
         this.currentMapId = 0;
         this.currentFloorId = 0;
+        this.userInfo = null;
     }
 
     public loadMapList() {
