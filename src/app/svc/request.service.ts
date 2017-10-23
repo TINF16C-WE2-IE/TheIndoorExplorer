@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Http, RequestOptions } from '@angular/http';
+import { Http, RequestOptions, Headers } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 @Injectable()
@@ -17,18 +17,19 @@ export class RequestService {
 
     constructor(private http: Http) {
         this.options = new RequestOptions();
+        this.options.withCredentials = true;
     }
 
     public get(endpoint: string, paramsObj: any): Observable<any> {
         return this.http.get(
             encodeURI(RequestService.URL_API + endpoint + this.uriEncodeObject(paramsObj)),
-            {withCredentials: true}
+            this.options
         ).map(res => this.handleResponse(res));
     }
 
     public post(endpoint: string, obj: any): Observable<any> {
         return this.http.post(
-            encodeURI(RequestService.URL_API + endpoint), obj, {withCredentials: true}
+            encodeURI(RequestService.URL_API + endpoint), obj, this.options
         ).map(res => this.handleResponse(res));
     }
 
