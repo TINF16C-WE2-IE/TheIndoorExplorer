@@ -20,13 +20,14 @@ export class RequestService {
 
     public get(endpoint: string, paramsObj: any): Observable<any> {
         return this.http.get(
-            encodeURI(RequestService.URL_API + endpoint + this.uriEncodeObject(paramsObj))
+            encodeURI(RequestService.URL_API + endpoint + this.uriEncodeObject(paramsObj)),
+            {withCredentials: true}
         ).map(res => this.handleResponse(res));
     }
 
     public post(endpoint: string, obj: any): Observable<any> {
         return this.http.post(
-            encodeURI(RequestService.URL_API + endpoint), obj
+            encodeURI(RequestService.URL_API + endpoint), obj, {withCredentials: true}
         ).map(res => this.handleResponse(res));
     }
 
