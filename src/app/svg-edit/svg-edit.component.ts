@@ -16,6 +16,8 @@ import { Portal } from '../model/portal.class';
 export class SvgEditComponent implements OnInit {
     mouse: Mouse;
 
+    public toolnames = ['Move', 'Draw Wall', 'Draw Portal'];
+
     get floor() {
         return this.modelSvc.currentFloor;
     }
@@ -31,18 +33,21 @@ export class SvgEditComponent implements OnInit {
         );
 
         this.mouse = new Mouse();
-        this.selectMoveTool();
+        this.selectTool('Move');
     }
 
-    selectMoveTool() {
-        this.mouse.tool = new MoveTool(this.mouse, this.modelSvc);
-    }
-
-    selectWallDrawTool() {
-        this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Wall});
-    }
-
-    selectPortalDrawTool() {
-        this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Portal});
+    selectTool($event: any) {
+        console.log($event);
+        switch ($event) {
+            case 'Move':
+              this.mouse.tool = new MoveTool(this.mouse, this.modelSvc);
+              break;
+            case 'Draw Wall':
+              this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Wall});
+              break;
+            case 'Draw Portal':
+              this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Portal});
+              break;
+        }
     }
 }

@@ -29,15 +29,13 @@
 
 <form #toolbox id="toolbox">
     <h3>Toolbox</h3>
-    <button class="toolbutton" [style.background-color]="mouse.tool.name=='Move Point' ? 'cyan' : ''"
-            (click)="selectMoveTool()">Move
-    </button>
-    <button class="toolbutton" [style.background-color]="mouse.tool.name=='Draw Wall' ? 'cyan' : ''"
-            (click)="selectWallDrawTool()">Wall
-    </button>
-    <button class="toolbutton" [style.background-color]="mouse.tool.name=='Draw Portal' ? 'cyan' : ''"
-            (click)="selectPortalDrawTool()">Portal
-    </button>
+
+    <mat-radio-group class="example-radio-group" [ngModelOptions]="{standalone: true}" [ngModel]="mouse.tool.name" (ngModelChange)="selectTool($event)">
+        <mat-radio-button class="example-radio-button" *ngFor="let name of toolnames" [value]="name">
+            {{name}}
+        </mat-radio-button>
+    </mat-radio-group>
+
     <!--<button (click)="saveCurrentMap()">Save</button>-->
     <p>Selected: {{mouse.tool.name}} ({{mouse.x}} | {{mouse.y}})</p>
     <p>
