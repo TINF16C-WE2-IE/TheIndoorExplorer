@@ -219,7 +219,7 @@ export class Pathfinder {
                 p2: { x: 10, y: 20 }
             },
         ];
-        this.createLinkGraph(walls, 2);
+        this.createAdvancedLinkGraph(walls, 2);
     }
 
     public debugTest(): void {
