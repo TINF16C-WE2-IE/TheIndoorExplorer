@@ -1,5 +1,5 @@
-import {Tool} from './toolbox/tool.class';
-import {Point} from '../model/point.class';
+import { Tool } from './toolbox/tool.class';
+import { Point } from '../model/point.class';
 
 export class Mouse {
     private _x: number = null;

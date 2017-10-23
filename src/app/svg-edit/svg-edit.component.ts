@@ -5,6 +5,8 @@ import 'rxjs/add/operator/switchMap';
 import { Mouse } from './mouse.class';
 import { MoveTool } from './toolbox/move-tool.class';
 import { LineTool } from './toolbox/line-tool.class';
+import { Wall } from '../model/wall.class';
+import { Portal } from '../model/portal.class';
 
 @Component({
     selector: 'app-svg-edit',
@@ -24,7 +26,7 @@ export class SvgEditComponent implements OnInit {
     ngOnInit() {
         this.route.params.subscribe(
             params => {
-                this.modelSvc.loadMap(params['mapId']);
+                this.modelSvc.loadMap(Number.parseInt(params['mapId']));
             }
         );
 
@@ -36,7 +38,11 @@ export class SvgEditComponent implements OnInit {
         this.mouse.tool = new MoveTool(this.mouse, this.modelSvc);
     }
 
-    selectLineTool() {
-        this.mouse.tool = new LineTool(this.mouse, this.modelSvc);
+    selectWallDrawTool() {
+        this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Wall});
+    }
+
+    selectPortalDrawTool() {
+        this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Portal});
     }
 }

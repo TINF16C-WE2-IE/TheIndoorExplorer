@@ -6,21 +6,21 @@ import { RequestService } from './request.service';
 @Injectable()
 export class ModelService {
 
-    public mapsList: Map[];
+    public maps: {[id: number]: Map};
     public currentMapId: number;
     public currentFloorId: number;
 
     public get currentMap(): Map {
-        return this.mapsList[this.currentMapId];
+        return this.maps[this.currentMapId];
     }
 
     public set currentMap(value: Map) {
-        this.mapsList.push(value);
-        this.currentMapId = this.mapsList.length - 1;
+        this.currentMapId = value.id;
+        this.maps[this.currentMapId] = value;
     }
 
     public get currentFloor() {
-        if (this.currentMap) {
+        if (this.currentMap && this.currentMap.floors) {
             return this.currentMap.floors[this.currentFloorId];
         }
         else {
@@ -29,15 +29,29 @@ export class ModelService {
     }
 
     constructor(private rqstSvc: RequestService) {
-        this.mapsList = [];
+        this.maps = {};
         this.currentMapId = 0;
         this.currentFloorId = 0;
     }
 
-    public loadMap(mapId: string) {
-        if (mapId === '-1') {
+    public loadMapList() {
+        this.rqstSvc.get(RequestService.LIST_MAPS, {}).subscribe(
+            resp => {
+                if (resp) {
+                    for (const mapInfo of resp as [
+                        {id: number, name: string, favorite; boolean, permission: number, visibility: number}
+                        ]) {
+                        this.maps[mapInfo.id] = new Map(mapInfo);
+                    }
+                }
+            }
+        );
+    }
+
+    public loadMap(mapId: number) {
+        if (mapId === -1) {
             this.currentMap = new Map({
-                id: '-1',
+                id: -1,
                 name: 'New Map',
                 floors: [{
                     walls: [{p1: {x: 50, y: 50}, p2: {x: 250, y: 50}}],
