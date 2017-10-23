@@ -17,6 +17,6 @@ export class ModelService {
 
         // Pathfinding debug test
         const p = new Pathfinder();
-        p.debugTest();
+        p.linkTest();
     }
 }

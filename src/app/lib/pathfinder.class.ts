@@ -1,4 +1,4 @@
-import { PathNode } from './path-node.class';
+import { PathNode } from '../model/path-node.class';
 
 export class Pathfinder {
 
@@ -80,12 +80,146 @@ export class Pathfinder {
             // while the last node in backtracking-path has a valid parent (means: not themselves), go on.
             const resultPath = new Array();
             resultPath.push(end);
-            while (parents[nodes.indexOf(resultPath[resultPath.length - 1])] !== resultPath[resultPath.length - 1]) {
+            while (!parents[nodes.indexOf(resultPath[resultPath.length - 1])].equals(resultPath[resultPath.length - 1])) {
                 resultPath.push(parents[nodes.indexOf(resultPath[resultPath.length - 1])]);
             }
             resultPath.reverse();
             return resultPath;
         }
+    }
+
+    // TODO: simple grid based approach
+    public createLinkedGraph(): PathNode[] {
+        return null;
+    }
+
+    // TODO:
+    // advanced approach, not fully completed yet.
+    public createAdvancedLinkGraph(walls: any[], radius: number): PathNode[] {
+
+        // result
+        const pathNodes: PathNode[] = new Array();
+
+        // keep track of links, we already checked.
+        const chckd: {p1: number, p2: number}[] = [];
+
+
+
+        // create nodes in a offset(radius) around every wall.
+        for (const w of walls) {
+
+            // create some vectors.
+            const v = {x: (w.p2.x - w.p1.x) / 2, y: (w.p2.y - w.p1.y) / 2}; // half of vector p2-p1
+            const vlength = Math.sqrt(v.x * v.x + v.y * v.y);               // length
+            const v0 = {x: v.x / vlength, y: v.y / vlength};                // normalized
+
+            const vn = {x: -v.y, y: v.x};                             // perpendicular vector to v
+            const vnlength = Math.sqrt(vn.x * vn.x + vn.y * vn.y);
+            const vn0 = {x: vn.x / vnlength, y: vn.y / vnlength};
+
+            const centerCoord = {x: w.p1.x + v0.x * vlength, y: w.p1.y + v0.y * vlength};
+            const p1 = new PathNode(
+                centerCoord.x + v0.x * (vlength + radius) + vn0.x * (radius),
+                centerCoord.y + v0.y * (vlength + radius) + vn0.y * (radius)
+            );
+            const p2 = new PathNode(
+                centerCoord.x + v0.x * (vlength + radius) - vn0.x * (radius),
+                centerCoord.y + v0.y * (vlength + radius) - vn0.y * (radius)
+            );
+            const p3 = new PathNode(
+                centerCoord.x - v0.x * (vlength + radius) - vn0.x * (radius),
+                centerCoord.y - v0.y * (vlength + radius) - vn0.y * (radius)
+            );
+            const p4 = new PathNode(
+                centerCoord.x - v0.x * (vlength + radius) + vn0.x * (radius),
+                centerCoord.y - v0.y * (vlength + radius) + vn0.y * (radius)
+            );
+
+            this.linkNodes(p1, p2);
+            this.linkNodes(p2, p3);
+            this.linkNodes(p3, p4);
+            this.linkNodes(p4, p1);
+            pathNodes.push(p1, p2, p3, p4);
+
+            chckd.push({p1: pathNodes.length - 4, p2: pathNodes.length - 3}, {p1: pathNodes.length - 3, p2: pathNodes.length - 4});
+            chckd.push({p1: pathNodes.length - 3, p2: pathNodes.length - 2}, {p1: pathNodes.length - 2, p2: pathNodes.length - 3});
+            chckd.push({p1: pathNodes.length - 2, p2: pathNodes.length - 1}, {p1: pathNodes.length - 1, p2: pathNodes.length - 2});
+            chckd.push({p1: pathNodes.length - 1, p2: pathNodes.length - 4}, {p1: pathNodes.length - 4, p2: pathNodes.length - 1});
+
+            console.log('created nodes of wall', w, [p1, p2, p3, p4]);
+        }
+
+        // now, all 4 nodes around each wall are linked to their neighbour.
+        // we now have to link nodes interchangeably between the walls.
+
+        for (let i = 0; i < pathNodes.length; i++) {
+            for (let j = 0; j < pathNodes.length; j++) {
+
+                // go on if the link already exists or we are looking on the same node.
+                if (chckd.find(element => element.p1 === i && element.p2 === j) !== undefined
+                    || i === j) {
+                    continue;
+                }
+
+                // we need again a vector from each wall, to check if this node-link interfers with any other wall-line.
+                const vLink = {x: (pathNodes[j].x - pathNodes[i].x), y: (pathNodes[j].y - pathNodes[i].y)};
+                let intersects = false;
+                for (const w of walls) {
+                    const vWall = {x: w.p2.x - w.p1.x, y: w.p2.y - w.p1.y};
+
+                    // find the parameter values (s, t) for the intersection point of theese 2 lines
+                    const s = ( -vLink.y * (pathNodes[i].x - w.p1.x)
+                                + vLink.x * (pathNodes[i].y - w.p1.y))
+                              / (-vWall.x * vLink.y + vLink.x * vWall.y);
+                    const t = ( vWall.x * (pathNodes[i].y - w.p1.y)
+                                - vWall.y * (pathNodes[i].x - w.p1.x))
+                              / (-vWall.x * vLink.y + vLink.x * vWall.y);
+
+                    if (s > 0 && s < 1 && t > 0 && t < 1) {
+                        intersects = true;
+                        break;
+                    }
+                }
+
+                if (intersects) {
+                    continue;
+                }
+
+
+                // TODO: decide based on the angles if this link is worth having it.
+                // now we know this link doesnt intersect with a wall. and we didnt check this link yet.
+                // -> calculate angles to determine, if this link is worth having it.
+                const d = Math.sqrt((pathNodes[i].x - pathNodes[j].x) * (pathNodes[i].x - pathNodes[j].x) +
+                                      (pathNodes[i].y - pathNodes[j].y) * (pathNodes[i].y - pathNodes[j].y));
+                const ang1 = Math.acos( (pathNodes[i].x - pathNodes[j].x) / d );
+                console.log('checking link between ', pathNodes[i], pathNodes[j], i, j, ' calculated: ', d, ang1);
+
+                // get the main angle between p2 and p1.
+                Math.atan2(pathNodes[j].y - pathNodes[i].y, pathNodes[j].x - pathNodes[i].x);
+
+
+
+                // and add this link to the checked list.
+                chckd.push({p1: i, p2: j}, {p1: j, p2: i});
+            }
+        }
+
+        console.error('creating a linked node-graph from map doesnt work yet. TODO.');
+        return null;
+    }
+
+    public linkTest(): void {
+        const walls = [
+            {
+                p1: { x: 5, y: 5 },
+                p2: { x: 15, y: 5 }
+            },
+            {
+                p1: { x: 10, y: 15 },
+                p2: { x: 10, y: 20 }
+            },
+        ];
+        this.createLinkGraph(walls, 2);
     }
 
     public debugTest(): void {
@@ -100,26 +234,26 @@ export class Pathfinder {
         const n9 = new PathNode(900, 900);
         const n10 = new PathNode(1000, 1000);
 
-        const link = (nn1: PathNode, nn2: PathNode) => {
-            const dist = Math.sqrt((nn1.x - nn2.x) * (nn1.x - nn2.x) + (nn1.y - nn2.y) * (nn1.y - nn2.y));
-            nn1.addLinkTo(nn2, dist);
-            nn2.addLinkTo(nn1, dist);
-        };
-
         // creates a simple path with 2 shortcuts (1<->4, 4<->7 and 3<->7)
-        link(n1, n2);
-        link(n2, n3);
-        link(n3, n4);
-        link(n4, n5);
-        link(n5, n6);
-        link(n6, n7);
-        link(n1, n4);
-        link(n3, n7);
-        link(n4, n7);
+        this.linkNodes(n1, n2);
+        this.linkNodes(n2, n3);
+        this.linkNodes(n3, n4);
+        this.linkNodes(n4, n5);
+        this.linkNodes(n5, n6);
+        this.linkNodes(n6, n7);
+        this.linkNodes(n1, n4);
+        this.linkNodes(n3, n7);
+        this.linkNodes(n4, n7);
 
         // in this special example: pathfinder should take the path over 1-4-7
         // because due to shortcuts, its faster than moving over 1-2-3-7.
 
         console.log('path-result: ', this.findPathFromTo([n1, n2, n3, n4, n5, n6, n7, n8, n9, n10], n1, n7));
+    }
+
+    public linkNodes (nn1: PathNode, nn2: PathNode): void {
+        const dist = Math.sqrt((nn1.x - nn2.x) * (nn1.x - nn2.x) + (nn1.y - nn2.y) * (nn1.y - nn2.y));
+        nn1.addLinkTo(nn2, dist);
+        nn2.addLinkTo(nn1, dist);
     }
 }
