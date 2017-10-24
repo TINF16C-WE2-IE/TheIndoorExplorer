@@ -64,44 +64,12 @@ export class Floor {
         }
         this.walls = this.walls.filter(wall => !wall.deleted);
         this.portals = this.portals.filter(portal => !portal.deleted);
+    }
 
-        //
-        // if (1 == 1) return;
-        // this.walls = this.walls.filter(wall => {
-        //     // replace slave Point instance with master instance, if possible
-        //     wall.replacePoint(slave, master);
-        //     if (wall.isValid()) {
-        //         if (
-        //             this.walls.find(w => wall !== w && wall.equals(w)) ||
-        //             this.portals.find(p => wall.equals(p))
-        //         ) {
-        //             console.log('Deleting invalid wall (duplicate):', JSON.stringify(wall));
-        //             wall.p1 = null;  // to avoid deleting the other equal wall later
-        //             return false;
-        //         }
-        //         else return true;
-        //     }
-        //     else {
-        //         console.log('Deleting invalid wall (start=end):', JSON.stringify(wall));
-        //         return false;
-        //     }
-        // });
-        //
-        // this.portals = this.portals.filter(portal => {
-        //     // replace slave Point instance with master instance, if possible
-        //     portal.replacePoint(slave, master);
-        //     if (portal.isValid()) {
-        //         if (this.walls.find(p => portal !== p && portal.equals(p))) {
-        //             console.log('Deleting invalid portal (duplicate):', JSON.stringify(portal));
-        //             portal.p1 = null;  // to avoid deleting the other equal portal later
-        //             return false;
-        //         }
-        //         else return true;
-        //     }
-        //     else {
-        //         console.log('Deleting invalid portal (start=end):', JSON.stringify(portal));
-        //         return false;
-        //     }
-        // });
+    public forExport() {
+        return {
+            walls: this.walls.map(wall => wall.forExport()),
+            portals: this.portals.map(portal => portal.forExport())
+        };
     }
 }

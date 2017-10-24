@@ -50,4 +50,8 @@ export class SvgEditComponent implements OnInit {
               break;
         }
     }
+
+    saveCurrentMap() {
+        this.modelSvc.saveMap();
+    }
 }

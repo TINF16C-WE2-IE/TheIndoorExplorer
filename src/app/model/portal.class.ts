@@ -10,4 +10,8 @@ export class Portal extends Line {
         this.id = id;
         this.label = label;
     }
+
+    public forExport() {
+        return Object.assign(super.forExport(), {id: this.id, label: this.label});
+    }
 }

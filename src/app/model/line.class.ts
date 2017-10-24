@@ -37,4 +37,8 @@ export class Line {
             this.p1.equals(other.p2) && this.p2.equals(other.p1)
         );
     }
+
+    public forExport() {
+        return {p1: this.p1.forExport(), p2: this.p2.forExport()};
+    }
 }

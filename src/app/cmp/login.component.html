@@ -5,7 +5,8 @@
 
 
     <mat-card-content>
-        <div fxLayout="row" fxLayoutAlign="space-evenly center" style="width: 100%; padding-left: 50px">
+        <div *ngIf="!modelSvc.userInfo?.id" fxLayout="row" fxLayoutAlign="space-evenly center"
+             style="width: 100%; padding-left: 50px">
             <div class="item item-1" fxFlex="40%" align="center">
                 <button mat-raised-button (click)="performLogin('nubenum')" color="primary">
                     Nubenum
@@ -14,6 +15,14 @@
             <div class="item item-2" fxFlex="40%" align="center">
                 <button mat-raised-button (click)="performLogin('github')" color="primary">
                     Github
+                </button>
+            </div>
+        </div>
+        <div *ngIf="modelSvc.userInfo?.id" fxLayout="row" fxLayoutAlign="space-evenly center"
+             style="width: 100%; padding-left: 50px">
+            <div class="item item-1" fxFlex="40%" align="center">
+                <button mat-raised-button (click)="performLogout()" color="primary">
+                    Logout
                 </button>
             </div>
         </div>
