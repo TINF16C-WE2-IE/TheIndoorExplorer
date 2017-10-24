@@ -1,4 +1,4 @@
-<svg id="editorCanvas" viewBox="0 0 500 500"
+<svg id="editorCanvas" viewBox="0 0 500 500" [style.cursor]="mouse.tool.cursorShape"
      (mouseup)="mouse.onMouseUp($event)" (mousedown)="mouse.onMouseDown($event)"
      (mousemove)="mouse.onMouseMove($event)" (mouseleave)="mouse.onMouseLeave($event)"
      xmlns:svg="http://www.w3.org/2000/svg" version="1.2">
@@ -33,7 +33,8 @@
 <form #toolbox id="toolbox">
     <h3>Toolbox</h3>
 
-    <mat-radio-group class="example-radio-group" [ngModelOptions]="{standalone: true}" [ngModel]="mouse.tool.name" (ngModelChange)="selectTool($event)">
+    <mat-radio-group class="example-radio-group" [ngModelOptions]="{standalone: true}" [ngModel]="mouse.tool.name"
+                     (ngModelChange)="selectTool($event)">
         <mat-radio-button class="example-radio-button" *ngFor="let name of toolnames" [value]="name">
             {{name}}
         </mat-radio-button>
