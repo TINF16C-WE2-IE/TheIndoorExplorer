@@ -38,13 +38,36 @@ export abstract class Tool {
         }
         else {
             const lines = ([...this.floor.walls, ...this.floor.portals] as Line[]).map(line => {
-                const [x0, y0, x1, y1, x2, y2] = [this.mouse.x, this.mouse.y, line.p1.x, line.p1.y, line.p2.x, line.p2.y];
-                const distance = Math.abs((y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1)
-                    / Math.sqrt((y2 - y1) ** 2 + (x2 - x1) ** 2);
-                return {distance: distance, line: line};
+                return {
+                    distance: this.pointDistance(this.mouse.x, this.mouse.y, line.p1.x, line.p1.y, line.p2.x, line.p2.y),
+                    line: line
+                };
             });
-            const line = lines.reduce((prev, current) => prev.distance > current.distance ? current : prev).line;
-            return [line.p1, line.p2];
+            const shortest = lines.reduce((prev, current) => prev.distance > current.distance ? current : prev);
+            return shortest.distance <= lineAccuracy ? [shortest.line.p1, shortest.line.p2] : [];
         }
+    }
+
+    private pointDistance(x, y, x1, y1, x2, y2) {
+        // calculates distance between point (x, y) and line segment (x1, y1)---(x2, y2)
+        // adapted from: https://stackoverflow.com/a/6853926/4464570
+        const dot = (x - x1) * (x2 - x1) + (y - y1) * (y2 - y1);
+        const len_sq = (x2 - x1) ** 2 + (y2 - y1) ** 2;
+        const param = len_sq !== 0 ? dot / len_sq : -1;
+
+        let xx, yy;
+        if (param < 0) {
+            xx = x1;
+            yy = y1;
+        }
+        else if (param > 1) {
+            xx = x2;
+            yy = y2;
+        }
+        else {
+            xx = x1 + param * (x2 - x1);
+            yy = y1 + param * (y2 - y1);
+        }
+        return Math.sqrt((x - xx) ** 2 + (y - yy) ** 2);
     }
 }
