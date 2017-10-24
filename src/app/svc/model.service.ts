@@ -1,3 +1,6 @@
+import { Point } from './../model/point.class';
+import { Line } from './../model/line.class';
+import { Pathfinder } from './../lib/pathfinder.class';
 import { Map } from '../model/map.class';
 import { Injectable } from '@angular/core';
 import { RequestService } from './request.service';
@@ -70,7 +73,8 @@ export class ModelService {
                 name: 'New Map',
                 floors: [{
                     walls: [{p1: {x: 50, y: 50}, p2: {x: 250, y: 50}}],
-                    portals: [{id: 1, label: 'main door', p1: {x: 100, y: 100}, p2: {x: 250, y: 250}}]
+                    portals: [{id: 1, label: 'main door', p1: {x: 100, y: 100}, p2: {x: 250, y: 250}},
+                    {id: 1, label: 'main door', p1: {x: 250, y: 250}, p2: {x: 300, y: 400}}]
                 }],
                 favorite: false,
                 permission: 0,

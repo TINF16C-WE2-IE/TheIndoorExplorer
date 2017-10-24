@@ -1,3 +1,6 @@
+import { Line } from './../model/line.class';
+import { Wall } from './../model/wall.class';
+import { Point } from './../model/point.class';
 import { PathNode } from '../model/path-node.class';
 
 export class Pathfinder {
@@ -88,9 +91,66 @@ export class Pathfinder {
         }
     }
 
-    // TODO: simple grid based approach
-    public createLinkedGraph(): PathNode[] {
-        return null;
+    // simple grid based approach
+    public createLinkedGraph(threshold, rectEditorWidth, rectEditorHeight, lines: Line[]): PathNode[] {
+
+
+        const numX = ((rectEditorWidth - threshold) / threshold + 1);
+        const numY = ((rectEditorHeight - threshold) / threshold + 1);
+        const pathNodes = [];
+
+        // create pathnodes and link them to left and up, in case the links dont intersect a wall.
+        for (let j = 0; j < numY; j++) {
+            for (let i = 0; i < numX; i++) {
+                const x = i * threshold + threshold / 2;
+                const xb = (i - 1) * threshold + threshold / 2;
+                const y = j * threshold + threshold / 2;
+                const yb = (j - 1) * threshold + threshold / 2;
+                pathNodes.push(new PathNode(x, y));
+
+                if (i > 0) {
+                    if (!this.checkIntersectionOfLineWithLines(xb, y, x, y, lines)) {
+                        this.linkNodes(
+                            pathNodes.find(element => element.x === x && element.y === y),
+                            pathNodes.find(element => element.x === xb && element.y === y),
+                        );
+                    }
+                }
+                if (j > 0) {
+                    if (!this.checkIntersectionOfLineWithLines(x, yb, x, y, lines)) {
+                        this.linkNodes(
+                            pathNodes.find(element => element.x === x && element.y === y),
+                            pathNodes.find(element => element.x === x && element.y === yb),
+                        );
+                    }
+                }
+            }
+        }
+
+        return pathNodes;
+    }
+
+    private checkIntersectionOfLineWithLines(p1x, p1y, p2x, p2y, lines: Line[]): boolean {
+
+        let intersects = false;
+        for (const w of lines) {
+            const vWall = {x: w.p2.x - w.p1.x, y: w.p2.y - w.p1.y};
+
+            // find the parameter values (s, t) for the intersection point of theese 2 lines
+            const s = ( -(p2y - p1y) * (p1x - w.p1.x)
+                        + (p2x - p1x) * (p1y - w.p1.y))
+                      / (-vWall.x * (p2y - p1y) + (p2x - p1x) * vWall.y);
+            const t = ( vWall.x * (p1y - w.p1.y)
+                        - vWall.y * (p1x - w.p1.x))
+                      / (-vWall.x * (p2y - p1y) + (p2x - p1x) * vWall.y);
+
+            if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+                intersects = true;
+                break;
+            }
+        }
+
+        return intersects;
     }
 
     // TODO:
@@ -206,49 +266,6 @@ export class Pathfinder {
 
         console.error('creating a linked node-graph from map doesnt work yet. TODO.');
         return null;
-    }
-
-    public linkTest(): void {
-        const walls = [
-            {
-                p1: { x: 5, y: 5 },
-                p2: { x: 15, y: 5 }
-            },
-            {
-                p1: { x: 10, y: 15 },
-                p2: { x: 10, y: 20 }
-            },
-        ];
-        this.createAdvancedLinkGraph(walls, 2);
-    }
-
-    public debugTest(): void {
-        const n1 = new PathNode(100, 100);
-        const n2 = new PathNode(200, 200);
-        const n3 = new PathNode(300, 500);
-        const n4 = new PathNode(400, 400);
-        const n5 = new PathNode(500, 500);
-        const n6 = new PathNode(600, 600);
-        const n7 = new PathNode(200, 100);
-        const n8 = new PathNode(800, 800);
-        const n9 = new PathNode(900, 900);
-        const n10 = new PathNode(1000, 1000);
-
-        // creates a simple path with 2 shortcuts (1<->4, 4<->7 and 3<->7)
-        this.linkNodes(n1, n2);
-        this.linkNodes(n2, n3);
-        this.linkNodes(n3, n4);
-        this.linkNodes(n4, n5);
-        this.linkNodes(n5, n6);
-        this.linkNodes(n6, n7);
-        this.linkNodes(n1, n4);
-        this.linkNodes(n3, n7);
-        this.linkNodes(n4, n7);
-
-        // in this special example: pathfinder should take the path over 1-4-7
-        // because due to shortcuts, its faster than moving over 1-2-3-7.
-
-        console.log('path-result: ', this.findPathFromTo([n1, n2, n3, n4, n5, n6, n7, n8, n9, n10], n1, n7));
     }
 
     public linkNodes (nn1: PathNode, nn2: PathNode): void {
