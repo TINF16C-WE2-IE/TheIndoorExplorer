@@ -5,7 +5,7 @@ export class MoveTool extends Tool {
     private point: Point = null;
 
     public get name() {
-        return 'Move Point';
+        return 'Move';
     }
 
     public onMouseDown(evt: MouseEvent) {
