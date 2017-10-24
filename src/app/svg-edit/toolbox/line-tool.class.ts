@@ -38,7 +38,7 @@ export class LineTool extends Tool {
             }
                 break;
             case Portal: {
-                const id = Math.max(...this.floor.portals.map(portal => portal.id)) + 1;
+                const id = Math.max(0, ...this.floor.portals.map(portal => portal.id)) + 1;
                 this.floor.portals.push(new Portal(id, 'New Portal!', start, this.point));
             }
                 break;

@@ -1,5 +1,5 @@
-import { RequestService } from './../svc/request.service';
-import { ModelService } from './../svc/model.service';
+import { RequestService } from '../svc/request.service';
+import { ModelService } from '../svc/model.service';
 import { Component } from '@angular/core';
 
 @Component({
@@ -9,10 +9,19 @@ import { Component } from '@angular/core';
 export class LoginComponent {
 
     constructor(private rqstSvc: RequestService, public modelSvc: ModelService) {
-
     }
 
     public performLogin(provider: string): void {
         window.location.href = RequestService.URL_LOGIN_ENDPOINT + this.rqstSvc.uriEncodeObject({'providerId': provider});
+    }
+
+    public performLogout(): void {
+        this.rqstSvc.get('logout', {}).subscribe(
+            resp => {
+                if (resp) {
+                    console.log('Logout response:', resp);
+                }
+            }
+        );
     }
 }

@@ -29,16 +29,22 @@
 
 <form #toolbox id="toolbox">
     <h3>Toolbox</h3>
-    <button class="toolbutton" [style.background-color]="mouse.tool.name=='Move Point' ? 'cyan' : ''"
-            (click)="selectMoveTool()">Move
-    </button>
-    <button class="toolbutton" [style.background-color]="mouse.tool.name=='Draw Wall' ? 'cyan' : ''"
-            (click)="selectWallDrawTool()">Wall
-    </button>
-    <button class="toolbutton" [style.background-color]="mouse.tool.name=='Draw Portal' ? 'cyan' : ''"
-            (click)="selectPortalDrawTool()">Portal
-    </button>
-    <!--<button (click)="saveCurrentMap()">Save</button>-->
+    <fieldset>
+        <legend>Tools</legend>
+        <button class="toolbutton" [style.background-color]="mouse.tool.name=='Move Point' ? 'cyan' : ''"
+                (click)="selectMoveTool()">Move
+        </button>
+        <button class="toolbutton" [style.background-color]="mouse.tool.name=='Draw Wall' ? 'cyan' : ''"
+                (click)="selectWallDrawTool()">Wall
+        </button>
+        <button class="toolbutton" [style.background-color]="mouse.tool.name=='Draw Portal' ? 'cyan' : ''"
+                (click)="selectPortalDrawTool()">Portal
+        </button>
+    </fieldset>
+    <fieldset>
+        <legend>Actions</legend>
+        <button class="actionbutton" (click)="saveCurrentMap()">Save</button>
+    </fieldset>
     <p>Selected: {{mouse.tool.name}} ({{mouse.x}} | {{mouse.y}})</p>
     <p>
         Stats:
@@ -46,6 +52,6 @@
         {{floor?.portals.length || 0}} Portals,
         {{floor?.getAllPoints().length || 0}} Points
     </p>
-    <pre>{{this?.floor | json}}</pre>
+    <!--<pre>{{this?.floor | json}}</pre>-->
 </form>
 

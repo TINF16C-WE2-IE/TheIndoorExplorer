@@ -34,15 +34,20 @@ export class RequestService {
 
     private handleResponse(res: any): any {
         if (res.ok === true && res.status === 200) {
-            const jsonObj = res.json();
-            if (jsonObj.error !== undefined && jsonObj !== null) {
-                console.error(jsonObj.error);
+            try {
+                const jsonObj = res.json();
+                if (jsonObj.error !== undefined && jsonObj !== null) {
+                    console.log(jsonObj.error);
+                    return null;
+                } else {
+                    return jsonObj;
+                }
+            } catch (e) {
+                console.log('Non-JSON response', res.body);
                 return null;
-            } else {
-                return jsonObj;
             }
         } else {
-            console.error('Server is not responding correctly! Maybe down?', res);
+            console.log('Server is not responding correctly! Maybe down?', res);
             return null;
         }
     }

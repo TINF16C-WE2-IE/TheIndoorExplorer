@@ -9,7 +9,7 @@ export class ModelService {
     public maps: {[id: number]: Map};
     public currentMapId: number;
     public currentFloorId: number;
-    public userInfo: any;
+    public userInfo: {id: number, username: string};
 
     public get currentMap() {
         return this.maps[this.currentMapId];
@@ -29,11 +29,24 @@ export class ModelService {
         }
     }
 
+
     constructor(private rqstSvc: RequestService) {
         this.maps = {};
         this.currentMapId = 0;
         this.currentFloorId = 0;
         this.userInfo = null;
+    }
+
+
+    public loadUserInfo() {
+        this.rqstSvc.get(RequestService.INFO_USER, {}).subscribe(
+            resp => {
+                if (resp) {
+                    console.log('got user info:', resp);
+                    this.userInfo = resp;
+                }
+            }
+        );
     }
 
     public loadMapList() {
@@ -76,7 +89,7 @@ export class ModelService {
     }
 
     public saveMap() {
-        this.rqstSvc.post(RequestService.LIST_MAP_SAVE, {'map': this.currentMap})
+        this.rqstSvc.post(RequestService.LIST_MAP_SAVE, this.currentMap.forExport())
             .subscribe(resp => {
                 console.log('got response map-save: ', resp);
                 if (resp !== null) {
@@ -84,5 +97,4 @@ export class ModelService {
                 }
             });
     }
-
 }

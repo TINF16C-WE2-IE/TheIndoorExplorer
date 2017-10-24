@@ -45,4 +45,8 @@ export class SvgEditComponent implements OnInit {
     selectPortalDrawTool() {
         this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Portal});
     }
+
+    saveCurrentMap() {
+        this.modelSvc.saveMap();
+    }
 }

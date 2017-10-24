@@ -20,4 +20,16 @@ export class Map {
         this.permission = obj.permission;
         this.visibility = obj.visibility;
     }
+
+
+    public forExport() {
+        return {
+            id: this.id,
+            name: this.name,
+            floors: this.floors.map(floor => floor.forExport()),
+            favorite: this.favorite,
+            permission: this.permission,
+            visibility: this.visibility
+        };
+    }
 }

@@ -65,4 +65,8 @@ export class Point {
     clone(): Point {
         return new Point(this.x, this.y, this.gridSnap);
     }
+
+    public forExport() {
+        return {x: this._x, y: this._y};
+    }
 }
