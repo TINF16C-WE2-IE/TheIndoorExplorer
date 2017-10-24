@@ -20,6 +20,7 @@ export class MoveTool extends Tool {
         this.selected = this.getExistingObjectsBelowCursor().map(point => {
             return {origin: point.clone(), current: point};
         });
+        return this.selected.length;
     }
 
     public onMouseUp(evt: MouseEvent) {
@@ -32,11 +33,13 @@ export class MoveTool extends Tool {
     }
 
     public onMouseMove(evt: MouseEvent) {
+        if (this.dragOrigin && !this.selected.length) return false;
         for (const selPoint of this.selected) {
             selPoint.current.setCoords(
                 selPoint.origin.x + (this.mouse.xs - this.dragOrigin.x),
                 selPoint.origin.y + (this.mouse.ys - this.dragOrigin.y)
             );
         }
+        return true;
     }
 }
