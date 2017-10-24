@@ -36,7 +36,9 @@
 <form #toolbox id="toolbox">
     <h3>Toolbox</h3>
 
-    <button mat-button *ngFor="let tool of tools" (click)="selectTool(tool.name)">
+    <button mat-button *ngFor="let tool of tools" 
+        [ngClass]="tool.name == selectedTool ? 'mat-raised-button tool-button' : 'tool-button'" 
+        (click)="selectTool(tool.name)">
         <mat-icon [svgIcon]="tool.icon"></mat-icon> {{tool.name}}
     </button>
 

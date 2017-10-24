@@ -16,6 +16,10 @@ body {
     padding-top: 5px;
 }
 
+.mat-button.tool-button {
+    display: block;
+}
+
 .example-spacer {
     flex: 1 1 auto;
 }
