@@ -33,6 +33,7 @@ export class Mouse {
         if (this.tool) {
             this.tool.onMouseDown(evt);
         }
+        return false; // disallow browser from dragging the svg image
     }
 
     public onMouseUp(evt: MouseEvent) {
