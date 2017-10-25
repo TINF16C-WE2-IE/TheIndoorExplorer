@@ -103,4 +103,17 @@ export class SvgEditComponent implements OnInit {
     saveCurrentMap() {
         this.modelSvc.saveMap();
     }
+
+    viewBoxString() {
+        return this.modelSvc.panOffset.x + ' ' + this.modelSvc.panOffset.y + ' '
+        + this.modelSvc.canvasSize.x + ' ' + this.modelSvc.canvasSize.y;
+    }
+
+    zoom(direction: number) {
+        this.modelSvc.currentMap.zoom(direction);
+    }
+
+    fitToViewport() {
+        this.modelSvc.currentMap.fitToViewport();
+    }
 }
