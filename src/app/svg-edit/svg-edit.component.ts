@@ -48,15 +48,18 @@ export class SvgEditComponent implements OnInit {
 
     generatePath() {
 
-        // create nodes graph with params: threshold, svg width, svg height
-        const nodes =
-        /*this.pfinder.createLinkedGraph(25, 500, 500,
-            [...this.modelSvc.currentFloor.portals, ...this.modelSvc.currentFloor.walls]
-        );*/
-        this.pfinder.createAdvancedLinkedGraph([...this.modelSvc.currentFloor.portals, ...this.modelSvc.currentFloor.walls], 15);
+        const start = new Point(450, 50, false);
+        const end = new Point(100, 450, false);
 
-        // find path with params: nodes list, start, end
-        const path = this.pfinder.findPathFromTo(nodes, nodes[3], nodes[6]);
+        // create nodes graph
+        const nodes = this.pfinder.createAdvancedLinkedGraph(
+            [...this.modelSvc.currentFloor.portals, ...this.modelSvc.currentFloor.walls]
+            , 15, start, end);
+
+        // find path in this node system
+        const path = this.pfinder.findPathFromTo(nodes,
+            nodes.find(el => el.x === start.x && el.y === start.y),
+            nodes.find(el => el.x === end.x && el.y === end.y));
         this.movingPath = new Array();
         for (let i = 1; i < path.length; i++) {
             this.movingPath.push(new Line(

@@ -159,7 +159,7 @@ export class Pathfinder {
 
 
     // advanced approach: more complex in preparation, but less nodes, so cheaper for path finding.
-    public createAdvancedLinkedGraph(walls: any[], radius: number): PathNode[] {
+    public createAdvancedLinkedGraph(walls: any[], radius: number, start: Point = null, end: Point = null): PathNode[] {
 
         // keep track of node-polygons
         const nodePolygons: {lines: Line[]}[] = [];
@@ -224,8 +224,8 @@ export class Pathfinder {
             for (const npl of nodePolygons) {
 
                 // dont connect links on the same polygon. we already have them
-                // BEWARE: this approach here only works with CONVEX shapes.
-                // if they are concav, there would be truly more connections on the same polygon!
+                // BEWARE: this approach here only works with CONVEX polygon-shapes.
+                // if they are concav, there would be truly more/other connections on the same polygon! (than just the walls)
                 if (np === npl
                       || np.lines.find(
                           el => npl.lines.find(
@@ -254,34 +254,17 @@ export class Pathfinder {
                             return !this.checkIntersectionOfLineWithLines(
                                 np.lines[i].p1.x, np.lines[i].p1.y, npl.lines[j].p1.x, npl.lines[j].p1.y, element.lines, false);
                         })) {
+                            if (this.checkIfLinkIsWorthIt(
+                                    np.lines[i].p1,
+                                    npl.lines[j].p1,
+                                    np.lines[(i === 0) ? (np.lines.length - 1) : (i - 1)].p1,
+                                    np.lines[(i === np.lines.length - 1) ? (0) : (i + 1)].p1,
+                                    npl.lines[(j === 0) ? (npl.lines.length - 1) : (j - 1)].p1,
+                                    npl.lines[(j === npl.lines.length - 1) ? (0) : (j + 1)].p1
+                            )) {
 
-                            // check if this link is worth having it. based on angles of their neighbour walls
+                                // check if this link is worth having it. based on angles of their neighbour walls
 
-                            // get some vectors and angles
-                            const nodeAng = Math.atan2(npl.lines[j].p1.y - np.lines[i].p1.y, npl.lines[j].p1.x - np.lines[i].p1.x);
-                            let ang11 = nodeAng - Math.atan2(
-                              npl.lines[(j === npl.lines.length - 1) ? (0) : (j + 1)].p1.y - np.lines[i].p1.y,
-                              npl.lines[(j === npl.lines.length - 1) ? (0) : (j + 1)].p1.x - np.lines[i].p1.x);
-                            let ang12 = nodeAng - Math.atan2(
-                              npl.lines[(j === 0) ? (npl.lines.length - 1) : (j - 1)].p1.y - np.lines[i].p1.y,
-                              npl.lines[(j === 0) ? (npl.lines.length - 1) : (j - 1)].p1.x - np.lines[i].p1.x);
-                            let ang21 = nodeAng - Math.atan2(
-                              np.lines[(i === np.lines.length - 1) ? (0) : (i + 1)].p1.y - npl.lines[j].p1.y,
-                              np.lines[(i === np.lines.length - 1) ? (0) : (i + 1)].p1.x - npl.lines[j].p1.x);
-                            let ang22 = nodeAng - Math.atan2(
-                              np.lines[(i === 0) ? (np.lines.length - 1) : (i - 1)].p1.y - npl.lines[j].p1.y,
-                              np.lines[(i === 0) ? (np.lines.length - 1) : (i - 1)].p1.x - npl.lines[j].p1.x);
-
-                            if (ang11 >= Math.PI) ang11 -= Math.PI * 2;
-                            else if (ang11 <= -Math.PI) ang11 += Math.PI * 2;
-                            if (ang12 >= Math.PI) ang12 -= Math.PI * 2;
-                            else if (ang12 <= -Math.PI) ang12 += Math.PI * 2;
-                            if (ang21 >= Math.PI) ang21 -= Math.PI * 2;
-                            else if (ang21 <= -Math.PI) ang21 += Math.PI * 2;
-                            if (ang22 >= Math.PI) ang22 -= Math.PI * 2;
-                            else if (ang22 <= -Math.PI) ang22 += Math.PI * 2;
-
-                            if (Math.sign(ang11) === Math.sign(ang12) && Math.sign(ang21) === Math.sign(ang22)) {
                                 // we need this link!
                                 this.linkNodes(
                                     nodes.find(el => el.x === np.lines[i].p1.x && el.y === np.lines[i].p1.y),
@@ -302,8 +285,70 @@ export class Pathfinder {
             }
         }
 
-        console.log(nodes);
+
+        // at last but not least, connect the start point to visible nodes!
+        if (start !== undefined && start !== null) {
+            const startn = new PathNode(start.x, start.y);
+            nodes.push(startn);
+            for (const n of nodes) {
+                if (nodePolygons.every(element => {
+                    return !this.checkIntersectionOfLineWithLines(
+                        start.x, start.y, n.x, n.y, element.lines, false);
+                })) {
+                    this.linkNodes(startn, n);
+
+                    // mainly just for debug
+                    this.connections.push(new Line(start, new Point(n.x, n.y, false)));
+                }
+            }
+        }
+
+        // also connect endpoint
+        if (end !== undefined && end !== null) {
+            const endn = new PathNode(end.x, end.y);
+            nodes.push(endn);
+            for (const n of nodes) {
+                if (nodePolygons.every(element => {
+                    return !this.checkIntersectionOfLineWithLines(
+                        end.x, end.y, n.x, n.y, element.lines, false);
+                })) {
+                    this.linkNodes(endn, n);
+
+                    // mainly just for debug
+                    this.connections.push(new Line(end, new Point(n.x, n.y, false)));
+                }
+            }
+        }
+
         return nodes;
+    }
+
+    // @params arguments are the 2 nodes, and then the 2 neighbour nodes of the first (before, after),
+    // then the 2 neighbour nodes for the second one (before, after).
+    private checkIfLinkIsWorthIt(p1: Point, p2: Point, p1prev: Point, p1next: Point, p2prev: Point, p2next: Point): boolean {
+
+        if ((p1.x === p1next.x && p1next.x === p1prev.x && p1.y === p1next.y && p1next.y === p1prev.y)
+            && (p2.x === p2next.x && p2next.x === p2prev.x && p2.y === p2next.y && p2next.y === p2prev.y)) {
+            return true;
+        }
+
+        // get some vectors and angles
+        const nodeAng = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+        let ang11 = nodeAng - Math.atan2(p2next.y - p1.y, p2next.x - p1.x);
+        let ang12 = nodeAng - Math.atan2(p2prev.y - p1.y, p2prev.x - p1.x);
+        let ang21 = nodeAng - Math.atan2(p1next.y - p2.y, p1next.x - p2.x);
+        let ang22 = nodeAng - Math.atan2(p1prev.y - p2.y, p1prev.x - p2.x);
+
+        if (ang11 >= Math.PI) ang11 -= Math.PI * 2;
+        else if (ang11 <= -Math.PI) ang11 += Math.PI * 2;
+        if (ang12 >= Math.PI) ang12 -= Math.PI * 2;
+        else if (ang12 <= -Math.PI) ang12 += Math.PI * 2;
+        if (ang21 >= Math.PI) ang21 -= Math.PI * 2;
+        else if (ang21 <= -Math.PI) ang21 += Math.PI * 2;
+        if (ang22 >= Math.PI) ang22 -= Math.PI * 2;
+        else if (ang22 <= -Math.PI) ang22 += Math.PI * 2;
+
+        return Math.sign(ang11) === Math.sign(ang12) && Math.sign(ang21) === Math.sign(ang22);
     }
 
     public linkNodes (nn1: PathNode, nn2: PathNode): void {

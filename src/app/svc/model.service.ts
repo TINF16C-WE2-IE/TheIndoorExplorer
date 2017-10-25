@@ -74,7 +74,7 @@ export class ModelService {
                 floors: [{
                     walls: [{p1: {x: 50, y: 50}, p2: {x: 250, y: 50}}],
                     portals: [{id: 1, label: 'main door', p1: {x: 100, y: 100}, p2: {x: 250, y: 250}},
-                    {id: 1, label: 'main door', p1: {x: 350, y: 150}, p2: {x: 310, y: 400}}]
+                    {id: 1, label: 'main door', p1: {x: 250, y: 250}, p2: {x: 310, y: 400}}]
                 }],
                 favorite: false,
                 permission: 0,
