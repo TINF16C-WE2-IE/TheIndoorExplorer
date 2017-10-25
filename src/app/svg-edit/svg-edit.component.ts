@@ -112,6 +112,17 @@ export class SvgEditComponent implements OnInit {
 
     createFloor(cloneFrom: Floor = null) {
         this.modelSvc.currentMap.createFloor(cloneFrom);
+        this.selectFloor(this.floors.length - 1);
+    }
+
+    moveFloor(floor: Floor, direction: number) {
+        const newPos = this.modelSvc.currentMap.moveFloor(floor, direction);
+        this.selectFloor(newPos);
+    }
+
+    removeFloor(floor: Floor) {
+        this.selectFloor(0);
+        this.modelSvc.currentMap.removeFloor(floor);
     }
 
     saveCurrentMap() {

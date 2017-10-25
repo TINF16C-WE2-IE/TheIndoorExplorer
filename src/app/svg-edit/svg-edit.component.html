@@ -68,19 +68,28 @@
             <mat-icon aria-label="Fit to Viewport">zoom_out_map</mat-icon>
         </button>
     </p>
+    <input type="text" name="objname" *ngIf="floor" [(ngModel)]="floor.label" placeholder="Object Name">
 
     <h4>Floors</h4>
     <p>
         <button mat-icon-button *ngFor="let f of floors; let i = index" 
             [ngClass]="floor == f ? 'mat-raised-button floor-button' : 'floor-button'" 
             (click)="selectFloor(i)">
-            {{floor.name.length ? floor.name : i+1}}
+            {{f.label.length ? f.label : i+1}}
         </button>
+    </p>
+    <p>
         <button mat-button (click)="createFloor()">
             <mat-icon>add_circle_outline</mat-icon> New floor
         </button>
         <button mat-button (click)="createFloor(floor)">
             <mat-icon>control_point_duplicate</mat-icon> Clone floor
+        </button>
+        <button mat-button (click)="removeFloor(floor)">
+            <mat-icon>remove_circle_outline</mat-icon> Remove floor
+        </button>
+        <button mat-button (click)="moveFloor(floor, 1)">
+            <mat-icon>vertical_align_top</mat-icon> Move up
         </button>
     </p>
     <!--<pre>{{this?.floor | json}}</pre>-->

@@ -29,9 +29,28 @@ export class Map {
 
     public createFloor(cloneFrom: Floor = null) {
         if (!cloneFrom) {
-            this.floors.push(new Floor({'walls': [], 'portals': []}));
+            this.floors.push(new Floor({'walls': [], 'portals': [], 'label': ''}));
         } else {
             this.floors.push(new Floor(cloneFrom.forExport()));
+        }
+    }
+
+    moveFloor(floor: Floor, direction: number): number {
+        const floorId = this.floors.indexOf(floor);
+        if (direction === 1 && floorId > -1 && floorId < this.floors.length - 1) {
+            const tmpFloor = this.floors[floorId];
+            const newFloorId = floorId + 1;
+            this.floors[floorId] = this.floors[newFloorId];
+            this.floors[newFloorId] = tmpFloor;
+            return newFloorId;
+        }
+        return floorId;
+    }
+
+    removeFloor(floor: Floor) {
+        const floorId = this.floors.indexOf(floor);
+        if (this.floors.length > 1 && floorId !== -1) {
+            this.floors.splice(floorId, 1);
         }
     }
 

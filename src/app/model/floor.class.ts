@@ -7,11 +7,12 @@ export class Floor {
 
     public portals: Portal[] = [];
     public walls: Wall[] = [];
-    public name = '';
+    public label = '';
 
     constructor(obj: {
         walls: {p1: {x: number, y: number}, p2: {x: number, y: number}}[],
-        portals: {id: number, label: string, p1: {x: number, y: number}, p2: {x: number, y: number}}[]
+        portals: {id: number, label: string, p1: {x: number, y: number}, p2: {x: number, y: number}}[],
+        label: string
     }) {
         for (const wall_obj of obj.walls) {
             const p1 = this.getExistingOrThisPoint(new Point(wall_obj.p1.x, wall_obj.p1.y));
@@ -23,6 +24,7 @@ export class Floor {
             const p2 = this.getExistingOrThisPoint(new Point(portal_obj.p2.x, portal_obj.p2.y));
             this.portals.push(new Portal(portal_obj.id, portal_obj.label, p1, p2));
         }
+        this.label = obj.label;
     }
 
     public getAllPoints(): Point[] {
@@ -76,7 +78,8 @@ export class Floor {
     public forExport() {
         return {
             walls: this.walls.map(wall => wall.forExport()),
-            portals: this.portals.map(portal => portal.forExport())
+            portals: this.portals.map(portal => portal.forExport()),
+            label: this.label
         };
     }
 }
