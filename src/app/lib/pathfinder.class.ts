@@ -93,8 +93,8 @@ export class Pathfinder {
         }
     }
 
-    // simple grid based approach
-    public createLinkedGraph(threshold, rectEditorWidth, rectEditorHeight, lines: Line[]): PathNode[] {
+    // simple grid based approach, very expensive, is DEPRECATED
+    public createGridBasedLinkedGraph(threshold, rectEditorWidth, rectEditorHeight, lines: Line[]): PathNode[] {
 
 
         const numX = ((rectEditorWidth - threshold) / threshold + 1);
@@ -159,7 +159,7 @@ export class Pathfinder {
 
 
     // advanced approach: more complex in preparation, but less nodes, so cheaper for path finding.
-    public createAdvancedLinkedGraph(walls: any[], radius: number, start: Point = null, end: Point = null): PathNode[] {
+    public createLinkedGraph(walls: any[], radius: number, start: Point = null, end: Point = null): PathNode[] {
 
         // keep track of node-polygons
         const nodePolygons: {lines: Line[]}[] = [];

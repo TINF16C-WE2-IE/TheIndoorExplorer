@@ -37,8 +37,7 @@ export class SvgEditComponent implements OnInit {
     ngOnInit() {
         this.route.params.subscribe(
             params => {
-                this.modelSvc.loadMap(-1);
-                this.generatePath();
+                this.modelSvc.loadMap(Number.parseInt(params['mapId']));
             }
         );
 
@@ -52,7 +51,7 @@ export class SvgEditComponent implements OnInit {
         const end = new Point(100, 450, false);
 
         // create nodes graph
-        const nodes = this.pfinder.createAdvancedLinkedGraph(
+        const nodes = this.pfinder.createLinkedGraph(
             [...this.modelSvc.currentFloor.portals, ...this.modelSvc.currentFloor.walls]
             , 15, start, end);
 
