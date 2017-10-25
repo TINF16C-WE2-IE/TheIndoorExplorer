@@ -14,18 +14,19 @@ export class Canvas {
         this.domElement = document.getElementById('editorCanvas');
     }
 
-    public getBodyOffset() {
+    private getBodyOffset() {
         const offset = this.domElement.getBoundingClientRect();
         this.bodyOffset.x = offset.x;
         this.bodyOffset.y = offset.y;
     }
 
-    public zoom(by: number, evt: Mouse = null) {
-        this.canvasSize += 100 * by;
-        if (this.canvasSize < 100) this.canvasSize = 100;
+    public zoom(direction: number, evt: Mouse = null) {
+        if (Math.abs(direction) !== 1) direction = 0;
+        const size = this.canvasSize + 100 * direction;
+        this.canvasSize = size < 100 ? 100 : size;
         if (evt) {
-            this.panOffset.x += (evt.x - this.bodyOffset.x - this.viewportSize / 2) / 4;
-            this.panOffset.y += (evt.x - this.bodyOffset.x - this.viewportSize / 2) / 4;
+            this.panOffset.x += (evt.x - this.bodyOffset.x - this.viewportSize / 2) / 10;
+            this.panOffset.y += (evt.x - this.bodyOffset.x - this.viewportSize / 2) / 10;
         }
     }
 
