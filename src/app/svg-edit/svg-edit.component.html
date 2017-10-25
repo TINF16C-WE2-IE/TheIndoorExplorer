@@ -57,11 +57,11 @@
         {{floor?.getAllPoints().length || 0}} Points
     </p>
     <p>
-        <button mat-icon-button>
-            <mat-icon aria-label="Zoom -" (click)="canvas.zoom(-1)">zoom_in</mat-icon>
+        <button mat-icon-button (click)="canvas.zoom(-1)">
+            <mat-icon aria-label="Zoom -">zoom_in</mat-icon>
         </button>
-        <button mat-icon-button>
-            <mat-icon aria-label="Zooom +" (click)="canvas.zoom(1)">zoom_out</mat-icon>
+        <button mat-icon-button (click)="canvas.zoom(1)">
+            <mat-icon aria-label="Zooom +">zoom_out</mat-icon>
         </button>
     </p>
     <!--<pre>{{this?.floor | json}}</pre>-->
