@@ -7,6 +7,7 @@ export class Floor {
 
     public portals: Portal[] = [];
     public walls: Wall[] = [];
+    public name = '';
 
     constructor(obj: {
         walls: {p1: {x: number, y: number}, p2: {x: number, y: number}}[],

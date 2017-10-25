@@ -27,6 +27,14 @@ export class Map {
         this.modelSvc = modelSvc;
     }
 
+    public createFloor(cloneFrom: Floor = null) {
+        if (!cloneFrom) {
+            this.floors.push(new Floor({'walls': [], 'portals': []}));
+        } else {
+            this.floors.push(new Floor(cloneFrom.forExport()));
+        }
+    }
+
     public forExport() {
         return {
             id: this.id,

@@ -37,6 +37,10 @@ export class ModelService {
         }
     }
 
+    public setCurrentFloor(id: number) {
+        this.currentFloorId = id;
+    }
+
     constructor(private rqstSvc: RequestService) {
         this.maps = {};
         this.currentMapId = 0;

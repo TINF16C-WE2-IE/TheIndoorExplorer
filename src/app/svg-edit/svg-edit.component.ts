@@ -1,4 +1,5 @@
 import { Map } from './../model/map.class';
+import { Floor } from './../model/floor.class';
 import { Wall } from './../model/wall.class';
 import { Point } from './../model/point.class';
 import { Line } from './../model/line.class';
@@ -36,6 +37,11 @@ export class SvgEditComponent implements OnInit {
 
     get floor() {
         return this.modelSvc.currentFloor;
+    }
+
+    get floors() {
+        if (this.modelSvc.currentMap) return this.modelSvc.currentMap.floors;
+        return null;
     }
 
     constructor(private modelSvc: ModelService, private route: ActivatedRoute, private router: Router,
@@ -100,6 +106,14 @@ export class SvgEditComponent implements OnInit {
         }
     }
 
+    selectFloor(id: number) {
+        this.modelSvc.setCurrentFloor(id);
+    }
+
+    createFloor(cloneFrom: Floor = null) {
+        this.modelSvc.currentMap.createFloor(cloneFrom);
+    }
+
     saveCurrentMap() {
         this.modelSvc.saveMap();
     }
@@ -116,4 +130,6 @@ export class SvgEditComponent implements OnInit {
     fitToViewport() {
         this.modelSvc.currentMap.fitToViewport();
     }
+
+
 }
