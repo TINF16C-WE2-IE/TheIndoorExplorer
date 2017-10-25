@@ -69,8 +69,7 @@ export class Map {
         if (Math.abs(direction) !== 1) direction = 0;
         let sizeX = this.modelSvc.canvasSize.x + 40 * direction;
         if (sizeX < 100) sizeX = 100;
-        this.modelSvc.canvasSize.x = sizeX;
-        this.modelSvc.canvasSize.y = sizeX * this.modelSvc.viewportSize.y / this.modelSvc.viewportSize.x;
+        this.updateCanvasSize(sizeX, 1);
         if (x && y) {
             this.modelSvc.panOffset.x += (x - this.modelSvc.bodyOffset.x - this.modelSvc.viewportSize.x / 2) / 20;
             this.modelSvc.panOffset.y += (y - this.modelSvc.bodyOffset.y - this.modelSvc.viewportSize.y / 2) / 20;
@@ -95,7 +94,7 @@ export class Map {
         this.updateCanvasSize(width, height);
     }
 
-    private updateCanvasSize(width: number, height: number) {
+    public updateCanvasSize(width: number, height: number) {
         if (width / height < this.modelSvc.viewportSize.x / this.modelSvc.viewportSize.y) {
             this.modelSvc.canvasSize.x = height * this.modelSvc.viewportSize.x / this.modelSvc.viewportSize.y;
             this.modelSvc.canvasSize.y = height;

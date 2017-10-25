@@ -61,7 +61,10 @@ export class Mouse {
     }
 
     private mapToCanvas(evt: MouseEvent) {
-        if (this.modelSvc.currentMap) this.modelSvc.currentMap.getMapDimensions();
+        if (this.modelSvc.currentMap) {
+            this.modelSvc.currentMap.getMapDimensions();
+            this.modelSvc.currentMap.updateCanvasSize(this.modelSvc.canvasSize.x, 1);
+        }
         const ratioX = this.modelSvc.canvasSize.x / this.modelSvc.viewportSize.x;
         const ratioY = this.modelSvc.canvasSize.y / this.modelSvc.viewportSize.y;
 
