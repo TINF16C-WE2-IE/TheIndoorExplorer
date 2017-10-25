@@ -61,15 +61,11 @@ export class Mouse {
     }
 
     private mapToCanvas(evt: MouseEvent) {
-        const domElement = document.getElementById('editorCanvas').getBoundingClientRect();
-        this.modelSvc.viewportSize.x = domElement.width;
-        this.modelSvc.viewportSize.y = domElement.height;
-        this.modelSvc.bodyOffset.x = domElement.left;
-        this.modelSvc.bodyOffset.y = domElement.top;
+        this.modelSvc.currentMap.getMapDimensions();
         const ratioX = this.modelSvc.canvasSize.x / this.modelSvc.viewportSize.x;
         const ratioY = this.modelSvc.canvasSize.y / this.modelSvc.viewportSize.y;
 
-        this._x = Math.round(evt.x - this.modelSvc.bodyOffset.x) * ratioX + this.modelSvc.panOffset.x;
-        this._y = Math.round(evt.y - this.modelSvc.bodyOffset.y) * ratioY + this.modelSvc.panOffset.y;
+        this._x = Math.round((evt.x - this.modelSvc.bodyOffset.x) * ratioX + this.modelSvc.panOffset.x);
+        this._y = Math.round((evt.y - this.modelSvc.bodyOffset.y) * ratioY + this.modelSvc.panOffset.y);
     }
 }
