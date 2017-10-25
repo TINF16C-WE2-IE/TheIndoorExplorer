@@ -16,7 +16,11 @@
         <svg:line *ngFor="let portal of floor.portals" stroke="green" stroke-width="5"
                   [attr.x1]="portal.p1.x" [attr.y1]="portal.p1.y" [attr.x2]="portal.p2.x" [attr.y2]="portal.p2.y"
                   marker-end="url(#circle)" marker-start="url(#circle)"/>
+
         <svg:line *ngFor="let path of movingPath" stroke="red" stroke-width="3"
+                  [attr.x1]="path.p1.x" [attr.y1]="path.p1.y" [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
+                  marker-end="url(#circle)" marker-start="url(#circle)"/>
+        <svg:line *ngFor="let path of pfinder.connections" stroke="grey" stroke-width="2"
                   [attr.x1]="path.p1.x" [attr.y1]="path.p1.y" [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
                   marker-end="url(#circle)" marker-start="url(#circle)"/>
 
