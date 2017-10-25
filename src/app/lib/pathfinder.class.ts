@@ -1,12 +1,15 @@
 import { Line } from './../model/line.class';
 import { Wall } from './../model/wall.class';
 import { Point } from './../model/point.class';
-import { PathNode } from '../model/path-node.class';
+import { PathNode } from './path-node.class';
 
 export class Pathfinder {
 
-    constructor() {
+    // mainly just for debugging
+    public connections: Line[];
 
+    constructor() {
+        this.connections = [];
     }
 
     // before calling this, nodes should have been linked together.
@@ -30,7 +33,6 @@ export class Pathfinder {
         }
         closedList.push(from);
 
-        console.log('pathfinder is calculating the best path over linked nodes. (nodes, from, to)', nodes, from, to);
         return this.calculatePath(nodes, costs, parents, openList, closedList, to);
     }
 
@@ -91,8 +93,8 @@ export class Pathfinder {
         }
     }
 
-    // simple grid based approach
-    public createLinkedGraph(threshold, rectEditorWidth, rectEditorHeight, lines: Line[]): PathNode[] {
+    // simple grid based approach, very expensive, is DEPRECATED
+    public createGridBasedLinkedGraph(threshold, rectEditorWidth, rectEditorHeight, lines: Line[]): PathNode[] {
 
 
         const numX = ((rectEditorWidth - threshold) / threshold + 1);
@@ -130,7 +132,7 @@ export class Pathfinder {
         return pathNodes;
     }
 
-    private checkIntersectionOfLineWithLines(p1x, p1y, p2x, p2y, lines: Line[]): boolean {
+    private checkIntersectionOfLineWithLines(p1x, p1y, p2x, p2y, lines: Line[], includeEndpoints = true): boolean {
 
         let intersects = false;
         for (const w of lines) {
@@ -144,7 +146,7 @@ export class Pathfinder {
                         - vWall.y * (p1x - w.p1.x))
                       / (-vWall.x * (p2y - p1y) + (p2x - p1x) * vWall.y);
 
-            if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+            if (includeEndpoints ? (s >= 0 && s <= 1 && t >= 0 && t <= 1) : (s > 0 && s < 1 && t > 0 && t < 1) ) {
                 intersects = true;
                 break;
             }
@@ -153,19 +155,24 @@ export class Pathfinder {
         return intersects;
     }
 
-    // TODO:
-    // advanced approach, not fully completed yet.
-    public createAdvancedLinkGraph(walls: any[], radius: number): PathNode[] {
-
-        // result
-        const pathNodes: PathNode[] = new Array();
-
-        // keep track of links, we already checked.
-        const chckd: {p1: number, p2: number}[] = [];
 
 
 
-        // create nodes in a offset(radius) around every wall.
+    // advanced approach: more complex in preparation, but less nodes, so cheaper for path finding.
+    public createLinkedGraph(walls: any[], radius: number, start: Point = null, end: Point = null): PathNode[] {
+
+        // keep track of node-polygons
+        const nodePolygons: {lines: Line[]}[] = [];
+
+        // total nodes list
+        const nodes: PathNode[] = [];
+
+        // keep track of already checked links between two node-polygons
+        const chckd: {n1x: number, n1y: number, n2x: number, n2y: number}[] = [];
+
+
+
+        // create nodes in an offset(radius) around every wall.
         for (const w of walls) {
 
             // create some vectors.
@@ -195,77 +202,153 @@ export class Pathfinder {
                 centerCoord.y - v0.y * (vlength + radius) + vn0.y * (radius)
             );
 
+            // for every polygon(walls) link the surrounding nodes and set them as checked
             this.linkNodes(p1, p2);
             this.linkNodes(p2, p3);
             this.linkNodes(p3, p4);
             this.linkNodes(p4, p1);
-            pathNodes.push(p1, p2, p3, p4);
-
-            chckd.push({p1: pathNodes.length - 4, p2: pathNodes.length - 3}, {p1: pathNodes.length - 3, p2: pathNodes.length - 4});
-            chckd.push({p1: pathNodes.length - 3, p2: pathNodes.length - 2}, {p1: pathNodes.length - 2, p2: pathNodes.length - 3});
-            chckd.push({p1: pathNodes.length - 2, p2: pathNodes.length - 1}, {p1: pathNodes.length - 1, p2: pathNodes.length - 2});
-            chckd.push({p1: pathNodes.length - 1, p2: pathNodes.length - 4}, {p1: pathNodes.length - 4, p2: pathNodes.length - 1});
-
-            console.log('created nodes of wall', w, [p1, p2, p3, p4]);
+            nodes.push(p1, p2, p3, p4);
+            nodePolygons.push({ lines: [
+                new Line(new Point(p1.x, p1.y, false), new Point(p2.x, p2.y, false)),
+                new Line(new Point(p2.x, p2.y, false), new Point(p3.x, p3.y, false)),
+                new Line(new Point(p3.x, p3.y, false), new Point(p4.x, p4.y, false)),
+                new Line(new Point(p4.x, p4.y, false), new Point(p1.x, p1.y, false))
+            ]});
         }
 
-        // now, all 4 nodes around each wall are linked to their neighbour.
-        // we now have to link nodes interchangeably between the walls.
+        for (const np of nodePolygons) {
 
-        for (let i = 0; i < pathNodes.length; i++) {
-            for (let j = 0; j < pathNodes.length; j++) {
+            // mainly just for debug
+            this.connections = this.connections.concat(np.lines);
 
-                // go on if the link already exists or we are looking on the same node.
-                if (chckd.find(element => element.p1 === i && element.p2 === j) !== undefined
-                    || i === j) {
+            for (const npl of nodePolygons) {
+
+                // dont connect links on the same polygon. we already have them
+                // BEWARE: this approach here only works with CONVEX polygon-shapes.
+                // if they are concav, there would be truly more/other connections on the same polygon! (than just the walls)
+                if (np === npl
+                      || np.lines.find(
+                          el => npl.lines.find(
+                              (elm => elm.p1 === el.p2 || elm.p2 === el.p1)
+                          ) !== undefined)
+                      !== undefined) {
+
                     continue;
                 }
 
-                // we need again a vector from each wall, to check if this node-link interfers with any other wall-line.
-                const vLink = {x: (pathNodes[j].x - pathNodes[i].x), y: (pathNodes[j].y - pathNodes[i].y)};
-                let intersects = false;
-                for (const w of walls) {
-                    const vWall = {x: w.p2.x - w.p1.x, y: w.p2.y - w.p1.y};
+                // check for any link between the nodes of np and npl
+                for (let i = 0; i < np.lines.length; i++) {
+                    for (let j = 0; j < npl.lines.length; j++) {
 
-                    // find the parameter values (s, t) for the intersection point of theese 2 lines
-                    const s = ( -vLink.y * (pathNodes[i].x - w.p1.x)
-                                + vLink.x * (pathNodes[i].y - w.p1.y))
-                              / (-vWall.x * vLink.y + vLink.x * vWall.y);
-                    const t = ( vWall.x * (pathNodes[i].y - w.p1.y)
-                                - vWall.y * (pathNodes[i].x - w.p1.x))
-                              / (-vWall.x * vLink.y + vLink.x * vWall.y);
+                        // move onto the next, in case we already checked this link.
+                        if (chckd.find(element =>
+                            (element.n1x === np.lines[i].p1.x && element.n1y === np.lines[i].p1.y
+                              && element.n2x === npl.lines[j].p1.x && element.n2y === npl.lines[j].p1.y)
+                            || (element.n1x === npl.lines[j].p1.x && element.n1y === npl.lines[j].p1.y
+                              && element.n2x === np.lines[i].p1.x && element.n2y === np.lines[i].p1.y)) !== undefined) {
+                            continue;
+                        }
 
-                    if (s > 0 && s < 1 && t > 0 && t < 1) {
-                        intersects = true;
-                        break;
+                        // if this link doesnt intersect any "polygon-links"
+                        if (nodePolygons.every(element => {
+                            return !this.checkIntersectionOfLineWithLines(
+                                np.lines[i].p1.x, np.lines[i].p1.y, npl.lines[j].p1.x, npl.lines[j].p1.y, element.lines, false);
+                        })) {
+                            if (this.checkIfLinkIsWorthIt(
+                                    np.lines[i].p1,
+                                    npl.lines[j].p1,
+                                    np.lines[(i === 0) ? (np.lines.length - 1) : (i - 1)].p1,
+                                    np.lines[(i === np.lines.length - 1) ? (0) : (i + 1)].p1,
+                                    npl.lines[(j === 0) ? (npl.lines.length - 1) : (j - 1)].p1,
+                                    npl.lines[(j === npl.lines.length - 1) ? (0) : (j + 1)].p1
+                            )) {
+
+                                // check if this link is worth having it. based on angles of their neighbour walls
+
+                                // we need this link!
+                                this.linkNodes(
+                                    nodes.find(el => el.x === np.lines[i].p1.x && el.y === np.lines[i].p1.y),
+                                    nodes.find(el => el.x === npl.lines[j].p1.x && el.y === npl.lines[j].p1.y)
+                                );
+
+                                // mainly just for debug
+                                this.connections.push(new Line(np.lines[i].p1, npl.lines[j].p1));
+                            }
+                        } else {
+
+                        }
+
+                        // and mark as checked.
+                        chckd.push({n1x: np.lines[i].p1.x, n1y: np.lines[i].p1.y, n2x: npl.lines[j].p1.x, n2y: npl.lines[j].p1.y});
                     }
                 }
-
-                if (intersects) {
-                    continue;
-                }
-
-
-                // TODO: decide based on the angles if this link is worth having it.
-                // now we know this link doesnt intersect with a wall. and we didnt check this link yet.
-                // -> calculate angles to determine, if this link is worth having it.
-                const d = Math.sqrt((pathNodes[i].x - pathNodes[j].x) * (pathNodes[i].x - pathNodes[j].x) +
-                                      (pathNodes[i].y - pathNodes[j].y) * (pathNodes[i].y - pathNodes[j].y));
-                const ang1 = Math.acos( (pathNodes[i].x - pathNodes[j].x) / d );
-                console.log('checking link between ', pathNodes[i], pathNodes[j], i, j, ' calculated: ', d, ang1);
-
-                // get the main angle between p2 and p1.
-                Math.atan2(pathNodes[j].y - pathNodes[i].y, pathNodes[j].x - pathNodes[i].x);
-
-
-
-                // and add this link to the checked list.
-                chckd.push({p1: i, p2: j}, {p1: j, p2: i});
             }
         }
 
-        console.error('creating a linked node-graph from map doesnt work yet. TODO.');
-        return null;
+
+        // at last but not least, connect the start point to visible nodes!
+        if (start !== undefined && start !== null) {
+            const startn = new PathNode(start.x, start.y);
+            nodes.push(startn);
+            for (const n of nodes) {
+                if (nodePolygons.every(element => {
+                    return !this.checkIntersectionOfLineWithLines(
+                        start.x, start.y, n.x, n.y, element.lines, false);
+                })) {
+                    this.linkNodes(startn, n);
+
+                    // mainly just for debug
+                    this.connections.push(new Line(start, new Point(n.x, n.y, false)));
+                }
+            }
+        }
+
+        // also connect endpoint
+        if (end !== undefined && end !== null) {
+            const endn = new PathNode(end.x, end.y);
+            nodes.push(endn);
+            for (const n of nodes) {
+                if (nodePolygons.every(element => {
+                    return !this.checkIntersectionOfLineWithLines(
+                        end.x, end.y, n.x, n.y, element.lines, false);
+                })) {
+                    this.linkNodes(endn, n);
+
+                    // mainly just for debug
+                    this.connections.push(new Line(end, new Point(n.x, n.y, false)));
+                }
+            }
+        }
+
+        return nodes;
+    }
+
+    // @params arguments are the 2 nodes, and then the 2 neighbour nodes of the first (before, after),
+    // then the 2 neighbour nodes for the second one (before, after).
+    private checkIfLinkIsWorthIt(p1: Point, p2: Point, p1prev: Point, p1next: Point, p2prev: Point, p2next: Point): boolean {
+
+        if ((p1.x === p1next.x && p1next.x === p1prev.x && p1.y === p1next.y && p1next.y === p1prev.y)
+            && (p2.x === p2next.x && p2next.x === p2prev.x && p2.y === p2next.y && p2next.y === p2prev.y)) {
+            return true;
+        }
+
+        // get some vectors and angles
+        const nodeAng = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+        let ang11 = nodeAng - Math.atan2(p2next.y - p1.y, p2next.x - p1.x);
+        let ang12 = nodeAng - Math.atan2(p2prev.y - p1.y, p2prev.x - p1.x);
+        let ang21 = nodeAng - Math.atan2(p1next.y - p2.y, p1next.x - p2.x);
+        let ang22 = nodeAng - Math.atan2(p1prev.y - p2.y, p1prev.x - p2.x);
+
+        if (ang11 >= Math.PI) ang11 -= Math.PI * 2;
+        else if (ang11 <= -Math.PI) ang11 += Math.PI * 2;
+        if (ang12 >= Math.PI) ang12 -= Math.PI * 2;
+        else if (ang12 <= -Math.PI) ang12 += Math.PI * 2;
+        if (ang21 >= Math.PI) ang21 -= Math.PI * 2;
+        else if (ang21 <= -Math.PI) ang21 += Math.PI * 2;
+        if (ang22 >= Math.PI) ang22 -= Math.PI * 2;
+        else if (ang22 <= -Math.PI) ang22 += Math.PI * 2;
+
+        return Math.sign(ang11) === Math.sign(ang12) && Math.sign(ang21) === Math.sign(ang22);
     }
 
     public linkNodes (nn1: PathNode, nn2: PathNode): void {
