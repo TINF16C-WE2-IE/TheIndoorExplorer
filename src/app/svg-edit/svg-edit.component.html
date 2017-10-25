@@ -6,6 +6,8 @@
      (wheel)="mouse.onWheel($event)"
      xmlns:svg="http://www.w3.org/2000/svg" version="1.2">
 
+    <svg:image *ngIf="backgroundImageDataURL" [attr.xlink:href]="backgroundImageDataURL" x="0" y="0" width="2000" opacity="0.5"/>     
+
     <svg:g *ngIf="floor">
         <svg:defs>
             <svg:marker id="circle" markerWidth="10" markerHeight="10" refX="5" refY="5" markerUnits="userSpaceOnUse">
@@ -68,8 +70,12 @@
             <mat-icon aria-label="Fit to Viewport">zoom_out_map</mat-icon>
         </button>
     </p>
+    <p>
+        Set a blueprint background image:
+        <input type="file" name="bgimg" (change)="backgroundImage($event)">
+    </p>
     <input type="text" name="objname" *ngIf="floor" [(ngModel)]="floor.label" placeholder="Object Name">
-
+    
     <h4>Floors</h4>
     <p>
         <button mat-icon-button *ngFor="let f of floors; let i = index" 

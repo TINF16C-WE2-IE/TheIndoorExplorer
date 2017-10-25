@@ -24,7 +24,7 @@ export class Floor {
             const p2 = this.getExistingOrThisPoint(new Point(portal_obj.p2.x, portal_obj.p2.y));
             this.portals.push(new Portal(portal_obj.id, portal_obj.label, p1, p2));
         }
-        this.label = obj.label;
+        this.label = obj.label ? obj.label : '';
     }
 
     public getAllPoints(): Point[] {

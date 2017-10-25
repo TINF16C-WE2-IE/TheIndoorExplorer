@@ -67,7 +67,7 @@ export class Map {
 
     public zoom(direction: number, x: number = null, y: number = null) {
         if (Math.abs(direction) !== 1) direction = 0;
-        let sizeX = this.modelSvc.canvasSize.x + 25 * direction;
+        let sizeX = this.modelSvc.canvasSize.x + 40 * direction;
         if (sizeX < 100) sizeX = 100;
         this.modelSvc.canvasSize.x = sizeX;
         this.modelSvc.canvasSize.y = sizeX * this.modelSvc.viewportSize.y / this.modelSvc.viewportSize.x;

@@ -31,6 +31,7 @@ export class SvgEditComponent implements OnInit {
         {'name': 'Insert Lift', 'icon': 'elevator'},
     ];
     public selectedTool = 'Move';
+    public backgroundImageDataURL = null;
 
     public movingPath: Line[];
     public pfinder: Pathfinder;
@@ -142,5 +143,22 @@ export class SvgEditComponent implements OnInit {
         this.modelSvc.currentMap.fitToViewport();
     }
 
+    backgroundImage(event) {
+        this.backgroundImageDataURL = null;
+        const file = event.srcElement.files[0];
+        if (!file.type.match('image.*')) {
+            return;
+        }
+        const reader = new FileReader();
+
+        const myThis = this;
+        reader.addEventListener('load', function () {
+            myThis.backgroundImageDataURL = reader.result;
+        }, false);
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    }
 
 }
