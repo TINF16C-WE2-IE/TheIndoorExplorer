@@ -1,6 +1,9 @@
-<svg id="editorCanvas" viewBox="0 0 500 500"
+<svg id="editorCanvas" 
+     [attr.viewBox]="canvas.panOffset.x+' '+canvas.panOffset.y+' '+canvas.canvasSize+' '+canvas.canvasSize"
+     [style.cursor]="mouse.tool.cursorShape"
      (mouseup)="mouse.onMouseUp($event)" (mousedown)="mouse.onMouseDown($event)"
      (mousemove)="mouse.onMouseMove($event)" (mouseleave)="mouse.onMouseLeave($event)"
+     (wheel)="mouse.onWheel($event)"
      xmlns:svg="http://www.w3.org/2000/svg" version="1.2">
 
     <svg:g *ngIf="floor">
@@ -34,11 +37,12 @@
 <form #toolbox id="toolbox">
     <h3>Toolbox</h3>
 
-    <mat-radio-group class="example-radio-group" [ngModelOptions]="{standalone: true}" [ngModel]="mouse.tool.name" (ngModelChange)="selectTool($event)">
-        <mat-radio-button class="example-radio-button" *ngFor="let name of toolnames" [value]="name">
-            {{name}}
-        </mat-radio-button>
-    </mat-radio-group>
+    <button mat-button *ngFor="let tool of tools" 
+        [ngClass]="tool.name == selectedTool ? 'mat-raised-button tool-button' : 'tool-button'" 
+        (click)="selectTool(tool.name)">
+        <mat-icon [svgIcon]="tool.icon"></mat-icon> {{tool.name}}
+    </button>
+
 
     <br>
     <div style="padding-top: 20px">
@@ -52,6 +56,14 @@
         {{floor?.walls.length || 0}} Walls,
         {{floor?.portals.length || 0}} Portals,
         {{floor?.getAllPoints().length || 0}} Points
+    </p>
+    <p>
+        <button mat-icon-button (click)="canvas.zoom(-1)">
+            <mat-icon aria-label="Zoom -">zoom_in</mat-icon>
+        </button>
+        <button mat-icon-button (click)="canvas.zoom(1)">
+            <mat-icon aria-label="Zooom +">zoom_out</mat-icon>
+        </button>
     </p>
     <!--<pre>{{this?.floor | json}}</pre>-->
 </form>

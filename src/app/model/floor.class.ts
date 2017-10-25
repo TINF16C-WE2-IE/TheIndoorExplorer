@@ -13,13 +13,13 @@ export class Floor {
         portals: {id: number, label: string, p1: {x: number, y: number}, p2: {x: number, y: number}}[]
     }) {
         for (const wall_obj of obj.walls) {
-            const p1 = this.getExistingPoint(new Point(wall_obj.p1.x, wall_obj.p1.y));
-            const p2 = this.getExistingPoint(new Point(wall_obj.p2.x, wall_obj.p2.y));
+            const p1 = this.getExistingOrThisPoint(new Point(wall_obj.p1.x, wall_obj.p1.y));
+            const p2 = this.getExistingOrThisPoint(new Point(wall_obj.p2.x, wall_obj.p2.y));
             this.walls.push(new Wall(p1, p2));
         }
         for (const portal_obj of obj.portals) {
-            const p1 = this.getExistingPoint(new Point(portal_obj.p1.x, portal_obj.p1.y));
-            const p2 = this.getExistingPoint(new Point(portal_obj.p2.x, portal_obj.p2.y));
+            const p1 = this.getExistingOrThisPoint(new Point(portal_obj.p1.x, portal_obj.p1.y));
+            const p2 = this.getExistingOrThisPoint(new Point(portal_obj.p2.x, portal_obj.p2.y));
             this.portals.push(new Portal(portal_obj.id, portal_obj.label, p1, p2));
         }
     }
@@ -34,14 +34,20 @@ export class Floor {
         ));
     }
 
-    public getExistingPoint(p: Point, exclude: Point[] = []) {
+    public getExistingOrThisPoint(p: Point, exclude: Point[] = [], nullIfNotFound = false) {
         const points: Point[] = this.getAllPoints().filter(
-            point => point.equals(p) && exclude.indexOf(point) === -1
+            point => point !== p && point.equals(p) && exclude.indexOf(point) === -1
         );
         if (points.length > 1) {
             console.log('WARNING! Twin points found!', JSON.stringify(points));
         }
-        return points.length > 0 ? points[0] : p;
+
+        if (points.length > 0) {
+            return points[0];
+        }
+        else {
+            return nullIfNotFound ? null : p;
+        }
     }
 
     public joinPoints(master: Point, slave: Point) {

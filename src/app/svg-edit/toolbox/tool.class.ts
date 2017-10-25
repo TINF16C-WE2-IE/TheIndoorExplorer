@@ -1,10 +1,15 @@
 import { Mouse } from '../mouse.class';
 import { Point } from '../../model/point.class';
 import { ModelService } from '../../svc/model.service';
+import { Line } from '../../model/line.class';
 
 export abstract class Tool {
     public get name() {
         return 'Generic Tool';
+    }
+
+    public get cursorShape() {
+        return 'crosshair';
     }
 
     protected get floor() {
@@ -23,6 +28,46 @@ export abstract class Tool {
 
 
     protected getFloorPointBelowCursor(exclude?: Point[]): Point {
-        return this.floor.getExistingPoint(new Point(this.mouse.x, this.mouse.y), exclude);
+        return this.floor.getExistingOrThisPoint(new Point(this.mouse.x, this.mouse.y), exclude);
+    }
+
+    protected getExistingObjectsBelowCursor(lineAccuracy = 5): Point[] {
+        const point = this.floor.getExistingOrThisPoint(new Point(this.mouse.x, this.mouse.y), [], true);
+        if (point) {
+            return [point];
+        }
+        else {
+            const lines = ([...this.floor.walls, ...this.floor.portals] as Line[]).map(line => {
+                return {
+                    distance: this.pointDistance(this.mouse.x, this.mouse.y, line.p1.x, line.p1.y, line.p2.x, line.p2.y),
+                    line: line
+                };
+            });
+            const shortest = lines.reduce((prev, current) => prev.distance > current.distance ? current : prev);
+            return shortest.distance <= lineAccuracy ? [shortest.line.p1, shortest.line.p2] : [];
+        }
+    }
+
+    private pointDistance(x, y, x1, y1, x2, y2) {
+        // calculates distance between point (x, y) and line segment (x1, y1)---(x2, y2)
+        // adapted from: https://stackoverflow.com/a/6853926/4464570
+        const dot = (x - x1) * (x2 - x1) + (y - y1) * (y2 - y1);
+        const len_sq = (x2 - x1) ** 2 + (y2 - y1) ** 2;
+        const param = len_sq !== 0 ? dot / len_sq : -1;
+
+        let xx, yy;
+        if (param < 0) {
+            xx = x1;
+            yy = y1;
+        }
+        else if (param > 1) {
+            xx = x2;
+            yy = y2;
+        }
+        else {
+            xx = x1 + param * (x2 - x1);
+            yy = y1 + param * (y2 - y1);
+        }
+        return Math.sqrt((x - xx) ** 2 + (y - yy) ** 2);
     }
 }

@@ -43,6 +43,7 @@ export class LineTool extends Tool {
             }
                 break;
         }
+        return true;
     }
 
     public onMouseUp(evt: MouseEvent) {
@@ -55,5 +56,6 @@ export class LineTool extends Tool {
         if (this.point) {
             this.point.setCoords(this.mouse.x, this.mouse.y);
         }
+        return true;
     }
 }

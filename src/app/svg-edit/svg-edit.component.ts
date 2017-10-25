@@ -8,9 +8,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import 'rxjs/add/operator/switchMap';
 import { Mouse } from './mouse.class';
+import { Canvas } from './canvas.class';
 import { MoveTool } from './toolbox/move-tool.class';
 import { LineTool } from './toolbox/line-tool.class';
 import { Portal } from '../model/portal.class';
+import {MatIconRegistry} from '@angular/material';
+import {DomSanitizer} from '@angular/platform-browser';
 
 @Component({
     selector: 'app-svg-edit',
@@ -19,8 +22,16 @@ import { Portal } from '../model/portal.class';
 })
 export class SvgEditComponent implements OnInit {
     mouse: Mouse;
+    canvas: Canvas;
 
-    public toolnames = ['Move', 'Draw Wall', 'Draw Portal'];
+    public tools = [
+        {'name': 'Move', 'icon': 'move'},
+        {'name': 'Draw Wall', 'icon': 'wall'},
+        {'name': 'Draw Portal', 'icon': 'portal'},
+        {'name': 'Insert Stairs', 'icon': 'stairs'},
+        {'name': 'Insert Lift', 'icon': 'elevator'},
+    ];
+    public selectedTool = 'Move';
 
     public movingPath: Line[];
     public pfinder: Pathfinder;
@@ -29,9 +40,16 @@ export class SvgEditComponent implements OnInit {
         return this.modelSvc.currentFloor;
     }
 
-    constructor(private modelSvc: ModelService, private route: ActivatedRoute, private router: Router) {
+    constructor(private modelSvc: ModelService, private route: ActivatedRoute, private router: Router,
+        iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
         this.movingPath = [];
         this.pfinder = new Pathfinder();
+
+        iconRegistry.addSvgIcon('move', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/move.svg'));
+        iconRegistry.addSvgIcon('wall', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/pencil.svg'));
+        iconRegistry.addSvgIcon('portal', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/portal.svg'));
+        iconRegistry.addSvgIcon('stairs', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/stairs.svg'));
+        iconRegistry.addSvgIcon('elevator', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/elevator.svg'));
     }
 
     ngOnInit() {
@@ -41,7 +59,8 @@ export class SvgEditComponent implements OnInit {
             }
         );
 
-        this.mouse = new Mouse();
+        this.canvas = new Canvas();
+        this.mouse = new Mouse(this.canvas);
         this.selectTool('Move');
     }
 
@@ -70,6 +89,7 @@ export class SvgEditComponent implements OnInit {
 
     selectTool($event: any) {
         console.log($event);
+        this.selectedTool = $event;
         switch ($event) {
             case 'Move':
               this.mouse.tool = new MoveTool(this.mouse, this.modelSvc);

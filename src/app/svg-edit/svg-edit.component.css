@@ -10,7 +10,9 @@
     flex: 0 0 auto;
     width: 500px;
     border: 1px red dotted;
-    cursor: crosshair;
+    user-select: none;
+    user-drag: none;
+    -webkit-user-drag: none;
 }
 
 #toolbox {

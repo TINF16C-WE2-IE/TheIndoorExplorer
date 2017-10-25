@@ -1,5 +1,6 @@
 import { Tool } from './toolbox/tool.class';
 import { Point } from '../model/point.class';
+import { Canvas } from './canvas.class';
 
 export class Mouse {
     private _x: number = null;
@@ -24,15 +25,18 @@ export class Mouse {
     }
 
 
-    constructor() {
-        this.canvas = document.getElementById('editorCanvas');
+    constructor(canvas: Canvas) {
+        this.canvas = canvas;
     }
 
 
     public onMouseDown(evt: MouseEvent) {
         if (this.tool) {
-            this.tool.onMouseDown(evt);
+            if (!this.tool.onMouseDown(evt)) {
+                this.canvas.startPan(evt);
+            }
         }
+        return false; // disallow browser from dragging the svg image
     }
 
     public onMouseUp(evt: MouseEvent) {
@@ -42,17 +46,24 @@ export class Mouse {
     }
 
     public onMouseMove(evt: MouseEvent) {
-        const offset = this.canvas.getBoundingClientRect();
-        this._x = Math.round(evt.x - offset.x);
-        this._y = Math.round(evt.y - offset.y);
+        const mapped = this.canvas.mapMouse(evt);
+        this._x = mapped.x;
+        this._y = mapped.y;
 
         if (this.tool) {
-            this.tool.onMouseMove(evt);
+            if (!this.tool.onMouseMove(evt)) {
+                this.canvas.pan(evt);
+            }
         }
     }
 
     public onMouseLeave(evt: MouseEvent) {
         this._x = null;
         this._y = null;
+    }
+
+    public onWheel(evt: WheelEvent) {
+        this.canvas.zoom(evt.deltaY / Math.abs(evt.deltaY), evt);
+        this.onMouseMove(evt);
     }
 }
