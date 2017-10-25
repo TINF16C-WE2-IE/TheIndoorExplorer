@@ -14,6 +14,11 @@ export class ModelService {
     public currentFloorId: number;
     public userInfo: {id: number, username: string};
 
+    public viewportSize: {x: number, y: number} = {x: 500, y: 500};
+    public canvasSize: {x: number, y: number} = {x: 500, y: 500};
+    public panOffset = new Point(0, 0);
+    public bodyOffset = new Point(0, 0);
+
     public get currentMap() {
         return this.maps[this.currentMapId];
     }
@@ -32,14 +37,12 @@ export class ModelService {
         }
     }
 
-
     constructor(private rqstSvc: RequestService) {
         this.maps = {};
         this.currentMapId = 0;
         this.currentFloorId = 0;
         this.userInfo = null;
     }
-
 
     public loadUserInfo() {
         this.rqstSvc.get(RequestService.INFO_USER, {}).subscribe(
@@ -59,7 +62,7 @@ export class ModelService {
                     for (const mapInfo of resp as [
                         {id: number, name: string, favorite; boolean, permission: number, visibility: number}
                         ]) {
-                        this.maps[mapInfo.id] = new Map(mapInfo);
+                        this.maps[mapInfo.id] = new Map(mapInfo, this);
                     }
                 }
             }
@@ -79,14 +82,15 @@ export class ModelService {
                 favorite: false,
                 permission: 0,
                 visibility: 0
-            });
+            }, this);
         }
         else {
             this.rqstSvc.get(RequestService.LIST_MAP_DETAILS, {'mapid': mapId})
                 .subscribe(resp => {
                     console.log('got response map details: ', resp);
                     if (resp !== null) {
-                        this.currentMap = new Map(resp);
+                        this.currentMap = new Map(resp, this);
+                        this.currentMap.fitToViewport();
                     }
                 });
         }
@@ -101,4 +105,6 @@ export class ModelService {
                 }
             });
     }
+
+
 }

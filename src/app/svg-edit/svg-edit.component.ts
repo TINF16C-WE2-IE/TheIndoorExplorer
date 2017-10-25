@@ -8,7 +8,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import 'rxjs/add/operator/switchMap';
 import { Mouse } from './mouse.class';
-import { Canvas } from './canvas.class';
 import { MoveTool } from './toolbox/move-tool.class';
 import { LineTool } from './toolbox/line-tool.class';
 import { Portal } from '../model/portal.class';
@@ -22,7 +21,6 @@ import {DomSanitizer} from '@angular/platform-browser';
 })
 export class SvgEditComponent implements OnInit {
     mouse: Mouse;
-    canvas: Canvas;
 
     public tools = [
         {'name': 'Move', 'icon': 'move'},
@@ -59,8 +57,7 @@ export class SvgEditComponent implements OnInit {
             }
         );
 
-        this.canvas = new Canvas();
-        this.mouse = new Mouse(this.canvas);
+        this.mouse = new Mouse(this.modelSvc);
         this.selectTool('Move');
     }
 

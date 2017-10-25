@@ -1,5 +1,5 @@
 <svg id="editorCanvas" 
-     [attr.viewBox]="canvas.panOffset.x+' '+canvas.panOffset.y+' '+canvas.canvasSize+' '+canvas.canvasSize"
+     [attr.viewBox]="modelSvc.panOffset.x+' '+modelSvc.panOffset.y+' '+modelSvc.canvasSize.x+' '+modelSvc.canvasSize.y"
      [style.cursor]="mouse.tool.cursorShape"
      (mouseup)="mouse.onMouseUp($event)" (mousedown)="mouse.onMouseDown($event)"
      (mousemove)="mouse.onMouseMove($event)" (mouseleave)="mouse.onMouseLeave($event)"
@@ -57,11 +57,14 @@
         {{floor?.getAllPoints().length || 0}} Points
     </p>
     <p>
-        <button mat-icon-button (click)="canvas.zoom(-1)">
+        <button mat-icon-button (click)="modelSvc.currentMap.zoom(-1)">
             <mat-icon aria-label="Zoom -">zoom_in</mat-icon>
         </button>
-        <button mat-icon-button (click)="canvas.zoom(1)">
+        <button mat-icon-button (click)="modelSvc.currentMap.zoom(1)">
             <mat-icon aria-label="Zooom +">zoom_out</mat-icon>
+        </button>
+        <button mat-icon-button (click)="modelSvc.currentMap.fitToViewport()">
+            <mat-icon aria-label="Fit to Viewport">zoom_out_map</mat-icon>
         </button>
     </p>
     <!--<pre>{{this?.floor | json}}</pre>-->

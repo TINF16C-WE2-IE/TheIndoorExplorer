@@ -4,6 +4,7 @@ import { Point } from '../../model/point.class';
 export class MoveTool extends Tool {
     private selected: {origin: Point, current: Point}[] = [];
     private dragOrigin: {x: number, y: number};
+    private panDragOrigin: {x: number, y: number};
 
     public get name() {
         return 'Move';
@@ -20,7 +21,10 @@ export class MoveTool extends Tool {
         this.selected = this.getExistingObjectsBelowCursor().map(point => {
             return {origin: point.clone(), current: point};
         });
-        return this.selected.length;
+        if (!this.selected.length) {
+            this.dragOrigin = {x: evt.x, y: evt.y};
+            this.panDragOrigin = {x: this.modelSvc.panOffset.x, y: this.modelSvc.panOffset.y};
+        }
     }
 
     public onMouseUp(evt: MouseEvent) {
@@ -30,16 +34,19 @@ export class MoveTool extends Tool {
         }
         this.selected = [];
         this.dragOrigin = null;
+        this.panDragOrigin = null;
     }
 
     public onMouseMove(evt: MouseEvent) {
-        if (this.dragOrigin && !this.selected.length) return false;
         for (const selPoint of this.selected) {
             selPoint.current.setCoords(
                 selPoint.origin.x + (this.mouse.xs - this.dragOrigin.x),
                 selPoint.origin.y + (this.mouse.ys - this.dragOrigin.y)
             );
         }
-        return true;
+        if (this.panDragOrigin) {
+            this.modelSvc.panOffset.x = this.panDragOrigin.x - evt.x + this.dragOrigin.x;
+            this.modelSvc.panOffset.y = this.panDragOrigin.y - evt.y + this.dragOrigin.y;
+        }
     }
 }

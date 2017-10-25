@@ -1,6 +1,6 @@
 import { Tool } from './toolbox/tool.class';
 import { Point } from '../model/point.class';
-import { Canvas } from './canvas.class';
+import { ModelService } from '../svc/model.service';
 
 export class Mouse {
     private _x: number = null;
@@ -25,16 +25,13 @@ export class Mouse {
     }
 
 
-    constructor(canvas: Canvas) {
-        this.canvas = canvas;
+    constructor(private modelSvc: ModelService) {
     }
 
 
     public onMouseDown(evt: MouseEvent) {
         if (this.tool) {
-            if (!this.tool.onMouseDown(evt)) {
-                this.canvas.startPan(evt);
-            }
+            this.tool.onMouseDown(evt);
         }
         return false; // disallow browser from dragging the svg image
     }
@@ -46,14 +43,10 @@ export class Mouse {
     }
 
     public onMouseMove(evt: MouseEvent) {
-        const mapped = this.canvas.mapMouse(evt);
-        this._x = mapped.x;
-        this._y = mapped.y;
+        this.mapToCanvas(evt);
 
         if (this.tool) {
-            if (!this.tool.onMouseMove(evt)) {
-                this.canvas.pan(evt);
-            }
+            this.tool.onMouseMove(evt);
         }
     }
 
@@ -63,7 +56,20 @@ export class Mouse {
     }
 
     public onWheel(evt: WheelEvent) {
-        this.canvas.zoom(evt.deltaY / Math.abs(evt.deltaY), evt);
+        this.modelSvc.currentMap.zoom(evt.deltaY / Math.abs(evt.deltaY), evt.x, evt.y);
         this.onMouseMove(evt);
+    }
+
+    private mapToCanvas(evt: MouseEvent) {
+        const domElement = document.getElementById('editorCanvas').getBoundingClientRect();
+        this.modelSvc.viewportSize.x = domElement.width;
+        this.modelSvc.viewportSize.y = domElement.height;
+        this.modelSvc.bodyOffset.x = domElement.left;
+        this.modelSvc.bodyOffset.y = domElement.top;
+        const ratioX = this.modelSvc.canvasSize.x / this.modelSvc.viewportSize.x;
+        const ratioY = this.modelSvc.canvasSize.y / this.modelSvc.viewportSize.y;
+
+        this._x = Math.round(evt.x - this.modelSvc.bodyOffset.x) * ratioX + this.modelSvc.panOffset.x;
+        this._y = Math.round(evt.y - this.modelSvc.bodyOffset.y) * ratioY + this.modelSvc.panOffset.y;
     }
 }

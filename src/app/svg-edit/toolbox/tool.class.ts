@@ -16,7 +16,7 @@ export abstract class Tool {
         return this.modelSvc.currentFloor;
     }
 
-    constructor(protected mouse: Mouse, private modelSvc: ModelService, public args = {}) {
+    constructor(protected mouse: Mouse, protected modelSvc: ModelService, public args = {}) {
     }
 
 
