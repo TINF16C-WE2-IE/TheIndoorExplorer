@@ -145,7 +145,7 @@ export class SvgEditComponent implements OnInit {
 
     backgroundImage(event) {
         this.backgroundImageDataURL = null;
-        const file = event.srcElement.files[0];
+        const file = event.target.files[0];
         if (!file.type.match('image.*')) {
             return;
         }

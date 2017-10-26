@@ -6,7 +6,7 @@
      (wheel)="mouse.onWheel($event)"
      xmlns:svg="http://www.w3.org/2000/svg" version="1.2">
 
-    <svg:image *ngIf="backgroundImageDataURL" [attr.xlink:href]="backgroundImageDataURL" x="0" y="0" width="2000" opacity="0.5"/>     
+    <svg:image *ngIf="backgroundImageDataURL" [attr.xlink:href]="backgroundImageDataURL" x="0" y="0" width="2000" height="2000" opacity="0.5"/>     
 
     <svg:g *ngIf="floor">
         <svg:defs>
