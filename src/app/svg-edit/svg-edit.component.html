@@ -18,10 +18,15 @@
         <svg:line *ngFor="let wall of floor.walls" stroke="black"
                   [attr.x1]="wall.p1.x" [attr.y1]="wall.p1.y" [attr.x2]="wall.p2.x" [attr.y2]="wall.p2.y"
                   marker-end="url(#circle)" marker-start="url(#circle)"/>
-        <svg:line *ngFor="let portal of floor.portals" stroke="green" stroke-width="5"
+        <svg:g *ngFor="let portal of floor.portals" >
+            <svg:line 
+                  [attr.stroke]="selectedObject() == portal ? '#b71c1c' : '#afafaf'" stroke-width="10" stroke-dasharray="2, 5"
                   [attr.x1]="portal.p1.x" [attr.y1]="portal.p1.y" [attr.x2]="portal.p2.x" [attr.y2]="portal.p2.y"
                   marker-end="url(#circle)" marker-start="url(#circle)"/>
-
+            <svg:text *ngIf="showLabels" text-anchor="middle"
+                  [attr.x]="(portal.p1.x+portal.p2.x) / 2" [attr.y]="(portal.p1.y+portal.p2.y) / 2 + 20">{{portal.label}}</svg:text>
+        </svg:g>                
+      
         <svg:line *ngFor="let path of movingPath" stroke="red" stroke-width="3"
                   [attr.x1]="path.p1.x" [attr.y1]="path.p1.y" [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
                   marker-end="url(#circle)" marker-start="url(#circle)"/>
@@ -38,7 +43,7 @@
 
 <form #toolbox id="toolbox">
     <h3>Toolbox</h3>
-
+    
     <button mat-button *ngFor="let tool of tools" 
         [ngClass]="tool.name == selectedTool ? 'mat-raised-button tool-button' : 'tool-button'" 
         (click)="selectTool(tool.name)">
@@ -70,11 +75,20 @@
             <mat-icon aria-label="Fit to Viewport">zoom_out_map</mat-icon>
         </button>
     </p>
+    <mat-slide-toggle [(ngModel)]="showLabels" name="showLabels">Show labels</mat-slide-toggle>
+    
     <p>
         Set a blueprint background image:
         <input type="file" name="bgimg" (change)="backgroundImage($event)">
     </p>
-    <input type="text" name="objname" *ngIf="floor" [(ngModel)]="floor.label" placeholder="Object Name">
+
+    <h4>{{selectedObject() ? selectedObject().constructor.name: 'Floor'}} Properties</h4>
+    <mat-form-field *ngIf="floor && !selectedObject()">
+        <input matInput name="floorname"  [(ngModel)]="floor.label" placeholder="Floor Name">
+    </mat-form-field>
+    <mat-form-field *ngIf="selectedObject()">
+        <input matInput name="objname" [(ngModel)]="selectedObject().label" placeholder="Object Name">
+    </mat-form-field>
     
     <h4>Floors</h4>
     <p>

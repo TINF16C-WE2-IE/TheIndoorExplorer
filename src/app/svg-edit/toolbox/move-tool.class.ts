@@ -18,7 +18,7 @@ export class MoveTool extends Tool {
     public onMouseDown(evt: MouseEvent) {
         // grab point (or points defining lines) below cursor
         this.dragOrigin = {x: this.mouse.x, y: this.mouse.y};
-        this.selected = this.getExistingObjectsBelowCursor().map(point => {
+        this.selected = this.getExistingObjectsBelowCursor().points.map(point => {
             return {origin: point.clone(), current: point};
         });
         if (!this.selected.length) {

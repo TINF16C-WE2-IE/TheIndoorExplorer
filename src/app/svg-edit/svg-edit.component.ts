@@ -10,6 +10,7 @@ import { Component, OnInit } from '@angular/core';
 import 'rxjs/add/operator/switchMap';
 import { Mouse } from './mouse.class';
 import { MoveTool } from './toolbox/move-tool.class';
+import { SelectTool } from './toolbox/select-tool.class';
 import { LineTool } from './toolbox/line-tool.class';
 import { Portal } from '../model/portal.class';
 import {MatIconRegistry} from '@angular/material';
@@ -25,12 +26,14 @@ export class SvgEditComponent implements OnInit {
 
     public tools = [
         {'name': 'Move', 'icon': 'move'},
+        {'name': 'Label', 'icon': 'wall'},
         {'name': 'Draw Wall', 'icon': 'wall'},
         {'name': 'Draw Portal', 'icon': 'portal'},
         {'name': 'Insert Stairs', 'icon': 'stairs'},
         {'name': 'Insert Lift', 'icon': 'elevator'},
     ];
     public selectedTool = 'Move';
+    public showLabels = true;
     public backgroundImageDataURL = null;
 
     public movingPath: Line[];
@@ -98,6 +101,9 @@ export class SvgEditComponent implements OnInit {
             case 'Move':
               this.mouse.tool = new MoveTool(this.mouse, this.modelSvc);
               break;
+            case 'Label':
+              this.mouse.tool = new SelectTool(this.mouse, this.modelSvc);
+              break;
             case 'Draw Wall':
               this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Wall});
               break;
@@ -159,6 +165,13 @@ export class SvgEditComponent implements OnInit {
         if (file) {
             reader.readAsDataURL(file);
         }
+    }
+
+    selectedObject(): Selectable {
+        if (this.mouse.tool instanceof SelectTool) {
+            return this.mouse.tool.selected;
+        }
+        return null;
     }
 
 }

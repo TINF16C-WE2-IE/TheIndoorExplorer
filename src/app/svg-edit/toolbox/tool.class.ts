@@ -1,5 +1,6 @@
 import { Mouse } from '../mouse.class';
 import { Point } from '../../model/point.class';
+import { Portal } from '../../model/portal.class';
 import { ModelService } from '../../svc/model.service';
 import { Line } from '../../model/line.class';
 
@@ -31,10 +32,10 @@ export abstract class Tool {
         return this.floor.getExistingOrThisPoint(new Point(this.mouse.x, this.mouse.y), exclude);
     }
 
-    protected getExistingObjectsBelowCursor(lineAccuracy = 5): Point[] {
+    protected getExistingObjectsBelowCursor(lineAccuracy = 5): {points: Point[], obj: any} {
         const point = this.floor.getExistingOrThisPoint(new Point(this.mouse.x, this.mouse.y), [], true);
         if (point) {
-            return [point];
+            return {points: [point], obj: null};
         }
         else {
             const lines = ([...this.floor.walls, ...this.floor.portals] as Line[]).map(line => {
@@ -44,8 +45,11 @@ export abstract class Tool {
                 };
             });
             const shortest = lines.reduce((prev, current) => prev.distance > current.distance ? current : prev);
-            return shortest.distance <= lineAccuracy ? [shortest.line.p1, shortest.line.p2] : [];
+            if (shortest.distance <= lineAccuracy) {
+                return {points: [shortest.line.p1, shortest.line.p2], obj: shortest.line};
+            }
         }
+        return {points: [], obj: null};
     }
 
     private pointDistance(x, y, x1, y1, x2, y2) {
