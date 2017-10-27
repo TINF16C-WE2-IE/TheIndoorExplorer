@@ -2,11 +2,13 @@ import { Portal } from './portal.class';
 import { Wall } from './wall.class';
 import { Point } from './point.class';
 import { Line } from './line.class';
+import { Selectable } from './../model/selectable.interface';
 
 export class Floor {
 
     public portals: Portal[] = [];
     public walls: Wall[] = [];
+    public searchResults: Selectable[] = [];
     public label = '';
 
     constructor(obj: {
@@ -88,6 +90,7 @@ export class Floor {
     }
 
     public search(query: string) {
-        return this.getAllSelectables().filter(obj => obj.label.toLowerCase().indexOf(query) !== -1);
+        if (query.length) this.searchResults = this.getAllSelectables().filter(obj => obj.label.toLowerCase().indexOf(query) !== -1);
+        else this.searchResults = [];
     }
 }

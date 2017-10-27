@@ -30,6 +30,8 @@ import {
     MatProgressSpinnerModule,
     MatSliderModule,
     MatSlideToggleModule,
+    MatListModule,
+    MatCheckboxModule,
     MatSnackBarModule,
     MatTableModule,
     MatToolbarModule,
@@ -44,8 +46,8 @@ import {
     imports: [
         BrowserModule, FormsModule, HttpModule, routing, BrowserAnimationsModule,
         MatButtonModule, MatCardModule, MatMenuModule, MatToolbarModule, MatIconModule, MatSliderModule,
-        MatSlideToggleModule, MatGridListModule, MatFormFieldModule, MatInputModule, MatProgressSpinnerModule,
-        MatTableModule, MatSnackBarModule, MatRadioModule,
+        MatSlideToggleModule, MatListModule, MatCheckboxModule, MatGridListModule, MatFormFieldModule,
+        MatInputModule, MatProgressSpinnerModule, MatTableModule, MatSnackBarModule, MatRadioModule,
         FlexLayoutModule
     ],
     providers: [

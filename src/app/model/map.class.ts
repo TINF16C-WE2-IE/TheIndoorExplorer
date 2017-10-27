@@ -1,4 +1,5 @@
 import { Floor } from './floor.class';
+import { Selectable } from './../model/selectable.interface';
 import { ModelService } from '../svc/model.service';
 
 
@@ -114,17 +115,9 @@ export class Map {
 
     public search(query: string) {
         query = query.toLowerCase();
-        let results: Selectable[] = [];
-        const resultFloors: Floor[] = [];
-        if (query.length) {
-            for (const floor of this.floors) {
-                const floorResult = floor.search(query);
-                if (floorResult.length) resultFloors.push(floor);
-                results = results.concat(floorResult);
-            }
+        for (const floor of this.floors) {
+            floor.search(query);
         }
-        this.modelSvc.selectedObjects = results;
-        this.modelSvc.searchResultFloors = resultFloors;
     }
 }
 

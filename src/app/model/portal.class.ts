@@ -1,5 +1,6 @@
 import { Point } from './point.class';
 import { Line } from './line.class';
+import { Selectable } from './../model/selectable.interface';
 
 export class Portal extends Line implements Selectable {
     public id: number;

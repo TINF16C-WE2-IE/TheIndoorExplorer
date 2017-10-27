@@ -38,6 +38,10 @@ export class Line {
         );
     }
 
+    public center(): Point {
+        return new Point((this.p1.x + this.p2.x) / 2, (this.p1.y + this.p2.y) / 2);
+    }
+
     public forExport() {
         return {p1: this.p1.forExport(), p2: this.p2.forExport()};
     }

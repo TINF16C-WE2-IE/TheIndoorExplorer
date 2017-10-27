@@ -1,4 +1,5 @@
 import { Floor } from './../model/floor.class';
+import { Selectable } from './../model/selectable.interface';
 import { Point } from './../model/point.class';
 import { Line } from './../model/line.class';
 import { Pathfinder } from './../lib/pathfinder.class';
@@ -14,7 +15,7 @@ export class ModelService {
     public currentMapId: number;
     public currentFloorId: number;
     public selectedObjects: Selectable[] = [];
-    public searchResultFloors: Floor[] = [];
+    public movingPath: Line[] = [];
     public userInfo: {id: number, username: string};
 
     public viewportSize: {x: number, y: number} = {x: 500, y: 500};

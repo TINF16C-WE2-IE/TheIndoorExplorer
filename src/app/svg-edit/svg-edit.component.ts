@@ -1,9 +1,9 @@
 import { Map } from './../model/map.class';
 import { Floor } from './../model/floor.class';
+import { Selectable } from './../model/selectable.interface';
 import { Wall } from './../model/wall.class';
 import { Point } from './../model/point.class';
 import { Line } from './../model/line.class';
-import { Pathfinder } from './../lib/pathfinder.class';
 import { ModelService } from '../svc/model.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
@@ -12,6 +12,7 @@ import { Mouse } from './mouse.class';
 import { MoveTool } from './toolbox/move-tool.class';
 import { SelectTool } from './toolbox/select-tool.class';
 import { LineTool } from './toolbox/line-tool.class';
+import { DirectionsTool } from './toolbox/directions-tool.class';
 import { Portal } from '../model/portal.class';
 import {MatIconRegistry} from '@angular/material';
 import {DomSanitizer} from '@angular/platform-browser';
@@ -33,11 +34,10 @@ export class SvgEditComponent implements OnInit {
         {'name': 'Insert Lift', 'icon': 'elevator'},
     ];
     public selectedTool = 'Move';
+    public editMode = false;
+    public searchQuery = '';
     public showLabels = true;
     public backgroundImageDataURL = null;
-
-    public movingPath: Line[];
-    public pfinder: Pathfinder;
 
     get floor() {
         return this.modelSvc.currentFloor;
@@ -48,10 +48,30 @@ export class SvgEditComponent implements OnInit {
         return null;
     }
 
+    get movingPath(): Line[] {
+        return this.modelSvc.movingPath;
+    }
+
+    get selectedObjects(): Selectable[] {
+        if (this.modelSvc.currentFloor) return this.modelSvc.selectedObjects.concat(this.modelSvc.currentFloor.searchResults);
+        return this.modelSvc.selectedObjects;
+    }
+
+    get singleSelectedObject(): Selectable {
+        if (this.mouse.tool instanceof SelectTool && this.modelSvc.selectedObjects.length === 1) {
+            return this.modelSvc.selectedObjects[0];
+        }
+        return null;
+    }
+
+    get hasWritePermission(): boolean {
+        return true;
+        // return this.modelSvc.currentMap.permission === 1;
+    }
+
+
     constructor(private modelSvc: ModelService, private route: ActivatedRoute, private router: Router,
         iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
-        this.movingPath = [];
-        this.pfinder = new Pathfinder();
 
         iconRegistry.addSvgIcon('move', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/move.svg'));
         iconRegistry.addSvgIcon('wall', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/pencil.svg'));
@@ -68,31 +88,10 @@ export class SvgEditComponent implements OnInit {
         );
 
         this.mouse = new Mouse(this.modelSvc);
-        this.selectTool('Move');
+        this.selectTool('Directions');
     }
 
-    generatePath() {
-
-        const start = new Point(450, 50, false);
-        const end = new Point(100, 450, false);
-
-        // create nodes graph
-        const nodes = this.pfinder.createLinkedGraph(
-            [...this.modelSvc.currentFloor.portals, ...this.modelSvc.currentFloor.walls]
-            , 15, start, end);
-
-        // find path in this node system
-        const path = this.pfinder.findPathFromTo(nodes,
-            nodes.find(el => el.x === start.x && el.y === start.y),
-            nodes.find(el => el.x === end.x && el.y === end.y));
-        this.movingPath = new Array();
-        for (let i = 1; i < path.length; i++) {
-            this.movingPath.push(new Line(
-                new Point(path[i].x, path[i].y, false),
-                new Point(path[i - 1].x, path[i - 1].y, false)
-            ));
-        }
-    }
+    // generatePath moved to directions-tool
 
     selectTool($event: any) {
         console.log($event);
@@ -112,6 +111,9 @@ export class SvgEditComponent implements OnInit {
               break;
             case 'Draw Portal':
               this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Portal});
+              break;
+            case 'Directions':
+              this.mouse.tool = new DirectionsTool(this.mouse, this.modelSvc);
               break;
         }
     }
@@ -170,24 +172,19 @@ export class SvgEditComponent implements OnInit {
         }
     }
 
-    selectedObjects(): Selectable[] {
-        return this.modelSvc.selectedObjects;
-    }
-
-    singleSelectedObject(): Selectable {
-        if (this.mouse.tool instanceof SelectTool && this.modelSvc.selectedObjects.length === 1) {
-            return this.modelSvc.selectedObjects[0];
-        }
-        return null;
-    }
-
     search(event) {
-        this.modelSvc.currentMap.search(event.target.value);
+        this.modelSvc.currentMap.search(this.searchQuery);
         this.modelSvc.currentMap.fitToViewport();
     }
 
-    searchResultFloors() {
-        return this.modelSvc.searchResultFloors;
+    switchToEditMode() {
+        this.editMode = true;
+        this.selectTool('Move');
     }
 
+    selectWaypoint(selected: Selectable) {
+        if (this.mouse.tool instanceof DirectionsTool) {
+            this.mouse.tool.selectWaypoint(selected);
+        }
+    }
 }

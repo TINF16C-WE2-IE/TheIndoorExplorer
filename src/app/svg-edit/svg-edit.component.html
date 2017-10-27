@@ -1,21 +1,39 @@
 <form id="toolbox" class="panel">
     <mat-form-field>
-        <input matInput name="search" (focus)="search($event)" (keyup)="search($event)" placeholder="Search...">
+        <input matInput type="search" incremental name="search" [(ngModel)]="searchQuery" (search)="search()" placeholder="Search...">
     </mat-form-field>
 
-    <h3>Toolbox</h3>
-    <p class="tool-buttons">
-        <button mat-button *ngFor="let tool of tools" 
-            [ngClass]="tool.name == selectedTool ? 'mat-raised-button tool-button' : 'tool-button'" 
-            (click)="selectTool(tool.name)">
-            <mat-icon [svgIcon]="tool.icon"></mat-icon> {{tool.name}}
-        </button>
-    </p>
-    <div style="padding-top: 20px">
-        <button mat-raised-button (click)="saveCurrentMap()" color="accent">
-            Save
-        </button>
+    <div *ngIf="!editMode">
+        <mat-list>
+            <span *ngFor="let f of floors; let i = index">
+                <h3 *ngIf="f.searchResults.length" mat-subheader>{{f.label.length ? f.label : i+1}}</h3>
+                <mat-list-item *ngFor="let result of f.searchResults" (click)="selectWaypoint(result)">{{result.label}}</mat-list-item>        
+            </span>
+        </mat-list>
+        <b>Select two portals to get directions</b>
     </div>
+
+    <div *ngIf="editMode">
+        <h3>Toolbox</h3>
+        <p class="tool-buttons">
+            <button mat-button *ngFor="let tool of tools" 
+                [ngClass]="tool.name == selectedTool ? 'mat-raised-button tool-button' : 'tool-button'" 
+                (click)="selectTool(tool.name)">
+                <mat-icon [svgIcon]="tool.icon"></mat-icon> {{tool.name}}
+            </button>
+        </p>
+        <p>
+            Set a blueprint background image:<br>
+            <input type="file" name="bgimg" (change)="backgroundImage($event)">
+        </p>
+        <div style="padding-top: 20px">
+            <button mat-raised-button (click)="saveCurrentMap()" color="accent">
+                Save
+            </button>
+        </div>
+    </div>
+
+
     <p>Selected: {{mouse.tool.name}} ({{mouse.x}} | {{mouse.y}})</p>
     <p>
         Stats:
@@ -34,12 +52,8 @@
             <mat-icon aria-label="Fit to Viewport">zoom_out_map</mat-icon>
         </button>
         <mat-slide-toggle [(ngModel)]="showLabels" name="showLabels">Show labels</mat-slide-toggle>    
-    </p>
-    
-    <p>
-        Set a blueprint background image:<br>
-        <input type="file" name="bgimg" (change)="backgroundImage($event)">
-    </p>
+    </p>   
+   
 
     <!--<pre>{{this?.floor | json}}</pre>-->
 </form>
@@ -66,7 +80,7 @@
                   marker-end="url(#circle)" marker-start="url(#circle)"/>
         <svg:g *ngFor="let portal of floor.portals" >
             <svg:line 
-                  [attr.stroke]="selectedObjects().indexOf(portal) !== -1 ? '#b71c1c' : '#afafaf'" stroke-width="10" stroke-dasharray="2, 5"
+                  [attr.stroke]="selectedObjects.indexOf(portal) !== -1 ? '#b71c1c' : '#afafaf'" stroke-width="10" stroke-dasharray="2, 5"
                   [attr.x1]="portal.p1.x" [attr.y1]="portal.p1.y" [attr.x2]="portal.p2.x" [attr.y2]="portal.p2.y"
                   marker-end="url(#circle)" marker-start="url(#circle)"/>
             <svg:text *ngIf="showLabels" text-anchor="middle"
@@ -91,31 +105,39 @@
     <h4>Floors</h4>
     <p>
         <button mat-icon-button *ngFor="let f of floors; let i = index" class="floor-button"
-            [class.mat-raised-button]="floor == f" [class.search-result-floor]="searchResultFloors().indexOf(f) != -1"
+            [class.mat-raised-button]="floor == f" [class.search-result-floor]="f.searchResults.length"
             (click)="selectFloor(i)" >
             {{f.label.length ? f.label : i+1}}
         </button>
     </p>
-    <p class="floor-buttons">
-        <button mat-button (click)="createFloor()">
-            <mat-icon>add_circle_outline</mat-icon> New floor
-        </button>
-        <button mat-button (click)="createFloor(floor)">
-            <mat-icon>control_point_duplicate</mat-icon> Clone floor
-        </button>
-        <button mat-button (click)="removeFloor(floor)">
-            <mat-icon>remove_circle_outline</mat-icon> Remove floor
-        </button>
-        <button mat-button (click)="moveFloor(floor, 1)">
-            <mat-icon>vertical_align_top</mat-icon> Move up
-        </button>
-    </p>
 
-    <h4>{{singleSelectedObject() ? singleSelectedObject().constructor.name: 'Floor'}} Properties</h4>
-    <mat-form-field *ngIf="floor && !singleSelectedObject()">
-        <input matInput name="floorname"  [(ngModel)]="floor.label" placeholder="Floor Name">
-    </mat-form-field>
-    <mat-form-field *ngIf="singleSelectedObject()">
-        <input matInput name="objname" [(ngModel)]="singleSelectedObject().label" placeholder="Object Name">
-    </mat-form-field>
+    <div *ngIf="editMode">
+        <p class="floor-buttons">
+            <button mat-button (click)="createFloor()">
+                <mat-icon>add_circle_outline</mat-icon> New floor
+            </button>
+            <button mat-button (click)="createFloor(floor)">
+                <mat-icon>control_point_duplicate</mat-icon> Clone floor
+            </button>
+            <button mat-button (click)="removeFloor(floor)">
+                <mat-icon>remove_circle_outline</mat-icon> Remove floor
+            </button>
+            <button mat-button (click)="moveFloor(floor, 1)">
+                <mat-icon>vertical_align_top</mat-icon> Move up
+            </button>
+        </p>
+
+        <h4>{{singleSelectedObject ? singleSelectedObject.constructor.name: 'Floor'}} Properties</h4>
+        <mat-form-field *ngIf="floor && !singleSelectedObject">
+            <input matInput name="floorname"  [(ngModel)]="floor.label" placeholder="Floor Name">
+        </mat-form-field>
+        <mat-form-field *ngIf="singleSelectedObject">
+            <input matInput name="objname" [(ngModel)]="singleSelectedObject.label" placeholder="Object Name">
+        </mat-form-field>
+    </div>
 </div>
+
+
+<button mat-fab *ngIf="!editMode && hasWritePermission" class="edit-button">
+    <mat-icon aria-label="Edit" (click)="switchToEditMode()">edit</mat-icon>
+</button>

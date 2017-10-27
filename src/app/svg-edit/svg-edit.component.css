@@ -27,3 +27,9 @@
 .floor-buttons button.mat-button, .tool-buttons button.mat-button {
     display: block;
 }
+
+.edit-button {
+    position: absolute;
+    bottom:32px;
+    right:32px;
+}
