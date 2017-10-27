@@ -111,6 +111,21 @@ export class Map {
         this.modelSvc.bodyOffset.x = domElement.left;
         this.modelSvc.bodyOffset.y = domElement.top;
     }
+
+    public search(query: string) {
+        query = query.toLowerCase();
+        let results: Selectable[] = [];
+        const resultFloors: Floor[] = [];
+        if (query.length) {
+            for (const floor of this.floors) {
+                const floorResult = floor.search(query);
+                if (floorResult.length) resultFloors.push(floor);
+                results = results.concat(floorResult);
+            }
+        }
+        this.modelSvc.selectedObjects = results;
+        this.modelSvc.searchResultFloors = resultFloors;
+    }
 }
 
 

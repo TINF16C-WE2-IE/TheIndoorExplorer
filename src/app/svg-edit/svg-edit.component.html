@@ -1,57 +1,16 @@
-<svg id="editorCanvas" 
-     [attr.viewBox]="viewBoxString()"
-     [style.cursor]="mouse.tool.cursorShape"
-     (mouseup)="mouse.onMouseUp($event)" (mousedown)="mouse.onMouseDown($event)"
-     (mousemove)="mouse.onMouseMove($event)" (mouseleave)="mouse.onMouseLeave($event)"
-     (wheel)="mouse.onWheel($event)"
-     xmlns:svg="http://www.w3.org/2000/svg" version="1.2">
+<form id="toolbox" class="panel">
+    <mat-form-field>
+        <input matInput name="search" (focus)="search($event)" (keyup)="search($event)" placeholder="Search...">
+    </mat-form-field>
 
-    <svg:image *ngIf="backgroundImageDataURL" [attr.xlink:href]="backgroundImageDataURL" x="0" y="0" width="2000" height="2000" opacity="0.5"/>     
-
-    <svg:g *ngIf="floor">
-        <svg:defs>
-            <svg:marker id="circle" markerWidth="10" markerHeight="10" refX="5" refY="5" markerUnits="userSpaceOnUse">
-                <svg:circle cx="5" cy="5" r="4" style="stroke: none; fill:#000000;"/>
-            </svg:marker>
-        </svg:defs>
-
-        <svg:line *ngFor="let wall of floor.walls" stroke="black"
-                  [attr.x1]="wall.p1.x" [attr.y1]="wall.p1.y" [attr.x2]="wall.p2.x" [attr.y2]="wall.p2.y"
-                  marker-end="url(#circle)" marker-start="url(#circle)"/>
-        <svg:g *ngFor="let portal of floor.portals" >
-            <svg:line 
-                  [attr.stroke]="selectedObject() == portal ? '#b71c1c' : '#afafaf'" stroke-width="10" stroke-dasharray="2, 5"
-                  [attr.x1]="portal.p1.x" [attr.y1]="portal.p1.y" [attr.x2]="portal.p2.x" [attr.y2]="portal.p2.y"
-                  marker-end="url(#circle)" marker-start="url(#circle)"/>
-            <svg:text *ngIf="showLabels" text-anchor="middle"
-                  [attr.x]="(portal.p1.x+portal.p2.x) / 2" [attr.y]="(portal.p1.y+portal.p2.y) / 2 + 20">{{portal.label}}</svg:text>
-        </svg:g>                
-      
-        <svg:line *ngFor="let path of movingPath" stroke="red" stroke-width="3"
-                  [attr.x1]="path.p1.x" [attr.y1]="path.p1.y" [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
-                  marker-end="url(#circle)" marker-start="url(#circle)"/>
-
-        <svg:circle *ngIf="mouse.xs !== null && mouse.ys !== null"
-                    [attr.cx]="mouse.xs" [attr.cy]="mouse.ys" r="5" style="stroke:red; fill:none"/>
-    </svg:g>
-
-    <text *ngIf="!floor" x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" font-size="40">
-        Bitte warten...
-    </text>
-
-</svg>
-
-<form #toolbox id="toolbox">
     <h3>Toolbox</h3>
-    
-    <button mat-button *ngFor="let tool of tools" 
-        [ngClass]="tool.name == selectedTool ? 'mat-raised-button tool-button' : 'tool-button'" 
-        (click)="selectTool(tool.name)">
-        <mat-icon [svgIcon]="tool.icon"></mat-icon> {{tool.name}}
-    </button>
-
-
-    <br>
+    <p class="tool-buttons">
+        <button mat-button *ngFor="let tool of tools" 
+            [ngClass]="tool.name == selectedTool ? 'mat-raised-button tool-button' : 'tool-button'" 
+            (click)="selectTool(tool.name)">
+            <mat-icon [svgIcon]="tool.icon"></mat-icon> {{tool.name}}
+        </button>
+    </p>
     <div style="padding-top: 20px">
         <button mat-raised-button (click)="saveCurrentMap()" color="accent">
             Save
@@ -74,31 +33,70 @@
         <button mat-icon-button (click)="fitToViewport()">
             <mat-icon aria-label="Fit to Viewport">zoom_out_map</mat-icon>
         </button>
+        <mat-slide-toggle [(ngModel)]="showLabels" name="showLabels">Show labels</mat-slide-toggle>    
     </p>
-    <mat-slide-toggle [(ngModel)]="showLabels" name="showLabels">Show labels</mat-slide-toggle>
     
     <p>
-        Set a blueprint background image:
+        Set a blueprint background image:<br>
         <input type="file" name="bgimg" (change)="backgroundImage($event)">
     </p>
 
-    <h4>{{selectedObject() ? selectedObject().constructor.name: 'Floor'}} Properties</h4>
-    <mat-form-field *ngIf="floor && !selectedObject()">
-        <input matInput name="floorname"  [(ngModel)]="floor.label" placeholder="Floor Name">
-    </mat-form-field>
-    <mat-form-field *ngIf="selectedObject()">
-        <input matInput name="objname" [(ngModel)]="selectedObject().label" placeholder="Object Name">
-    </mat-form-field>
-    
+    <!--<pre>{{this?.floor | json}}</pre>-->
+</form>
+            
+<svg id="editorCanvas" 
+     [attr.viewBox]="viewBoxString()"
+     [style.cursor]="mouse.tool.cursorShape"
+     (mouseup)="mouse.onMouseUp($event)" (mousedown)="mouse.onMouseDown($event)"
+     (mousemove)="mouse.onMouseMove($event)" (mouseleave)="mouse.onMouseLeave($event)"
+     (wheel)="mouse.onWheel($event)"
+     xmlns:svg="http://www.w3.org/2000/svg" version="1.2">
+
+    <svg:image *ngIf="backgroundImageDataURL" [attr.xlink:href]="backgroundImageDataURL" x="0" y="0" width="2000" height="2000" opacity="0.5"/>     
+
+    <svg:g *ngIf="floor">
+        <svg:defs>
+            <svg:marker id="circle" markerWidth="10" markerHeight="10" refX="5" refY="5" markerUnits="userSpaceOnUse">
+                <svg:circle cx="5" cy="5" r="4" style="stroke: none; fill:#000000;"/>
+            </svg:marker>
+        </svg:defs>
+
+        <svg:line *ngFor="let wall of floor.walls" stroke="black"
+                  [attr.x1]="wall.p1.x" [attr.y1]="wall.p1.y" [attr.x2]="wall.p2.x" [attr.y2]="wall.p2.y"
+                  marker-end="url(#circle)" marker-start="url(#circle)"/>
+        <svg:g *ngFor="let portal of floor.portals" >
+            <svg:line 
+                  [attr.stroke]="selectedObjects().indexOf(portal) !== -1 ? '#b71c1c' : '#afafaf'" stroke-width="10" stroke-dasharray="2, 5"
+                  [attr.x1]="portal.p1.x" [attr.y1]="portal.p1.y" [attr.x2]="portal.p2.x" [attr.y2]="portal.p2.y"
+                  marker-end="url(#circle)" marker-start="url(#circle)"/>
+            <svg:text *ngIf="showLabels" text-anchor="middle"
+                  [attr.x]="(portal.p1.x+portal.p2.x) / 2" [attr.y]="(portal.p1.y+portal.p2.y) / 2 + 20">{{portal.label}}</svg:text>
+        </svg:g>                
+      
+        <svg:line *ngFor="let path of movingPath" stroke="red" stroke-width="3"
+                  [attr.x1]="path.p1.x" [attr.y1]="path.p1.y" [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
+                  marker-end="url(#circle)" marker-start="url(#circle)"/>
+
+        <svg:circle *ngIf="mouse.xs !== null && mouse.ys !== null"
+                    [attr.cx]="mouse.xs" [attr.cy]="mouse.ys" r="5" style="stroke:red; fill:none"/>
+    </svg:g>
+
+    <text *ngIf="!floor" x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" font-size="40">
+        Bitte warten...
+    </text>
+
+</svg>
+
+<div class="panel">
     <h4>Floors</h4>
     <p>
-        <button mat-icon-button *ngFor="let f of floors; let i = index" 
-            [ngClass]="floor == f ? 'mat-raised-button floor-button' : 'floor-button'" 
-            (click)="selectFloor(i)">
+        <button mat-icon-button *ngFor="let f of floors; let i = index" class="floor-button"
+            [class.mat-raised-button]="floor == f" [class.search-result-floor]="searchResultFloors().indexOf(f) != -1"
+            (click)="selectFloor(i)" >
             {{f.label.length ? f.label : i+1}}
         </button>
     </p>
-    <p>
+    <p class="floor-buttons">
         <button mat-button (click)="createFloor()">
             <mat-icon>add_circle_outline</mat-icon> New floor
         </button>
@@ -112,6 +110,12 @@
             <mat-icon>vertical_align_top</mat-icon> Move up
         </button>
     </p>
-    <!--<pre>{{this?.floor | json}}</pre>-->
-</form>
 
+    <h4>{{singleSelectedObject() ? singleSelectedObject().constructor.name: 'Floor'}} Properties</h4>
+    <mat-form-field *ngIf="floor && !singleSelectedObject()">
+        <input matInput name="floorname"  [(ngModel)]="floor.label" placeholder="Floor Name">
+    </mat-form-field>
+    <mat-form-field *ngIf="singleSelectedObject()">
+        <input matInput name="objname" [(ngModel)]="singleSelectedObject().label" placeholder="Object Name">
+    </mat-form-field>
+</div>

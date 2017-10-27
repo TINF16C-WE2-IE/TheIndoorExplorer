@@ -37,6 +37,10 @@ export class Floor {
         ));
     }
 
+    public getAllSelectables(): Selectable[] {
+        return this.portals;
+    }
+
     public getExistingOrThisPoint(p: Point, exclude: Point[] = [], nullIfNotFound = false) {
         const points: Point[] = this.getAllPoints().filter(
             point => point !== p && point.equals(p) && exclude.indexOf(point) === -1
@@ -81,5 +85,9 @@ export class Floor {
             portals: this.portals.map(portal => portal.forExport()),
             label: this.label
         };
+    }
+
+    public search(query: string) {
+        return this.getAllSelectables().filter(obj => obj.label.toLowerCase().indexOf(query) !== -1);
     }
 }

@@ -96,6 +96,9 @@ export class SvgEditComponent implements OnInit {
 
     selectTool($event: any) {
         console.log($event);
+        // this.modelSvc.selectedObjects = [];
+        // this.modelSvc.searchResultFloors = [];
+
         this.selectedTool = $event;
         switch ($event) {
             case 'Move':
@@ -167,11 +170,24 @@ export class SvgEditComponent implements OnInit {
         }
     }
 
-    selectedObject(): Selectable {
-        if (this.mouse.tool instanceof SelectTool) {
-            return this.mouse.tool.selected;
+    selectedObjects(): Selectable[] {
+        return this.modelSvc.selectedObjects;
+    }
+
+    singleSelectedObject(): Selectable {
+        if (this.mouse.tool instanceof SelectTool && this.modelSvc.selectedObjects.length === 1) {
+            return this.modelSvc.selectedObjects[0];
         }
         return null;
+    }
+
+    search(event) {
+        this.modelSvc.currentMap.search(event.target.value);
+        this.modelSvc.currentMap.fitToViewport();
+    }
+
+    searchResultFloors() {
+        return this.modelSvc.searchResultFloors;
     }
 
 }

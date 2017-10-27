@@ -7,7 +7,7 @@
 }
 
 #editorCanvas {
-    flex: 4 0 auto;
+    width: 50%;
     height: 500px;
     border: 1px red dotted;
     user-select: none;
@@ -15,8 +15,15 @@
     -webkit-user-drag: none;
 }
 
-#toolbox {
+.panel {
     flex: 1 1 auto;
-    margin-left: 2em;
+    margin: 0 2em;
 }
 
+.search-result-floor {
+    color:#b71c1c;
+}
+
+.floor-buttons button.mat-button, .tool-buttons button.mat-button {
+    display: block;
+}
