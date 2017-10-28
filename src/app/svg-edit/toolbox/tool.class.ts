@@ -1,8 +1,8 @@
 import { Mouse } from '../mouse.class';
 import { Point } from '../../model/point.class';
-import { Portal } from '../../model/portal.class';
 import { ModelService } from '../../svc/model.service';
 import { Line } from '../../model/line.class';
+import { Selectable } from '../../model/selectable.interface';
 
 export abstract class Tool {
     public get name() {
@@ -75,7 +75,7 @@ export abstract class Tool {
         return Math.sqrt((x - xx) ** 2 + (y - yy) ** 2);
     }
 
-    protected isSelectable(obj: any) {
-        return (obj && obj.id && obj.label !== undefined);
+    protected isSelectable(obj: Selectable | any): obj is Selectable {
+        return (obj && obj.id !== undefined && obj.label !== undefined);
     }
 }

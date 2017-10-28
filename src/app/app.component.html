@@ -1,12 +1,6 @@
-<mat-toolbar color="primary">
-    <span>Indoor Explorer Client</span>
 
-    <span class="example-spacer"></span>
-    <button mat-icon-button [routerLink]="['/home']">
-        <mat-icon class="example-icon" color="'acccent'">home</mat-icon>
-    </button>
-</mat-toolbar>
+<app-toolbar></app-toolbar>
 
-<br><br>
+<div id="spacer"></div>
 
-<router-outlet></router-outlet>
+<router-outlet (activate)="scrollTop()"></router-outlet>

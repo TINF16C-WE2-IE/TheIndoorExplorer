@@ -1,5 +1,4 @@
 import { Tool } from './tool.class';
-import { Point } from '../../model/point.class';
 
 export class SelectTool extends Tool {
 

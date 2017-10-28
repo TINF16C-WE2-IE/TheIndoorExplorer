@@ -38,7 +38,7 @@ export class DirectionsTool extends Tool {
         }
     }
 
-    public selectWaypoint(selected: any) {
+    public selectWaypoint(selected: Selectable | any) {
         // TS has no way of checking for an interface :(
         if (this.isSelectable(selected)) {
             if (this.modelSvc.selectedObjects.length) {

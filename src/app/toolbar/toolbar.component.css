@@ -1,0 +1,8 @@
+.mat-toolbar{
+    background-color: #4ABDAC;
+    position: fixed;
+    top:0;
+}
+.example-fill-remaining-space {
+    flex: 1 1 auto;
+}
