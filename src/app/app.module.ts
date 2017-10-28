@@ -31,6 +31,7 @@ import {
     MatSnackBarModule,
     MatTableModule,
     MatToolbarModule,
+    MatTooltipModule,
     MatRadioModule
 } from '@angular/material';
 import { ToolbarComponent } from './toolbar/toolbar.component';
@@ -47,7 +48,7 @@ import {MainComponent} from './home/main.component';
         BrowserModule, FormsModule, HttpModule, routing, BrowserAnimationsModule,
         MatButtonModule, MatCardModule, MatMenuModule, MatToolbarModule, MatIconModule, MatSliderModule,
         MatSlideToggleModule, MatListModule, MatGridListModule, MatFormFieldModule,
-        MatInputModule, MatProgressSpinnerModule, MatTableModule, MatSnackBarModule, MatRadioModule,
+        MatInputModule, MatProgressSpinnerModule, MatTableModule, MatTooltipModule, MatSnackBarModule, MatRadioModule,
         FlexLayoutModule
     ],
     providers: [
