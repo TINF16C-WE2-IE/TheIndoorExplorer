@@ -29,29 +29,29 @@ export class Mouse {
     }
 
 
-    public onMouseDown(evt: MouseEvent | TouchEvent) {
-        evt = this.convertTouchEvent(evt);
-        this.mapToCanvas(evt);
+    public onMouseDown(evt: any) {
+        const mEvt: MouseEvent = this.convertTouchEvent(evt);
+        this.mapToCanvas(mEvt);
 
         if (this.tool) {
-            this.tool.onMouseDown(evt);
+            this.tool.onMouseDown(mEvt);
         }
         return false; // disallow browser from dragging the svg image
     }
 
-    public onMouseUp(evt: MouseEvent | TouchEvent) {
-        evt = this.convertTouchEvent(evt);
+    public onMouseUp(evt: any) {
+        const mEvt: MouseEvent = this.convertTouchEvent(evt);
         if (this.tool) {
-            this.tool.onMouseUp(evt);
+            this.tool.onMouseUp(mEvt);
         }
     }
 
-    public onMouseMove(evt: MouseEvent | TouchEvent) {
-        evt = this.convertTouchEvent(evt);
-        this.mapToCanvas(evt);
+    public onMouseMove(evt: any) {
+        const mEvt: MouseEvent = this.convertTouchEvent(evt);
+        this.mapToCanvas(mEvt);
 
         if (this.tool) {
-            this.tool.onMouseMove(evt);
+            this.tool.onMouseMove(mEvt);
         }
     }
 
@@ -60,8 +60,8 @@ export class Mouse {
         this._y = null;
     }
 
-    private convertTouchEvent(evt: MouseEvent | TouchEvent): MouseEvent {
-        if (evt instanceof TouchEvent) {
+    private convertTouchEvent(evt: any): MouseEvent {
+        if (evt.touches) {
             if (evt.touches.length) return new MouseEvent(evt.type, {clientX: evt.touches[0].clientX, clientY: evt.touches[0].clientY});
             return null;
         }
