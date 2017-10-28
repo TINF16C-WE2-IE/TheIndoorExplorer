@@ -6,9 +6,15 @@
     box-sizing: border-box;
 }
 
+html{
+    height: 100%;
+}
+
 body {
-    padding: 0;
     margin: 0;
+    background-color: #4ABDAC;
+    height:100%;
+    position: relative;
 }
 
 .example-card {

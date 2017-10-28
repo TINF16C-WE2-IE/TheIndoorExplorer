@@ -1,0 +1,15 @@
+#icon{
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+    display: block;
+}
+h1{
+    font-family: Roboto;
+    font-weight: 400;
+    text-align: center;
+}
+
+h1 #innerTitle{
+    font-weight: 100;
+}
