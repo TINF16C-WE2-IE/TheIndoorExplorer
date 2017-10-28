@@ -29,20 +29,25 @@ export class Mouse {
     }
 
 
-    public onMouseDown(evt: MouseEvent) {
+    public onMouseDown(evt: MouseEvent | TouchEvent) {
+        evt = this.convertTouchEvent(evt);
+        this.mapToCanvas(evt);
+
         if (this.tool) {
             this.tool.onMouseDown(evt);
         }
         return false; // disallow browser from dragging the svg image
     }
 
-    public onMouseUp(evt: MouseEvent) {
+    public onMouseUp(evt: MouseEvent | TouchEvent) {
+        evt = this.convertTouchEvent(evt);
         if (this.tool) {
             this.tool.onMouseUp(evt);
         }
     }
 
-    public onMouseMove(evt: MouseEvent) {
+    public onMouseMove(evt: MouseEvent | TouchEvent) {
+        evt = this.convertTouchEvent(evt);
         this.mapToCanvas(evt);
 
         if (this.tool) {
@@ -55,6 +60,14 @@ export class Mouse {
         this._y = null;
     }
 
+    private convertTouchEvent(evt: MouseEvent | TouchEvent): MouseEvent {
+        if (evt instanceof TouchEvent) {
+            if (evt.touches.length) return new MouseEvent(evt.type, {clientX: evt.touches[0].clientX, clientY: evt.touches[0].clientY});
+            return null;
+        }
+        return evt;
+    }
+
     public onWheel(evt: WheelEvent) {
         this.modelSvc.currentMap.zoom(evt.deltaY / Math.abs(evt.deltaY), evt.x, evt.y);
         this.onMouseMove(evt);
@@ -64,10 +77,12 @@ export class Mouse {
         if (this.modelSvc.currentMap) {
             this.modelSvc.currentMap.getMapDimensions();
         }
-        const ratioX = this.modelSvc.canvasSize.x / this.modelSvc.viewportSize.x;
-        const ratioY = this.modelSvc.canvasSize.y / this.modelSvc.viewportSize.y;
+        if (evt) {
+            const ratioX = this.modelSvc.canvasSize.x / this.modelSvc.viewportSize.x;
+            const ratioY = this.modelSvc.canvasSize.y / this.modelSvc.viewportSize.y;
 
-        this._x = Math.round((evt.x - this.modelSvc.bodyOffset.x) * ratioX + this.modelSvc.panOffset.x);
-        this._y = Math.round((evt.y - this.modelSvc.bodyOffset.y) * ratioY + this.modelSvc.panOffset.y);
+            this._x = Math.round((evt.x - this.modelSvc.bodyOffset.x) * ratioX + this.modelSvc.panOffset.x);
+            this._y = Math.round((evt.y - this.modelSvc.bodyOffset.y) * ratioY + this.modelSvc.panOffset.y);
+        }
     }
 }

@@ -7,6 +7,8 @@ import { Pathfinder } from '../../lib/pathfinder.class';
 export class DirectionsTool extends Tool {
 
     public pfinder: Pathfinder;
+    private dragOrigin: {x: number, y: number};
+    private panDragOrigin: {x: number, y: number};
 
     public get name() {
         return 'Label';
@@ -17,15 +19,23 @@ export class DirectionsTool extends Tool {
     }
 
     public onMouseDown(evt: MouseEvent) {
+        this.dragOrigin = {x: evt.x, y: evt.y};
+        this.panDragOrigin = {x: this.modelSvc.panOffset.x, y: this.modelSvc.panOffset.y};
     }
 
     public onMouseUp(evt: MouseEvent) {
         // select object (or points defining lines) below cursor
         const selected = this.getExistingObjectsBelowCursor().obj;
         this.selectWaypoint(selected);
+        this.dragOrigin = null;
+        this.panDragOrigin = null;
     }
 
     public onMouseMove(evt: MouseEvent) {
+        if (this.panDragOrigin) {
+            this.modelSvc.panOffset.x = this.panDragOrigin.x - evt.x + this.dragOrigin.x;
+            this.modelSvc.panOffset.y = this.panDragOrigin.y - evt.y + this.dragOrigin.y;
+        }
     }
 
     public selectWaypoint(selected: Selectable) {
@@ -37,8 +47,9 @@ export class DirectionsTool extends Tool {
             } else {
                 this.modelSvc.selectedObjects.push(selected);
             }
+        } else {
+            this.modelSvc.selectedObjects = [];
         }
-        console.log(this.modelSvc.selectedObjects);
     }
 
     generatePath(start: Point, end: Point) {
