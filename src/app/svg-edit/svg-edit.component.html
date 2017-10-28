@@ -24,7 +24,7 @@
         </p>
         <p>
             Set a blueprint background image:<br>
-            <input type="file" name="bgimg" (change)="backgroundImage($event)">
+            <input type="file" name="bgimg" (change)="backgroundImage($event)" accept="image/*">
         </p>
         <div style="padding-top: 20px">
             <button mat-raised-button (click)="saveCurrentMap()" color="accent">
@@ -140,6 +140,6 @@
 </div>
 
 
-<button mat-fab *ngIf="!editMode && hasWritePermission" class="edit-button">
-    <mat-icon aria-label="Edit" (click)="switchToEditMode()">edit</mat-icon>
+<button mat-fab *ngIf="!editMode && hasWritePermission"  (click)="switchToEditMode()" class="edit-button">
+    <mat-icon aria-label="Edit">edit</mat-icon>
 </button>

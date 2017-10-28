@@ -18,7 +18,7 @@ export class SelectTool extends Tool {
         // select object (or points defining lines) below cursor
         const selected = this.getExistingObjectsBelowCursor().obj;
         // TS has no way of checking for an interface :(
-        this.modelSvc.selectedObjects = (selected && selected.id && selected.label) ? [selected] : [];
+        this.modelSvc.selectedObjects = this.isSelectable(selected) ? [selected] : [];
     }
 
     public onMouseMove(evt: MouseEvent) {

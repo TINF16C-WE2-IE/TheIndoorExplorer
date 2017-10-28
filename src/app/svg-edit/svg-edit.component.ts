@@ -6,7 +6,7 @@ import { Point } from './../model/point.class';
 import { Line } from './../model/line.class';
 import { ModelService } from '../svc/model.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import 'rxjs/add/operator/switchMap';
 import { Mouse } from './mouse.class';
 import { MoveTool } from './toolbox/move-tool.class';
@@ -186,5 +186,11 @@ export class SvgEditComponent implements OnInit {
         if (this.mouse.tool instanceof DirectionsTool) {
             this.mouse.tool.selectWaypoint(selected);
         }
+    }
+
+    @HostListener('window:resize', ['$event'])
+    onResize(event) {
+        console.log('resize');
+        this.modelSvc.currentMap.fitToViewport();
     }
 }

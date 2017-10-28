@@ -11,7 +11,7 @@ export class DirectionsTool extends Tool {
     private panDragOrigin: {x: number, y: number};
 
     public get name() {
-        return 'Label';
+        return 'Directions';
     }
 
     public get cursorShape() {
@@ -38,9 +38,9 @@ export class DirectionsTool extends Tool {
         }
     }
 
-    public selectWaypoint(selected: Selectable) {
+    public selectWaypoint(selected: any) {
         // TS has no way of checking for an interface :(
-        if (selected && selected.id && selected.label) {
+        if (this.isSelectable(selected)) {
             if (this.modelSvc.selectedObjects.length) {
                 this.generatePath(this.modelSvc.selectedObjects[0].center(), selected.center());
                 this.modelSvc.selectedObjects = [];

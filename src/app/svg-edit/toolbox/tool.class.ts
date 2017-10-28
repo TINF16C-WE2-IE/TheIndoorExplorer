@@ -74,4 +74,8 @@ export abstract class Tool {
         }
         return Math.sqrt((x - xx) ** 2 + (y - yy) ** 2);
     }
+
+    protected isSelectable(obj: any) {
+        return (obj && obj.id && obj.label !== undefined);
+    }
 }
