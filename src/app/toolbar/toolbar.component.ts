@@ -1,41 +1,37 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { RequestService } from '../svc/request.service';
 import { ModelService } from '../svc/model.service';
 
 
-
 @Component({
-  selector: 'app-toolbar',
-  templateUrl: './toolbar.component.html',
-  styleUrls: ['./toolbar.component.css']
+    selector: 'app-toolbar',
+    templateUrl: './toolbar.component.html',
+    styleUrls: ['./toolbar.component.css']
 })
-export class ToolbarComponent implements OnInit {
+export class ToolbarComponent {
     isScrolled: boolean;
-  constructor(private rqstSvc: RequestService, public modelSvc: ModelService) {  }
+    @ViewChild('appMenu') appMenu: ElementRef;
 
-  public performLogin(provider: string): void {
+    constructor(private rqstSvc: RequestService, public modelSvc: ModelService) {
+    }
+
+    public performLogin(provider: string): void {
         window.location.href = RequestService.URL_LOGIN_ENDPOINT + this.rqstSvc.uriEncodeObject({'providerId': provider});
     }
 
-  public performeLogout(): void {
-      this.rqstSvc.get('logout', {}).subscribe(
-          resp => {
-              if (resp) {
-                  console.log('Logout response:', resp);
-              }
-          }
-      );
+    public performLogout(): void {
+        this.rqstSvc.get('logout', {}).subscribe(
+            resp => {
+                if (resp) {
+                    console.log('Logout response:', resp);
+                }
+            }
+        );
 
-  }
+    }
 
-  ngOnInit() {
-  }
     @HostListener('window:scroll', ['$event'])
-    onScroll(event) {
-        if (window.pageYOffset > 0) {
-            this.isScrolled = true;
-        }else {
-            this.isScrolled = false;
-        }
+    onScroll() {
+        this.isScrolled = window.pageYOffset > 0;
     }
 }
