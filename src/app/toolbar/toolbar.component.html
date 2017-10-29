@@ -10,8 +10,14 @@
     <div *ngIf="modelSvc.userInfo?.id">
         <button mat-button [matMenuTriggerFor]="appMenu">
             <mat-icon id="toolbarLoggedIn">account_box</mat-icon>
-            <span>{{modelSvc.userInfo.username}}</span></button>
+            <span>{{modelSvc.userInfo.username}}</span>
+        </button>
     </div>
+    <button mat-button [routerLink]="['']">
+        <mat-icon id="home" >home</mat-icon>
+        <span>Home</span>
+
+    </button>
 </mat-toolbar>
 
 <mat-menu #appMenu="matMenu" [overlapTrigger]="false">
