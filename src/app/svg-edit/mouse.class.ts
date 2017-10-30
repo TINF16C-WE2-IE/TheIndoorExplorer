@@ -73,6 +73,10 @@ export class Mouse {
         this.onMouseMove(evt);
     }
 
+    public onPinch(evt: any) {
+        console.log(evt);
+    }
+
     private mapToCanvas(evt: MouseEvent) {
         if (this.modelSvc.currentMap) {
             this.modelSvc.currentMap.getMapDimensions();
