@@ -123,7 +123,7 @@ export class Pathfinder {
         // joining (union) intersecting polygons.
 
         // keep track of node-polygons
-        let nodePolygons: Polygon[] = [];
+        const nodePolygons: Polygon[] = [];
 
 
         // create nodes in an offset(radius) around every wall.
@@ -183,8 +183,6 @@ export class Pathfinder {
             }
         }
 
-        console.log('created node polygons', nodePolygons);
-
         return nodePolygons;
     }
 
@@ -197,6 +195,9 @@ export class Pathfinder {
         // total nodes list
         const nodes: PathNode[] = [];
         this.connections = [];
+
+        // checked-links list, which contains checked links, but theese links were not worth it
+        const chckd: Line[] = [];
 
         for (const vv of polygons) {
 
@@ -223,83 +224,73 @@ export class Pathfinder {
             this.linkNodes(first, prevNode);
         }
 
-        console.log(nodes);
-        return nodes;
-        // TODO: we need all border-lines of the polygons
-
-        /*
+        // additional connections between polygons
+        const newConnections: Line[] = [];
 
         for (const np of polygons) {
+            let v1 = np.vertex;
             for (const npl of polygons) {
+                let v2 = npl.vertex;
 
                 // check for any link between the nodes of np and npl
-                for (let i = 0; i < np.lines.length; i++) {
-                    for (let j = 0; j < npl.lines.length; j++) {
+                do {
+                    do {
 
                         // move onto the next, in case we already checked this link.
-                        if (chckd.find(element =>
-                            (element.n1x === np.lines[i].p1.x && element.n1y === np.lines[i].p1.y
-                              && element.n2x === npl.lines[j].p1.x && element.n2y === npl.lines[j].p1.y)
-                            || (element.n1x === npl.lines[j].p1.x && element.n1y === npl.lines[j].p1.y
-                              && element.n2x === np.lines[i].p1.x && element.n2y === np.lines[i].p1.y)) !== undefined) {
-                            continue;
-                        }
+                        if (newConnections.concat(chckd).find(el =>
+                            (el.p1.x === v1.point.x && el.p1.y === v1.point.y
+                              && el.p2.x === v2.point.x && el.p2.y === v2.point.y)
+                            || (el.p1.x === v2.point.x && el.p1.y === v2.point.y
+                              && el.p2.x === v1.point.x && el.p2.y === v1.point.y)) === undefined) {
 
-                        // if this link doesnt intersect any "polygon-links"
-                        if (nodePolygons.every(element => {
-                            return !this.checkIntersectionOfLineWithLines(
-                                np.lines[i].p1.x, np.lines[i].p1.y, npl.lines[j].p1.x, npl.lines[j].p1.y,
-                                element.lines.concat(walls), false);
-                        })) {
-                            if (this.checkIfLinkIsWorthIt(
-                                    np.lines[i].p1,
-                                    npl.lines[j].p1,
-                                    np.lines[(i === 0) ? (np.lines.length - 1) : (i - 1)].p1,
-                                    np.lines[(i === np.lines.length - 1) ? (0) : (i + 1)].p1,
-                                    npl.lines[(j === 0) ? (npl.lines.length - 1) : (j - 1)].p1,
-                                    npl.lines[(j === npl.lines.length - 1) ? (0) : (j + 1)].p1
-                            )) {
+                          // if this link doesnt intersect any "polygon-borders" (connections)
+                          if (!this.checkIntersectionOfLineWithLines(
+                                  v1.point.x, v1.point.y, v2.point.x, v2.point.y,
+                                  this.connections.concat(walls), false)
+                          ) {
+                              if (this.checkIfLinkIsWorthIt(
+                                      v1.point, v2.point,
+                                      v1.previous.point, v1.next.point,
+                                      v2.previous.point, v2.next.point
+                              )) {
+                                  // we need this link!
+                                  this.linkNodes(
+                                      nodes.find(el => el.x === v1.point.x && el.y === v1.point.y),
+                                      nodes.find(el => el.x === v2.point.x && el.y === v2.point.y)
+                                  );
+                                  newConnections.push(new Line(v1.point, v2.point));
+                              }
+                          } else {
+                              // just and mark as checked.
+                              chckd.push(new Line(v1.point, v2.point));
+                          }
+                      }
 
-                                // check if this link is worth having it. based on angles of their neighbour walls
+                        v2 = v2.next;
+                    } while (v2 !== npl.vertex);
 
-                                // we need this link!
-                                this.linkNodes(
-                                    nodes.find(el => el.x === np.lines[i].p1.x && el.y === np.lines[i].p1.y),
-                                    nodes.find(el => el.x === npl.lines[j].p1.x && el.y === npl.lines[j].p1.y)
-                                );
-
-                                // mainly just for debug
-                                this.connections.push(new Line(np.lines[i].p1, npl.lines[j].p1));
-                            }
-                        } else {
-
-                        }
-
-                        // and mark as checked.
-                        chckd.push({n1x: np.lines[i].p1.x, n1y: np.lines[i].p1.y, n2x: npl.lines[j].p1.x, n2y: npl.lines[j].p1.y});
-                    }
-                }
+                    v1 = v1.next;
+                } while (v1 !== np.vertex);
             }
         }
 
-
         // at last but not least, connect the start point to visible nodes!
-        if (start !== undefined && start !== null) {
-            const startn = new PathNode(start.x, start.y);
-            nodes.push(startn);
-            for (const n of nodes) {
+        if (start !== null && start !== undefined) {
+            if (start !== undefined && start !== null) {
+                const startn = new PathNode(start.x, start.y);
+                nodes.push(startn);
+                for (const n of nodes) {
 
-                do {
+                // if this link doesnt intersect any "polygon-borders" (connections)
+                if (!this.checkIntersectionOfLineWithLines(
+                        start.x, start.y, n.x, n.y,
+                        this.connections.concat(walls), false)
+                ) {
 
-                } while
-                if (polygons.every(element => {
-                    return !this.checkIntersectionOfLineWithLines(
-                        start.x, start.y, n.x, n.y, new Lin.concat(walls), false);
-                })) {
-                    this.linkNodes(startn, n);
-
-                    // mainly just for debug
-                    this.connections.push(new Line(start, new Point(n.x, n.y, false)));
+                        // we need this link!
+                        this.linkNodes(startn, n);
+                        newConnections.push(new Line(start, new Point(n.x, n.y, false)));
+                    }
                 }
             }
         }
@@ -308,21 +299,22 @@ export class Pathfinder {
         if (end !== undefined && end !== null) {
             const endn = new PathNode(end.x, end.y);
             nodes.push(endn);
-            for (const n of nodes) {
-                if (nodePolygons.every(element => {
-                    return !this.checkIntersectionOfLineWithLines(
-                        end.x, end.y, n.x, n.y, element.lines.concat(walls), false);
-                })) {
-                    this.linkNodes(endn, n);
+                for (const n of nodes) {
 
-                    // mainly just for debug
-                    this.connections.push(new Line(end, new Point(n.x, n.y, false)));
+                // if this link doesnt intersect any "polygon-borders" (connections)
+                if (!this.checkIntersectionOfLineWithLines(
+                        end.x, end.y, n.x, n.y,
+                        this.connections.concat(walls), false)
+                ) {
+                        // we need this link!
+                        this.linkNodes(endn, n);
+                        newConnections.push(new Line(end, new Point(n.x, n.y, false)));
+                    }
                 }
-            }
         }
 
+        this.connections = this.connections.concat(newConnections);
         return nodes;
-        */
     }
 
     // @params arguments are the 2 nodes, and then the 2 neighbour nodes of the first (before, after),
