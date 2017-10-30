@@ -44,9 +44,11 @@ export abstract class Tool {
                     line: line
                 };
             });
-            const shortest = lines.reduce((prev, current) => prev.distance > current.distance ? current : prev);
-            if (shortest.distance <= lineAccuracy) {
-                return {points: [shortest.line.p1, shortest.line.p2], obj: shortest.line};
+            if (lines.length) {
+                const shortest = lines.reduce((prev, current) => prev.distance > current.distance ? current : prev);
+                if (shortest.distance <= lineAccuracy) {
+                    return {points: [shortest.line.p1, shortest.line.p2], obj: shortest.line};
+                }
             }
         }
         return {points: [], obj: null};

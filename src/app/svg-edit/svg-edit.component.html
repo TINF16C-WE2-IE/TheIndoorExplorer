@@ -4,13 +4,17 @@
     </mat-form-field>
 
     <div *ngIf="!editMode">
-        <mat-list>
+        <mat-nav-list>
             <span *ngFor="let f of floors; let i = index">
                 <h3 *ngIf="f.searchResults.length" mat-subheader>{{f.label.length ? f.label : i+1}}</h3>
                 <mat-list-item *ngFor="let result of f.searchResults" (click)="selectWaypoint(result)">{{result.label}}</mat-list-item>        
             </span>
-        </mat-list>
-        <b>Select two portals to get directions</b>
+        </mat-nav-list>
+        <p *ngIf="singleSelectedObject">
+            Starting point: {{singleSelectedObject.label}}<br>
+            <b>Select a destination</b>
+        </p>
+        <p *ngIf="!singleSelectedObject"><b>Select two portals to get directions</b></p>        
     </div>
 
     <div *ngIf="editMode">
@@ -68,7 +72,7 @@
      (wheel)="mouse.onWheel($event)"
      xmlns:svg="http://www.w3.org/2000/svg" version="1.2">
 
-    <svg:image *ngIf="backgroundImageDataURL" [attr.xlink:href]="backgroundImageDataURL" x="0" y="0" width="2000" height="2000" opacity="0.5"/>     
+    <svg:image *ngIf="backgroundImageDataURL" [attr.xlink:href]="backgroundImageDataURL" x="0" y="0" width="2000" height="2000" opacity="0.5" preserveAspectRatio="xMinYMin meet" />     
 
     <svg:g *ngIf="floor">
         <svg:defs>

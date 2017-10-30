@@ -58,7 +58,7 @@ export class SvgEditComponent implements OnInit {
     }
 
     get singleSelectedObject(): Selectable {
-        if (this.mouse.tool instanceof SelectTool && this.modelSvc.selectedObjects.length === 1) {
+        if (this.modelSvc.selectedObjects.length === 1) {
             return this.modelSvc.selectedObjects[0];
         }
         return null;
