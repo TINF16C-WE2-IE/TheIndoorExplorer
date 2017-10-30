@@ -60,7 +60,8 @@ export class SvgEditComponent implements OnInit {
     ngOnInit() {
         this.route.params.subscribe(
             params => {
-                this.modelSvc.loadMap(Number.parseInt(params['mapId']));
+                this.modelSvc.loadMap(-1);
+                this.generatePath();
             }
         );
 
@@ -70,7 +71,7 @@ export class SvgEditComponent implements OnInit {
 
     generatePath() {
 
-        const start = new Point(450, 50, false);
+        const start = new Point(290, 200, false);
         const end = new Point(100, 450, false);
 
         // create nodes graph

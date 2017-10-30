@@ -1,3 +1,5 @@
+import { VertexRef } from './vertex-ref.class';
+import { Polygon } from './polygon.class';
 import { Line } from './../model/line.class';
 import { Wall } from './../model/wall.class';
 import { Point } from './../model/point.class';
@@ -93,45 +95,6 @@ export class Pathfinder {
         }
     }
 
-    // simple grid based approach, very expensive, is DEPRECATED
-    public createGridBasedLinkedGraph(threshold, rectEditorWidth, rectEditorHeight, lines: Line[]): PathNode[] {
-
-
-        const numX = ((rectEditorWidth - threshold) / threshold + 1);
-        const numY = ((rectEditorHeight - threshold) / threshold + 1);
-        const pathNodes = [];
-
-        // create pathnodes and link them to left and up, in case the links dont intersect a wall.
-        for (let j = 0; j < numY; j++) {
-            for (let i = 0; i < numX; i++) {
-                const x = i * threshold + threshold / 2;
-                const xb = (i - 1) * threshold + threshold / 2;
-                const y = j * threshold + threshold / 2;
-                const yb = (j - 1) * threshold + threshold / 2;
-                pathNodes.push(new PathNode(x, y));
-
-                if (i > 0) {
-                    if (!this.checkIntersectionOfLineWithLines(xb, y, x, y, lines)) {
-                        this.linkNodes(
-                            pathNodes.find(element => element.x === x && element.y === y),
-                            pathNodes.find(element => element.x === xb && element.y === y),
-                        );
-                    }
-                }
-                if (j > 0) {
-                    if (!this.checkIntersectionOfLineWithLines(x, yb, x, y, lines)) {
-                        this.linkNodes(
-                            pathNodes.find(element => element.x === x && element.y === y),
-                            pathNodes.find(element => element.x === x && element.y === yb),
-                        );
-                    }
-                }
-            }
-        }
-
-        return pathNodes;
-    }
-
     private checkIntersectionOfLineWithLines(p1x, p1y, p2x, p2y, lines: Line[], includeEndpoints = true): boolean {
 
         let intersects = false;
@@ -155,25 +118,16 @@ export class Pathfinder {
         return intersects;
     }
 
-
-
-
-    // advanced approach: more complex in preparation, but less nodes, so cheaper for path finding.
-    public createLinkedGraph(walls: any[], radius: number, start: Point = null, end: Point = null): PathNode[] {
+    private createPolygonsFromLines(ls: Line[], radius: number): Polygon[] {
+        // we create polygons around the lines with given radius.
+        // joining (union) intersecting polygons.
 
         // keep track of node-polygons
-        const nodePolygons: {lines: Line[]}[] = [];
-
-        // total nodes list
-        const nodes: PathNode[] = [];
-
-        // keep track of already checked links between two node-polygons
-        const chckd: {n1x: number, n1y: number, n2x: number, n2y: number}[] = [];
-
+        let nodePolygons: Polygon[] = [];
 
 
         // create nodes in an offset(radius) around every wall.
-        for (const w of walls) {
+        for (const w of ls) {
 
             // create some vectors.
             const v = {x: (w.p2.x - w.p1.x) / 2, y: (w.p2.y - w.p1.y) / 2}; // half of vector p2-p1
@@ -185,56 +139,98 @@ export class Pathfinder {
             const vn0 = {x: vn.x / vnlength, y: vn.y / vnlength};
 
             const centerCoord = {x: w.p1.x + v0.x * vlength, y: w.p1.y + v0.y * vlength};
-            const p1 = new PathNode(
+            const p1 = new VertexRef(new Point(
                 centerCoord.x + v0.x * (vlength + radius) + vn0.x * (radius),
-                centerCoord.y + v0.y * (vlength + radius) + vn0.y * (radius)
-            );
-            const p2 = new PathNode(
+                centerCoord.y + v0.y * (vlength + radius) + vn0.y * (radius), false
+            ));
+            /*
+            const p2 = new VertexRef(new Point(
+                centerCoord.x + v0.x * (vlength + radius * 1.5),
+                centerCoord.y + v0.y * (vlength + radius * 1.5), false
+            ));
+            */
+            const p3 = new VertexRef(new Point(
                 centerCoord.x + v0.x * (vlength + radius) - vn0.x * (radius),
-                centerCoord.y + v0.y * (vlength + radius) - vn0.y * (radius)
-            );
-            const p3 = new PathNode(
+                centerCoord.y + v0.y * (vlength + radius) - vn0.y * (radius), false
+            ));
+            const p4 = new VertexRef(new Point(
                 centerCoord.x - v0.x * (vlength + radius) - vn0.x * (radius),
-                centerCoord.y - v0.y * (vlength + radius) - vn0.y * (radius)
-            );
-            const p4 = new PathNode(
+                centerCoord.y - v0.y * (vlength + radius) - vn0.y * (radius), false
+            ));
+            /*
+            const p5 = new VertexRef(new Point(
+                centerCoord.x - v0.x * (vlength + radius * 1.5),
+                centerCoord.y - v0.y * (vlength + radius * 1.5), false
+            ));
+            */
+            const p6 = new VertexRef(new Point(
                 centerCoord.x - v0.x * (vlength + radius) + vn0.x * (radius),
-                centerCoord.y - v0.y * (vlength + radius) + vn0.y * (radius)
-            );
+                centerCoord.y - v0.y * (vlength + radius) + vn0.y * (radius), false
+            ));
 
-            // for every polygon(walls) link the surrounding nodes and set them as checked
-            this.linkNodes(p1, p2);
-            this.linkNodes(p2, p3);
-            this.linkNodes(p3, p4);
-            this.linkNodes(p4, p1);
-            nodes.push(p1, p2, p3, p4);
-            nodePolygons.push({ lines: [
-                new Line(new Point(p1.x, p1.y, false), new Point(p2.x, p2.y, false)),
-                new Line(new Point(p2.x, p2.y, false), new Point(p3.x, p3.y, false)),
-                new Line(new Point(p3.x, p3.y, false), new Point(p4.x, p4.y, false)),
-                new Line(new Point(p4.x, p4.y, false), new Point(p1.x, p1.y, false))
-            ]});
+            p1.next = p3; p1.previous = p6;
+            /*p2.next = p3; p2.previous = p1;*/
+            p3.next = p4; p3.previous = p1;
+            p4.next = p6; p4.previous = p3;
+            /*p5.next = p6; p5.previous = p4;*/
+            p6.next = p1; p6.previous = p4;
+
+            nodePolygons.push(new Polygon(p1));
+            if (nodePolygons.length >= 2) {
+                for (let i = 0; i < nodePolygons.length - 1; i++) {
+                    nodePolygons.splice(i, 2, ...nodePolygons[i].union(nodePolygons[i + 1]));
+                }
+            }
         }
 
-        for (const np of nodePolygons) {
+        console.log('created node polygons', nodePolygons);
 
-            // mainly just for debug
-            this.connections = this.connections.concat(np.lines);
+        return nodePolygons;
+    }
 
-            for (const npl of nodePolygons) {
 
-                // dont connect links on the same polygon. we already have them
-                // BEWARE: this approach here only works with CONVEX polygon-shapes.
-                // if they are concav, there would be truly more/other connections on the same polygon! (than just the walls)
-                if (np === npl
-                      || np.lines.find(
-                          el => npl.lines.find(
-                              (elm => elm.p1 === el.p2 || elm.p2 === el.p1)
-                          ) !== undefined)
-                      !== undefined) {
+    // advanced approach: more complex in preparation, but less nodes, so cheaper for path finding.
+    public createLinkedGraph(walls: any[], radius: number, start: Point = null, end: Point = null): PathNode[] {
 
-                    continue;
+        const polygons = this.createPolygonsFromLines(walls, radius);
+
+        // total nodes list
+        const nodes: PathNode[] = [];
+        this.connections = [];
+
+        for (const vv of polygons) {
+
+            let prevNode = null;
+            let first = null;
+            let ref = vv.vertex;
+            do {
+
+                this.connections = this.connections.concat(new Line(ref.point, ref.next.point));
+                const nn = new PathNode(ref.point.x, ref.point.y);
+                if (first === null) {
+                    first = nn;
                 }
+                nodes.push(nn);
+                if (prevNode !== null) {
+                    this.linkNodes(nn, prevNode);
+                }
+
+                prevNode = nn;
+                ref = ref.next;
+            } while (ref !== vv.vertex);
+
+            // link one last time
+            this.linkNodes(first, prevNode);
+        }
+
+        console.log(nodes);
+        return nodes;
+        // TODO: we need all border-lines of the polygons
+
+        /*
+
+        for (const np of polygons) {
+            for (const npl of polygons) {
 
                 // check for any link between the nodes of np and npl
                 for (let i = 0; i < np.lines.length; i++) {
@@ -252,7 +248,8 @@ export class Pathfinder {
                         // if this link doesnt intersect any "polygon-links"
                         if (nodePolygons.every(element => {
                             return !this.checkIntersectionOfLineWithLines(
-                                np.lines[i].p1.x, np.lines[i].p1.y, npl.lines[j].p1.x, npl.lines[j].p1.y, element.lines, false);
+                                np.lines[i].p1.x, np.lines[i].p1.y, npl.lines[j].p1.x, npl.lines[j].p1.y,
+                                element.lines.concat(walls), false);
                         })) {
                             if (this.checkIfLinkIsWorthIt(
                                     np.lines[i].p1,
@@ -291,9 +288,13 @@ export class Pathfinder {
             const startn = new PathNode(start.x, start.y);
             nodes.push(startn);
             for (const n of nodes) {
-                if (nodePolygons.every(element => {
+
+                do {
+
+                } while
+                if (polygons.every(element => {
                     return !this.checkIntersectionOfLineWithLines(
-                        start.x, start.y, n.x, n.y, element.lines, false);
+                        start.x, start.y, n.x, n.y, new Lin.concat(walls), false);
                 })) {
                     this.linkNodes(startn, n);
 
@@ -310,7 +311,7 @@ export class Pathfinder {
             for (const n of nodes) {
                 if (nodePolygons.every(element => {
                     return !this.checkIntersectionOfLineWithLines(
-                        end.x, end.y, n.x, n.y, element.lines, false);
+                        end.x, end.y, n.x, n.y, element.lines.concat(walls), false);
                 })) {
                     this.linkNodes(endn, n);
 
@@ -321,6 +322,7 @@ export class Pathfinder {
         }
 
         return nodes;
+        */
     }
 
     // @params arguments are the 2 nodes, and then the 2 neighbour nodes of the first (before, after),

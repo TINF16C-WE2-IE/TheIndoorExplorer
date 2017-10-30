@@ -79,9 +79,22 @@ export class ModelService {
                 id: -1,
                 name: 'New Map',
                 floors: [{
-                    walls: [{p1: {x: 50, y: 50}, p2: {x: 250, y: 50}}],
-                    portals: [{id: 1, label: 'main door', p1: {x: 100, y: 100}, p2: {x: 250, y: 250}},
-                    {id: 1, label: 'main door', p1: {x: 250, y: 250}, p2: {x: 310, y: 400}}],
+                    walls: [], /*{p1: {x: 50, y: 50}, p2: {x: 250, y: 50}}],*/
+                    portals: [
+                        /*
+                        {id: 1, label: 'main door', p1: {x: 100, y: 100}, p2: {x: 250, y: 250}},
+                        {id: 2, label: 'main door', p1: {x: 250, y: 250}, p2: {x: 310, y: 400}},
+                        {id: 3, label: 'main door', p1: {x: 310, y: 400}, p2: {x: 380, y: 350}},
+                        {id: 3, label: 'main door', p1: {x: 380, y: 350}, p2: {x: 460, y: 100}}
+                        */
+
+                          {id: 1, label: 'main door', p1: {x: 100, y: 230}, p2: {x: 700, y: 100}},
+                        {id: 2, label: 'main door', p1: {x: 190, y: 160}, p2: {x: 190, y: 370}},
+                            {id: 3, label: 'main door', p1: {x: 250, y: 140}, p2: {x: 250, y: 250}},
+                            {id: 4, label: 'main door', p1: {x: 650, y: 240}, p2: {x: 600, y: 350}},
+                            {id: 5, label: 'main door', p1: {x: 500, y: 240}, p2: {x: 700, y: 400}},
+
+                    ],
                     label: ''
                 }],
                 favorite: false,

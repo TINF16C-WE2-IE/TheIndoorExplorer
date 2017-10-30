@@ -1,4 +1,4 @@
-<svg id="editorCanvas" 
+<svg id="editorCanvas"
      [attr.viewBox]="viewBoxString()"
      [style.cursor]="mouse.tool.cursorShape"
      (mouseup)="mouse.onMouseUp($event)" (mousedown)="mouse.onMouseDown($event)"
@@ -6,7 +6,7 @@
      (wheel)="mouse.onWheel($event)"
      xmlns:svg="http://www.w3.org/2000/svg" version="1.2">
 
-    <svg:image *ngIf="backgroundImageDataURL" [attr.xlink:href]="backgroundImageDataURL" x="0" y="0" width="2000" height="2000" opacity="0.5"/>     
+    <svg:image *ngIf="backgroundImageDataURL" [attr.xlink:href]="backgroundImageDataURL" x="0" y="0" width="2000" height="2000" opacity="0.5"/>
 
     <svg:g *ngIf="floor">
         <svg:defs>
@@ -22,7 +22,11 @@
                   [attr.x1]="portal.p1.x" [attr.y1]="portal.p1.y" [attr.x2]="portal.p2.x" [attr.y2]="portal.p2.y"
                   marker-end="url(#circle)" marker-start="url(#circle)"/>
 
+
         <svg:line *ngFor="let path of movingPath" stroke="red" stroke-width="3"
+                  [attr.x1]="path.p1.x" [attr.y1]="path.p1.y" [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
+                  marker-end="url(#circle)" marker-start="url(#circle)"/>
+        <svg:line *ngFor="let path of pfinder.connections" stroke="grey" stroke-width="2"
                   [attr.x1]="path.p1.x" [attr.y1]="path.p1.y" [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
                   marker-end="url(#circle)" marker-start="url(#circle)"/>
 
@@ -39,8 +43,8 @@
 <form #toolbox id="toolbox">
     <h3>Toolbox</h3>
 
-    <button mat-button *ngFor="let tool of tools" 
-        [ngClass]="tool.name == selectedTool ? 'mat-raised-button tool-button' : 'tool-button'" 
+    <button mat-button *ngFor="let tool of tools"
+        [ngClass]="tool.name == selectedTool ? 'mat-raised-button tool-button' : 'tool-button'"
         (click)="selectTool(tool.name)">
         <mat-icon [svgIcon]="tool.icon"></mat-icon> {{tool.name}}
     </button>
@@ -75,11 +79,11 @@
         <input type="file" name="bgimg" (change)="backgroundImage($event)">
     </p>
     <input type="text" name="objname" *ngIf="floor" [(ngModel)]="floor.label" placeholder="Object Name">
-    
+
     <h4>Floors</h4>
     <p>
-        <button mat-icon-button *ngFor="let f of floors; let i = index" 
-            [ngClass]="floor == f ? 'mat-raised-button floor-button' : 'floor-button'" 
+        <button mat-icon-button *ngFor="let f of floors; let i = index"
+            [ngClass]="floor == f ? 'mat-raised-button floor-button' : 'floor-button'"
             (click)="selectFloor(i)">
             {{f.label.length ? f.label : i+1}}
         </button>
