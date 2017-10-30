@@ -1,29 +1,32 @@
 <form id="toolbox" class="panel">
     <mat-form-field>
-        <input matInput type="search" incremental name="search" [(ngModel)]="searchQuery" (search)="search()" placeholder="Search...">
+        <input matInput type="search" incremental name="search" [(ngModel)]="searchQuery" (search)="search()"
+               placeholder="Search...">
     </mat-form-field>
 
     <div *ngIf="!editMode">
         <mat-nav-list>
             <span *ngFor="let f of floors; let i = index">
                 <h3 *ngIf="f.searchResults.length" mat-subheader>{{f.label.length ? f.label : i+1}}</h3>
-                <mat-list-item *ngFor="let result of f.searchResults" (click)="selectWaypoint(result)">{{result.label}}</mat-list-item>        
+                <mat-list-item *ngFor="let result of f.searchResults"
+                               (click)="selectWaypoint(result)">{{result.label}}</mat-list-item>
             </span>
         </mat-nav-list>
         <p *ngIf="singleSelectedObject">
             Starting point: {{singleSelectedObject.label}}<br>
             <b>Select a destination</b>
         </p>
-        <p *ngIf="!singleSelectedObject"><b>Select two portals to get directions</b></p>        
+        <p *ngIf="!singleSelectedObject"><b>Select two portals to get directions</b></p>
     </div>
 
     <div *ngIf="editMode">
         <h3>Toolbox</h3>
         <p class="tool-buttons">
-            <button mat-button *ngFor="let tool of tools" 
-                [ngClass]="tool.name == selectedTool ? 'mat-raised-button tool-button' : 'tool-button'" 
-                (click)="selectTool(tool.name)">
-                <mat-icon [svgIcon]="tool.icon"></mat-icon> {{tool.name}}
+            <button mat-button *ngFor="let tool of tools"
+                    [ngClass]="tool.name == selectedTool ? 'mat-raised-button tool-button' : 'tool-button'"
+                    (click)="selectTool(tool.name)">
+                <mat-icon [svgIcon]="tool.icon"></mat-icon>
+                {{tool.name}}
             </button>
         </p>
         <p>
@@ -55,14 +58,14 @@
         <button mat-icon-button (click)="fitToViewport()">
             <mat-icon aria-label="Fit to Viewport">zoom_out_map</mat-icon>
         </button>
-        <mat-slide-toggle [(ngModel)]="showLabels" name="showLabels">Show labels</mat-slide-toggle>    
-    </p>   
-   
+        <mat-slide-toggle [(ngModel)]="showLabels" name="showLabels">Show labels</mat-slide-toggle>
+    </p>
+
 
     <!--<pre>{{this?.floor | json}}</pre>-->
 </form>
-            
-<svg id="editorCanvas" 
+
+<svg id="editorCanvas"
      [attr.viewBox]="viewBoxString()"
      [style.cursor]="mouse.tool.cursorShape"
      (mouseup)="mouse.onMouseUp($event)" (mousedown)="mouse.onMouseDown($event)"
@@ -72,27 +75,53 @@
      (wheel)="mouse.onWheel($event)"
      xmlns:svg="http://www.w3.org/2000/svg" version="1.2">
 
-    <svg:image *ngIf="backgroundImageDataURL" [attr.xlink:href]="backgroundImageDataURL" x="0" y="0" width="2000" height="2000" opacity="0.5" preserveAspectRatio="xMinYMin meet" />     
+    <svg:image *ngIf="backgroundImageDataURL" [attr.xlink:href]="backgroundImageDataURL" x="0" y="0" width="2000"
+               height="2000" opacity="0.5" preserveAspectRatio="xMinYMin meet"/>
 
     <svg:g *ngIf="floor">
         <svg:defs>
             <svg:marker id="circle" markerWidth="10" markerHeight="10" refX="5" refY="5" markerUnits="userSpaceOnUse">
                 <svg:circle cx="5" cy="5" r="4" style="stroke: none; fill:#000000;"/>
             </svg:marker>
+
+            <svg:marker id="solidArrow" markerWidth="13" markerHeight="13" refX="2" refY="6"
+                        orient="auto" markerUnits="userSpaceOnUse">
+                <svg:path d="M2,2 L2,11 L10,6 L2,2" style="fill: grey;"/>
+            </svg:marker>
         </svg:defs>
 
         <svg:line *ngFor="let wall of floor.walls" stroke="black"
                   [attr.x1]="wall.p1.x" [attr.y1]="wall.p1.y" [attr.x2]="wall.p2.x" [attr.y2]="wall.p2.y"
                   marker-end="url(#circle)" marker-start="url(#circle)"/>
-        <svg:g *ngFor="let portal of floor.portals" >
-            <svg:line 
-                  [attr.stroke]="selectedObjects.indexOf(portal) !== -1 ? '#b71c1c' : '#afafaf'" stroke-width="10" stroke-dasharray="2, 5"
-                  [attr.x1]="portal.p1.x" [attr.y1]="portal.p1.y" [attr.x2]="portal.p2.x" [attr.y2]="portal.p2.y"
-                  marker-end="url(#circle)" marker-start="url(#circle)"/>
+
+        <svg:g *ngFor="let portal of floor.portals">
+            <svg:line
+                    [attr.stroke]="selectedObjects.indexOf(portal) !== -1 ? '#b71c1c' : '#afafaf'" stroke-width="10"
+                    stroke-dasharray="2, 5"
+                    [attr.x1]="portal.p1.x" [attr.y1]="portal.p1.y" [attr.x2]="portal.p2.x" [attr.y2]="portal.p2.y"
+                    marker-end="url(#circle)" marker-start="url(#circle)"/>
             <svg:text *ngIf="showLabels" text-anchor="middle"
-                  [attr.x]="(portal.p1.x+portal.p2.x) / 2" [attr.y]="(portal.p1.y+portal.p2.y) / 2 + 20">{{portal.label}}</svg:text>
-        </svg:g>                
-      
+                      [attr.x]="(portal.p1.x+portal.p2.x) / 2" [attr.y]="(portal.p1.y+portal.p2.y) / 2 + 20">
+                {{portal.label}}
+            </svg:text>
+        </svg:g>
+
+        <svg:g *ngFor="let stairs of floor.stairways">
+            <svg:line
+                    [attr.stroke]="selectedObjects.indexOf(stairs) !== -1 ? '#b71c1c' : '#afafaf'" stroke-width="10"
+                    stroke-dasharray="2, 5"
+                    [attr.x1]="stairs.p1.x" [attr.y1]="stairs.p1.y" [attr.x2]="stairs.p2.x" [attr.y2]="stairs.p2.y"
+                    marker-end="url(#circle)" marker-start="url(#circle)"/>
+            <svg:line stroke="grey" stroke-width="10" stroke-dasharray="4, 8"
+                      [attr.x1]="stairs.center.x" [attr.y1]="stairs.center.y"
+                      [attr.x2]="stairs.rearCenter.x" [attr.y2]="stairs.rearCenter.y"
+                      marker-end="url(#solidArrow)"/>
+            <svg:text *ngIf="showLabels" text-anchor="middle"
+                      [attr.x]="(stairs.p1.x+stairs.p2.x) / 2" [attr.y]="(stairs.p1.y+stairs.p2.y) / 2 + 20">
+                {{stairs.label}}
+            </svg:text>
+        </svg:g>
+
         <svg:line *ngFor="let path of movingPath" stroke="red" stroke-width="3"
                   [attr.x1]="path.p1.x" [attr.y1]="path.p1.y" [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
                   marker-end="url(#circle)" marker-start="url(#circle)"/>
@@ -111,8 +140,8 @@
     <h4>Floors</h4>
     <p>
         <button mat-icon-button *ngFor="let f of floors; let i = index" class="floor-button"
-            [class.mat-raised-button]="floor == f" [class.search-result-floor]="f.searchResults.length"
-            (click)="selectFloor(i)" >
+                [class.mat-raised-button]="floor == f" [class.search-result-floor]="f.searchResults.length"
+                (click)="selectFloor(i)">
             {{f.label.length ? f.label : i+1}}
         </button>
     </p>
@@ -120,22 +149,26 @@
     <div *ngIf="editMode">
         <p class="floor-buttons">
             <button mat-button (click)="createFloor()">
-                <mat-icon>add_circle_outline</mat-icon> New floor
+                <mat-icon>add_circle_outline</mat-icon>
+                New floor
             </button>
             <button mat-button (click)="createFloor(floor)">
-                <mat-icon>control_point_duplicate</mat-icon> Clone floor
+                <mat-icon>control_point_duplicate</mat-icon>
+                Clone floor
             </button>
             <button mat-button (click)="removeFloor(floor)">
-                <mat-icon>remove_circle_outline</mat-icon> Remove floor
+                <mat-icon>remove_circle_outline</mat-icon>
+                Remove floor
             </button>
             <button mat-button (click)="moveFloor(floor, 1)">
-                <mat-icon>vertical_align_top</mat-icon> Move up
+                <mat-icon>vertical_align_top</mat-icon>
+                Move up
             </button>
         </p>
 
         <h4>{{singleSelectedObject ? singleSelectedObject.constructor.name: 'Floor'}} Properties</h4>
         <mat-form-field *ngIf="floor && !singleSelectedObject">
-            <input matInput name="floorname"  [(ngModel)]="floor.label" placeholder="Floor Name">
+            <input matInput name="floorname" [(ngModel)]="floor.label" placeholder="Floor Name">
         </mat-form-field>
         <mat-form-field *ngIf="singleSelectedObject">
             <input matInput name="objname" [(ngModel)]="singleSelectedObject.label" placeholder="Object Name">
@@ -144,6 +177,6 @@
 </div>
 
 
-<button mat-fab *ngIf="!editMode && hasWritePermission"  (click)="switchToEditMode()" class="edit-button">
+<button mat-fab *ngIf="!editMode && hasWritePermission" (click)="switchToEditMode()" class="edit-button">
     <mat-icon aria-label="Edit">edit</mat-icon>
 </button>

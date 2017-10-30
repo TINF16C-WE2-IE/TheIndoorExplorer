@@ -79,19 +79,17 @@ export class ModelService {
 
     public loadMap(mapId: number) {
         if (mapId === -1) {
-            this.currentMap = new Map({
+            const newMap = new Map({
                 id: -1,
                 name: 'New Map',
-                floors: [{
-                    walls: [],
-                    portals: [],
-                    label: ''
-                }],
+                floors: [],
                 favorite: false,
                 permission: 0,
                 visibility: 0
             }, this);
-            this.currentMap.fitToViewport();
+            newMap.createFloor();
+            newMap.fitToViewport();
+            this.currentMap = newMap;
         }
         else {
             this.rqstSvc.get(RequestService.LIST_MAP_DETAILS, {'mapid': mapId})
