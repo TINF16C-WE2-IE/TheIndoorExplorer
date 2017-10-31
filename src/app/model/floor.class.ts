@@ -43,7 +43,7 @@ export class Floor {
 
     public getAllPoints(): Point[] {
         return Array.from(new Set(
-            [...this.walls, ...this.portals]
+            [...this.walls, ...this.portals, ...this.stairways]
                 .map(line => {
                     return line.getPoints();
                 })

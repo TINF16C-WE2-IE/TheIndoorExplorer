@@ -13,8 +13,7 @@
             </span>
         </mat-nav-list>
         <p *ngIf="singleSelectedObject">
-            Starting point: {{singleSelectedObject.label}}<br>
-            <b>Select a destination</b>
+            Starting point: {{singleSelectedObject.label}}<br> <b>Select a destination</b>
         </p>
         <p *ngIf="!singleSelectedObject"><b>Select two portals to get directions</b></p>
     </div>
@@ -30,8 +29,8 @@
             </button>
         </p>
         <p>
-            Set a blueprint background image:<br>
-            <input type="file" name="bgimg" (change)="backgroundImage($event)" accept="image/*">
+            Set a blueprint background image:<br> <input type="file" name="bgimg" (change)="backgroundImage($event)"
+                                                         accept="image/*">
         </p>
         <div style="padding-top: 20px">
             <button mat-raised-button (click)="saveCurrentMap()" color="accent">
@@ -43,9 +42,7 @@
 
     <p>Selected: {{mouse.tool.name}} ({{mouse.x}} | {{mouse.y}})</p>
     <p>
-        Stats:
-        {{floor?.walls.length || 0}} Walls,
-        {{floor?.portals.length || 0}} Portals,
+        Stats: {{floor?.walls.length || 0}} Walls, {{floor?.portals.length || 0}} Portals,
         {{floor?.getAllPoints().length || 0}} Points
     </p>
     <p>
@@ -112,7 +109,7 @@
                     stroke-dasharray="2, 5"
                     [attr.x1]="stairs.p1.x" [attr.y1]="stairs.p1.y" [attr.x2]="stairs.p2.x" [attr.y2]="stairs.p2.y"
                     marker-end="url(#circle)" marker-start="url(#circle)"/>
-            <svg:line stroke="grey" stroke-width="10" stroke-dasharray="4, 8"
+            <svg:line stroke="grey" [attr.stroke-width]="stairs.width" stroke-dasharray="4, 8"
                       [attr.x1]="stairs.center.x" [attr.y1]="stairs.center.y"
                       [attr.x2]="stairs.rearCenter.x" [attr.y2]="stairs.rearCenter.y"
                       marker-end="url(#solidArrow)"/>
