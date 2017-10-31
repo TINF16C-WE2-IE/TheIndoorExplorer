@@ -1,5 +1,4 @@
 import { Floor } from './floor.class';
-import { Selectable } from './../model/selectable.interface';
 import { ModelService } from '../svc/model.service';
 import { Mouse } from '../svg-edit/mouse.class';
 
@@ -12,26 +11,24 @@ export class Map {
     public permission: number;
     public visibility: number;
 
-    private modelSvc: ModelService;
-
 
     constructor(obj: {
-        id: number, name: string, floors?: any[],
-        favorite: boolean, permission: number, visibility: number
-    }, modelSvc: ModelService) {
+                    id: number, name: string, floors?: any[],
+                    favorite: boolean, permission: number, visibility: number
+                },
+                private modelSvc: ModelService) {
         this.id = obj.id;
         this.name = obj.name;
         this.floors = obj.floors ? obj.floors.map(floor_obj => new Floor(floor_obj)) : null;
         this.favorite = obj.favorite;
         this.permission = obj.permission;
         this.visibility = obj.visibility;
-
-        this.modelSvc = modelSvc;
     }
+
 
     public createFloor(cloneFrom: Floor = null) {
         if (!cloneFrom) {
-            this.floors.push(new Floor({'walls': [], 'portals': [], 'label': ''}));
+            this.floors.push(new Floor({walls: [], portals: [], stairways: [], label: ''}));
         } else {
             this.floors.push(new Floor(cloneFrom.forExport()));
         }
@@ -128,5 +125,3 @@ export class Map {
         }
     }
 }
-
-
