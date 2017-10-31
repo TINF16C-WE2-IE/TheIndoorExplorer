@@ -22,6 +22,7 @@ export class ModelService {
     public canvasSize: {x: number, y: number} = {x: 500, y: 500};
     public panOffset = new Point(0, 0);
     public bodyOffset = new Point(0, 0);
+    public zoom = 1;
 
     public get currentMap() {
         return this.maps[this.currentMapId];

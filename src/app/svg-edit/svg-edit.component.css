@@ -9,10 +9,11 @@
 #editorCanvas {
     width: 50%;
     height: 500px;
-    border: 1px red dotted;
+    background-color: white; 
     user-select: none;
     user-drag: none;
     -webkit-user-drag: none;
+    box-sizing: content-box;
 }
 
 .panel {

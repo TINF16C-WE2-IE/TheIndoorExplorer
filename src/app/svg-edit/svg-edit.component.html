@@ -46,10 +46,10 @@
         {{floor?.getAllPoints().length || 0}} Points
     </p>
     <p>
-        <button mat-icon-button (click)="zoom(-1)">
+        <button mat-icon-button (click)="zoom(1.1)">
             <mat-icon aria-label="Zoom -">zoom_in</mat-icon>
         </button>
-        <button mat-icon-button (click)="zoom(1)">
+        <button mat-icon-button (click)="zoom(0.9)">
             <mat-icon aria-label="Zooom +">zoom_out</mat-icon>
         </button>
         <button mat-icon-button (click)="fitToViewport()">
@@ -68,7 +68,8 @@
      (mouseup)="mouse.onMouseUp($event)" (mousedown)="mouse.onMouseDown($event)"
      (mousemove)="mouse.onMouseMove($event)" (mouseleave)="mouse.onMouseLeave($event)"
      (touchend)="mouse.onMouseUp($event)" (touchstart)="mouse.onMouseDown($event)"
-     (touchmove)="mouse.onMouseMove($event)" (pinch)="mouse.onPinch($event)"
+     (touchmove)="mouse.onMouseMove($event)"
+     (pinchmove)="mouse.onPinch($event)" (pinchend)="mouse.onPinchEnd($event)"
      (wheel)="mouse.onWheel($event)"
      xmlns:svg="http://www.w3.org/2000/svg" version="1.2">
 

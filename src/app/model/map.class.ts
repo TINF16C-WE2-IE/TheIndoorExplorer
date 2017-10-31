@@ -1,6 +1,7 @@
 import { Floor } from './floor.class';
 import { Selectable } from './../model/selectable.interface';
 import { ModelService } from '../svc/model.service';
+import { Mouse } from '../svg-edit/mouse.class';
 
 
 export class Map {
@@ -66,15 +67,16 @@ export class Map {
         };
     }
 
-    public zoom(direction: number, x: number = null, y: number = null) {
-        if (Math.abs(direction) !== 1) direction = 0;
-        let sizeX = this.modelSvc.canvasSize.x + 40 * direction;
+    public zoom(scale: number, mouse: Mouse = null, x: number = null, y: number = null, dangling = false) {
+        const startCanvasWidth = 2000 / this.modelSvc.zoom;
+        let sizeX = startCanvasWidth / scale;
         if (sizeX < 100) sizeX = 100;
-        this.updateCanvasSize(sizeX, 1);
-        if (x && y) {
-            this.modelSvc.panOffset.x += (x - this.modelSvc.bodyOffset.x - this.modelSvc.viewportSize.x / 2) / 20;
-            this.modelSvc.panOffset.y += (y - this.modelSvc.bodyOffset.y - this.modelSvc.viewportSize.y / 2) / 20;
+        if (mouse && x && y) {
+            const ratio = startCanvasWidth / this.modelSvc.viewportSize.x;
+            this.modelSvc.panOffset.x = mouse.x - (x - this.modelSvc.bodyOffset.x) * ratio / scale;
+            this.modelSvc.panOffset.y = mouse.y - (y - this.modelSvc.bodyOffset.y) * ratio / scale;
         }
+        this.updateCanvasSize(sizeX, 1, dangling);
     }
 
     public fitToViewport() {
@@ -100,7 +102,7 @@ export class Map {
         }
     }
 
-    public updateCanvasSize(width: number, height: number) {
+    public updateCanvasSize(width: number, height: number, dangling = false) {
         if (width / height < this.modelSvc.viewportSize.x / this.modelSvc.viewportSize.y) {
             this.modelSvc.canvasSize.x = height * this.modelSvc.viewportSize.x / this.modelSvc.viewportSize.y;
             this.modelSvc.canvasSize.y = height;
@@ -108,6 +110,7 @@ export class Map {
             this.modelSvc.canvasSize.x = width;
             this.modelSvc.canvasSize.y = width * this.modelSvc.viewportSize.y / this.modelSvc.viewportSize.x;
         }
+        if (!dangling) this.modelSvc.zoom = 2000 / this.modelSvc.canvasSize.x;
     }
 
     public getMapDimensions() {

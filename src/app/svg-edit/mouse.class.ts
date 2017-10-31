@@ -5,7 +5,6 @@ import { ModelService } from '../svc/model.service';
 export class Mouse {
     private _x: number = null;
     private _y: number = null;
-    private canvas;
     public tool: Tool;
 
     get x(): number {
@@ -62,19 +61,27 @@ export class Mouse {
 
     private convertTouchEvent(evt: any): MouseEvent {
         if (evt.touches) {
-            if (evt.touches.length) return new MouseEvent(evt.type, {clientX: evt.touches[0].clientX, clientY: evt.touches[0].clientY});
+            if (evt.touches.length === 1) {
+                return new MouseEvent(evt.type, {clientX: evt.touches[0].clientX, clientY: evt.touches[0].clientY});
+            }
             return null;
         }
         return evt;
     }
 
     public onWheel(evt: WheelEvent) {
-        this.modelSvc.currentMap.zoom(evt.deltaY / Math.abs(evt.deltaY), evt.x, evt.y);
+        const scale = (- evt.deltaY / Math.abs(evt.deltaY)) * 0.1 + 1;
+        this.modelSvc.currentMap.zoom(scale, this, evt.x, evt.y);
         this.onMouseMove(evt);
     }
 
     public onPinch(evt: any) {
-        console.log(evt);
+        this.onMouseMove(new MouseEvent(evt.type, {clientX: evt.center.x, clientY: evt.center.y}));
+        this.modelSvc.currentMap.zoom(evt.scale, this, evt.center.x, evt.center.y, true);
+    }
+
+    public onPinchEnd(evt: any) {
+        this.modelSvc.currentMap.updateCanvasSize(this.modelSvc.canvasSize.x, 1);
     }
 
     private mapToCanvas(evt: MouseEvent) {
@@ -82,11 +89,9 @@ export class Mouse {
             this.modelSvc.currentMap.getMapDimensions();
         }
         if (evt) {
-            const ratioX = this.modelSvc.canvasSize.x / this.modelSvc.viewportSize.x;
-            const ratioY = this.modelSvc.canvasSize.y / this.modelSvc.viewportSize.y;
-
-            this._x = Math.round((evt.x - this.modelSvc.bodyOffset.x) * ratioX + this.modelSvc.panOffset.x);
-            this._y = Math.round((evt.y - this.modelSvc.bodyOffset.y) * ratioY + this.modelSvc.panOffset.y);
+            const ratio = this.modelSvc.canvasSize.x / this.modelSvc.viewportSize.x;
+            this._x = Math.round((evt.x - this.modelSvc.bodyOffset.x) * ratio + this.modelSvc.panOffset.x);
+            this._y = Math.round((evt.y - this.modelSvc.bodyOffset.y) * ratio + this.modelSvc.panOffset.y);
         }
     }
 }
