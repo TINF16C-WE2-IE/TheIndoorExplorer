@@ -35,7 +35,7 @@ export class Floor {
         for (const stairs_obj of obj.stairways) {
             const p1 = this.getExistingOrThisPoint(new Point(stairs_obj.p1.x, stairs_obj.p1.y));
             const p2 = this.getExistingOrThisPoint(new Point(stairs_obj.p2.x, stairs_obj.p2.y));
-            this.portals.push(new Stairs(stairs_obj.id, stairs_obj.label, p1, p2,
+            this.stairways.push(new Stairs(stairs_obj.id, stairs_obj.label, p1, p2,
                 stairs_obj.length, stairs_obj.canEnter, stairs_obj.canLeave));
         }
         this.label = obj.label ? obj.label : '';
@@ -89,8 +89,13 @@ export class Floor {
                 line.deleted = true;
             }
         }
+        this.applyDelete();
+    }
+
+    public applyDelete() {
         this.walls = this.walls.filter(wall => !wall.deleted);
         this.portals = this.portals.filter(portal => !portal.deleted);
+        this.stairways = this.stairways.filter(stairs => !stairs.deleted);
     }
 
     public forExport() {

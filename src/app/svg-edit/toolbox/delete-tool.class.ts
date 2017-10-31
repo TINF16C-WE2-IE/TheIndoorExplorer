@@ -1,9 +1,9 @@
 import { Tool } from './tool.class';
 
-export class SelectTool extends Tool {
+export class DeleteTool extends Tool {
 
     public get name() {
-        return 'Properties';
+        return 'Delete';
     }
 
     public get cursorShape() {
@@ -14,10 +14,9 @@ export class SelectTool extends Tool {
     }
 
     public onMouseUp(evt: MouseEvent) {
-        // select object (or points defining lines) below cursor
         const selected = this.getExistingObjectsBelowCursor().obj;
-        // TS has no way of checking for an interface :(
-        this.modelSvc.selectedObjects = this.isSelectable(selected) ? [selected] : [];
+        selected.deleted = true;
+        this.modelSvc.currentFloor.applyDelete();
     }
 
     public onMouseMove(evt: MouseEvent) {
