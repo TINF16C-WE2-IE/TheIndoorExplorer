@@ -1,5 +1,4 @@
 import { Floor } from './floor.class';
-import { Selectable } from './../model/selectable.interface';
 import { ModelService } from '../svc/model.service';
 
 
@@ -11,26 +10,24 @@ export class Map {
     public permission: number;
     public visibility: number;
 
-    private modelSvc: ModelService;
-
 
     constructor(obj: {
-        id: number, name: string, floors?: any[],
-        favorite: boolean, permission: number, visibility: number
-    }, modelSvc: ModelService) {
+                    id: number, name: string, floors?: any[],
+                    favorite: boolean, permission: number, visibility: number
+                },
+                private modelSvc: ModelService) {
         this.id = obj.id;
         this.name = obj.name;
         this.floors = obj.floors ? obj.floors.map(floor_obj => new Floor(floor_obj)) : null;
         this.favorite = obj.favorite;
         this.permission = obj.permission;
         this.visibility = obj.visibility;
-
-        this.modelSvc = modelSvc;
     }
+
 
     public createFloor(cloneFrom: Floor = null) {
         if (!cloneFrom) {
-            this.floors.push(new Floor({'walls': [], 'portals': [], 'label': ''}));
+            this.floors.push(new Floor({walls: [], portals: [], stairways: [], label: ''}));
         } else {
             this.floors.push(new Floor(cloneFrom.forExport()));
         }
@@ -80,19 +77,24 @@ export class Map {
     public fitToViewport() {
         this.getMapDimensions();
         const allPoints = this.modelSvc.currentFloor.getAllPoints();
-        const topLeft = allPoints[0].clone();
-        const bottomRight = allPoints[0].clone();
-        for (const point of allPoints) {
-            if (point.x < topLeft.x) topLeft.x = point.x;
-            if (point.y < topLeft.y) topLeft.y = point.y;
-            if (point.x > bottomRight.x) bottomRight.x = point.x;
-            if (point.y > bottomRight.y) bottomRight.y = point.y;
+        if (allPoints.length) {
+            const topLeft = allPoints[0].clone();
+            const bottomRight = allPoints[0].clone();
+            for (const point of allPoints) {
+                if (point.x < topLeft.x) topLeft.x = point.x;
+                if (point.y < topLeft.y) topLeft.y = point.y;
+                if (point.x > bottomRight.x) bottomRight.x = point.x;
+                if (point.y > bottomRight.y) bottomRight.y = point.y;
+            }
+            const margin = 100;
+            this.modelSvc.panOffset.setCoords(topLeft.x - margin, topLeft.y - margin);
+            const width = bottomRight.x - topLeft.x + 2 * margin;
+            const height = bottomRight.y - topLeft.y + 2 * margin;
+            this.updateCanvasSize(width, height);
+        } else {
+            this.modelSvc.panOffset.setCoords(0, 0);
+            this.updateCanvasSize(2000, 1);
         }
-        const margin = 100;
-        this.modelSvc.panOffset.setCoords(topLeft.x - margin, topLeft.y - margin);
-        const width = bottomRight.x - topLeft.x + 2 * margin;
-        const height = bottomRight.y - topLeft.y + 2 * margin;
-        this.updateCanvasSize(width, height);
     }
 
     public updateCanvasSize(width: number, height: number) {
@@ -120,5 +122,3 @@ export class Map {
         }
     }
 }
-
-

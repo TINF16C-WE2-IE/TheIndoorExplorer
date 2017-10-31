@@ -1,12 +1,10 @@
-import { Map } from './../model/map.class';
 import { Floor } from './../model/floor.class';
 import { Selectable } from './../model/selectable.interface';
 import { Wall } from './../model/wall.class';
-import { Point } from './../model/point.class';
 import { Line } from './../model/line.class';
 import { ModelService } from '../svc/model.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import 'rxjs/add/operator/switchMap';
 import { Mouse } from './mouse.class';
 import { MoveTool } from './toolbox/move-tool.class';
@@ -14,8 +12,9 @@ import { SelectTool } from './toolbox/select-tool.class';
 import { LineTool } from './toolbox/line-tool.class';
 import { DirectionsTool } from './toolbox/directions-tool.class';
 import { Portal } from '../model/portal.class';
-import {MatIconRegistry} from '@angular/material';
-import {DomSanitizer} from '@angular/platform-browser';
+import { MatIconRegistry } from '@angular/material';
+import { DomSanitizer } from '@angular/platform-browser';
+import { Stairs } from '../model/stairs.class';
 
 @Component({
     selector: 'app-svg-edit',
@@ -30,8 +29,8 @@ export class SvgEditComponent implements OnInit {
         {'name': 'Label', 'icon': 'wall'},
         {'name': 'Draw Wall', 'icon': 'wall'},
         {'name': 'Draw Portal', 'icon': 'portal'},
-        {'name': 'Insert Stairs', 'icon': 'stairs'},
-        {'name': 'Insert Lift', 'icon': 'elevator'},
+        {'name': 'Draw Stairs', 'icon': 'stairs'},
+        {'name': 'Draw Elevator', 'icon': 'elevator'}
     ];
     public selectedTool = 'Move';
     public editMode = false;
@@ -58,7 +57,7 @@ export class SvgEditComponent implements OnInit {
     }
 
     get singleSelectedObject(): Selectable {
-        if (this.mouse.tool instanceof SelectTool && this.modelSvc.selectedObjects.length === 1) {
+        if (this.modelSvc.selectedObjects.length === 1) {
             return this.modelSvc.selectedObjects[0];
         }
         return null;
@@ -71,7 +70,7 @@ export class SvgEditComponent implements OnInit {
 
 
     constructor(private modelSvc: ModelService, private route: ActivatedRoute, private router: Router,
-        iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
+                iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
 
         iconRegistry.addSvgIcon('move', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/move.svg'));
         iconRegistry.addSvgIcon('wall', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/pencil.svg'));
@@ -101,20 +100,23 @@ export class SvgEditComponent implements OnInit {
         this.selectedTool = $event;
         switch ($event) {
             case 'Move':
-              this.mouse.tool = new MoveTool(this.mouse, this.modelSvc);
-              break;
+                this.mouse.tool = new MoveTool(this.mouse, this.modelSvc);
+                break;
             case 'Label':
-              this.mouse.tool = new SelectTool(this.mouse, this.modelSvc);
-              break;
+                this.mouse.tool = new SelectTool(this.mouse, this.modelSvc);
+                break;
             case 'Draw Wall':
-              this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Wall});
-              break;
+                this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Wall});
+                break;
             case 'Draw Portal':
-              this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Portal});
-              break;
+                this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Portal});
+                break;
+            case 'Draw Stairs':
+                this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Stairs});
+                break;
             case 'Directions':
-              this.mouse.tool = new DirectionsTool(this.mouse, this.modelSvc);
-              break;
+                this.mouse.tool = new DirectionsTool(this.mouse, this.modelSvc);
+                break;
         }
     }
 
@@ -143,7 +145,7 @@ export class SvgEditComponent implements OnInit {
 
     viewBoxString() {
         return this.modelSvc.panOffset.x + ' ' + this.modelSvc.panOffset.y + ' '
-        + this.modelSvc.canvasSize.x + ' ' + this.modelSvc.canvasSize.y;
+            + this.modelSvc.canvasSize.x + ' ' + this.modelSvc.canvasSize.y;
     }
 
     zoom(direction: number) {
@@ -163,7 +165,7 @@ export class SvgEditComponent implements OnInit {
         const reader = new FileReader();
 
         const myThis = this;
-        reader.addEventListener('load', function () {
+        reader.addEventListener('load', function() {
             myThis.backgroundImageDataURL = reader.result;
         }, false);
 

@@ -2,18 +2,24 @@ import { Portal } from './portal.class';
 import { Wall } from './wall.class';
 import { Point } from './point.class';
 import { Line } from './line.class';
-import { Selectable } from './../model/selectable.interface';
+import { Selectable } from './selectable.interface';
+import { Stairs } from './stairs.class';
 
 export class Floor {
 
     public portals: Portal[] = [];
     public walls: Wall[] = [];
+    public stairways: Stairs[] = [];
     public searchResults: Selectable[] = [];
     public label = '';
 
     constructor(obj: {
         walls: {p1: {x: number, y: number}, p2: {x: number, y: number}}[],
         portals: {id: number, label: string, p1: {x: number, y: number}, p2: {x: number, y: number}}[],
+        stairways: {
+            id: number, label: string, p1: {x: number, y: number}, p2: {x: number, y: number},
+            length: number, canEnter: boolean, canLeave: boolean
+        }[]
         label: string
     }) {
         for (const wall_obj of obj.walls) {
@@ -26,12 +32,18 @@ export class Floor {
             const p2 = this.getExistingOrThisPoint(new Point(portal_obj.p2.x, portal_obj.p2.y));
             this.portals.push(new Portal(portal_obj.id, portal_obj.label, p1, p2));
         }
+        for (const stairs_obj of obj.stairways) {
+            const p1 = this.getExistingOrThisPoint(new Point(stairs_obj.p1.x, stairs_obj.p1.y));
+            const p2 = this.getExistingOrThisPoint(new Point(stairs_obj.p2.x, stairs_obj.p2.y));
+            this.portals.push(new Stairs(stairs_obj.id, stairs_obj.label, p1, p2,
+                stairs_obj.length, stairs_obj.canEnter, stairs_obj.canLeave));
+        }
         this.label = obj.label ? obj.label : '';
     }
 
     public getAllPoints(): Point[] {
         return Array.from(new Set(
-            [...this.walls, ...this.portals]
+            [...this.walls, ...this.portals, ...this.stairways]
                 .map(line => {
                     return line.getPoints();
                 })
@@ -85,6 +97,7 @@ export class Floor {
         return {
             walls: this.walls.map(wall => wall.forExport()),
             portals: this.portals.map(portal => portal.forExport()),
+            stairways: this.stairways.map(stairs => stairs.forExport()),
             label: this.label
         };
     }
