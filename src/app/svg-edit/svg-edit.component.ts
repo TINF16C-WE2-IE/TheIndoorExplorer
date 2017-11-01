@@ -71,7 +71,7 @@ export class SvgEditComponent implements OnInit {
 
     generatePath() {
 
-        const start = new Point(390, 100, false);
+        const start = new Point(400, 140, false);
         const end = new Point(100, 450, false);
 
         // create nodes graph

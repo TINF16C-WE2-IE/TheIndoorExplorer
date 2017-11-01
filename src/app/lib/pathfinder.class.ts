@@ -95,7 +95,8 @@ export class Pathfinder {
         }
     }
 
-    private checkIntersectionOfLineWithLines(p1x, p1y, p2x, p2y, lines: Line[], includeEndpoints = true): boolean {
+    private checkIntersectionOfLineWithLines(p1x, p1y, p2x, p2y, lines: Line[],
+              includeEndpoints = true, smallAmount: number = 0.0): boolean {
 
         let intersects = false;
         for (const w of lines) {
@@ -109,7 +110,8 @@ export class Pathfinder {
                         - vWall.y * (p1x - w.p1.x))
                       / (-vWall.x * (p2y - p1y) + (p2x - p1x) * vWall.y);
 
-            if (includeEndpoints ? (s >= 0 && s <= 1 && t >= 0 && t <= 1) : (s > 0 && s < 1 && t > 0 && t < 1) ) {
+            if (includeEndpoints ? (s >= 0 && s <= 1 && t >= 0 && t <= 1) :
+                (s > 0 + smallAmount && s < 1 - smallAmount && t > 0 + smallAmount && t < 1 - smallAmount) ) {
                 intersects = true;
                 break;
             }
@@ -236,35 +238,41 @@ export class Pathfinder {
                 do {
                     do {
 
-                        // move onto the next, in case we already checked this link.
-                        if (newConnections.concat(chckd).find(el =>
-                            (el.p1.x === v1.point.x && el.p1.y === v1.point.y
-                              && el.p2.x === v2.point.x && el.p2.y === v2.point.y)
-                            || (el.p1.x === v2.point.x && el.p1.y === v2.point.y
-                              && el.p2.x === v1.point.x && el.p2.y === v1.point.y)) === undefined) {
+                        if (v1 !== v2 && v1 !== v2.next && v1 !== v2.previous && v2 !== v1.next && v2 !== v1.previous) {
 
-                          // if this link doesnt intersect any "polygon-borders" (connections)
-                          if (!this.checkIntersectionOfLineWithLines(
-                                  v1.point.x, v1.point.y, v2.point.x, v2.point.y,
-                                  this.connections.concat(walls), false)
-                          ) {
-                              if (this.checkIfLinkIsWorthIt(
-                                      v1.point, v2.point,
-                                      v1.previous.point, v1.next.point,
-                                      v2.previous.point, v2.next.point
-                              )) {
-                                  // we need this link!
-                                  this.linkNodes(
-                                      nodes.find(el => el.x === v1.point.x && el.y === v1.point.y),
-                                      nodes.find(el => el.x === v2.point.x && el.y === v2.point.y)
-                                  );
-                                  newConnections.push(new Line(v1.point, v2.point));
-                              }
-                          } else {
-                              // just and mark as checked.
-                              chckd.push(new Line(v1.point, v2.point));
-                          }
-                      }
+                            // move onto the next, in case we already checked this link.
+                            if (newConnections.concat(chckd).find(el =>
+                                (el.p1.x === v1.point.x && el.p1.y === v1.point.y
+                                  && el.p2.x === v2.point.x && el.p2.y === v2.point.y)
+                                || (el.p1.x === v2.point.x && el.p1.y === v2.point.y
+                                  && el.p2.x === v1.point.x && el.p2.y === v1.point.y)) === undefined) {
+
+                                // if this link doesnt intersect any "polygon-borders" (connections)
+                                if (!this.checkIntersectionOfLineWithLines(
+                                        v1.point.x, v1.point.y, v2.point.x, v2.point.y,
+                                        this.connections.concat(walls), false, 0.01)
+                                ) {
+                                    if (this.checkIfLinkIsWorthIt(
+                                            v1.point, v2.point,
+                                            v1.previous.point, v1.next.point,
+                                            v2.previous.point, v2.next.point
+                                    )) {
+                                        // we need this link!
+                                        this.linkNodes(
+                                            nodes.find(el => el.x === v1.point.x && el.y === v1.point.y),
+                                            nodes.find(el => el.x === v2.point.x && el.y === v2.point.y)
+                                        );
+                                        newConnections.push(new Line(v1.point, v2.point));
+                                    }
+                                } else {
+
+                                    // just and mark as checked.
+                                    chckd.push(new Line(v1.point, v2.point));
+                                }
+                            } else {
+
+                            }
+                        }
 
                         v2 = v2.next;
                     } while (v2 !== npl.vertex);
