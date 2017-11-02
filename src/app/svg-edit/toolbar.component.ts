@@ -1,22 +1,23 @@
-import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import {Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
 import { RequestService } from '../svc/request.service';
 import { ModelService } from '../svc/model.service';
 
 @Component({
-    selector: 'app-main',
-    templateUrl: './main.component.html',
-    styleUrls: ['./main.component.css']
+  selector: 'app-toolbar',
+  templateUrl: './toolbar.component.html',
+  styleUrls: ['./toolbar.component.css']
 })
-export class MainComponent {
-    isScrolled: boolean;
+export class ToolbarComponent implements OnInit {
+
     @ViewChild('appMenu') appMenu: ElementRef;
+    public searchQuery = '';
 
     constructor(private rqstSvc: RequestService, public modelSvc: ModelService) {
     }
 
     public performLogin(provider: string): void {
         window.location.href = RequestService.URL_LOGIN_ENDPOINT
-            +  this.rqstSvc.uriEncodeObject({'providerId': provider})
+            + this.rqstSvc.uriEncodeObject({'providerId': provider})
             + '&redirect= ' + encodeURI(location.href);
     }
 
@@ -30,9 +31,11 @@ export class MainComponent {
         );
         location.reload();
     }
-
-    @HostListener('window:scroll', ['$event'])
-    onScroll() {
-        this.isScrolled = window.pageYOffset > 0;
+  ngOnInit() {
+  }
+    search(event) {
+        this.modelSvc.currentMap.search(this.searchQuery);
+        this.modelSvc.currentMap.fitToViewport();
     }
+
 }

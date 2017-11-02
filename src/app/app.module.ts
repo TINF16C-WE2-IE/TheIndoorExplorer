@@ -37,6 +37,7 @@ import {
 } from '@angular/material';
 import { MapListComponent } from './home/map-list.component';
 import {MainComponent} from './home/main.component';
+import { ToolbarComponent } from './svg-edit/toolbar.component';
 
 export class MyHammerConfig extends HammerGestureConfig  {
     overrides = <any>{
@@ -48,7 +49,7 @@ export class MyHammerConfig extends HammerGestureConfig  {
     declarations: [
         AppComponent,
         SvgEditComponent,
-        UpdatesComponent, FooterComponent, MapListComponent, MainComponent
+        UpdatesComponent, FooterComponent, MapListComponent, MainComponent, ToolbarComponent
     ],
     imports: [
         BrowserModule, FormsModule, HttpModule, routing, BrowserAnimationsModule,
