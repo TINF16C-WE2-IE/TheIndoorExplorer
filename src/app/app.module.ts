@@ -34,7 +34,6 @@ import {
     MatTooltipModule,
     MatRadioModule
 } from '@angular/material';
-import { ToolbarComponent } from './toolbar/toolbar.component';
 import { MapListComponent } from './home/map-list.component';
 import {MainComponent} from './home/main.component';
 
@@ -42,7 +41,7 @@ import {MainComponent} from './home/main.component';
     declarations: [
         AppComponent,
         SvgEditComponent,
-        UpdatesComponent, FooterComponent, ToolbarComponent, MapListComponent, MainComponent
+        UpdatesComponent, FooterComponent, MapListComponent, MainComponent
     ],
     imports: [
         BrowserModule, FormsModule, HttpModule, routing, BrowserAnimationsModule,
