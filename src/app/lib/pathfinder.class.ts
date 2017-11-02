@@ -193,6 +193,7 @@ export class Pathfinder {
     public createLinkedGraph(walls: any[], radius: number, start: Point = null, end: Point = null): PathNode[] {
 
         const polygons = this.createPolygonsFromLines(walls, radius);
+        console.log('generated polygons!', polygons);
 
         // total nodes list
         const nodes: PathNode[] = [];
@@ -226,6 +227,7 @@ export class Pathfinder {
             this.linkNodes(first, prevNode);
         }
 
+        /*
         // additional connections between polygons
         const newConnections: Line[] = [];
 
@@ -322,6 +324,7 @@ export class Pathfinder {
         }
 
         this.connections = this.connections.concat(newConnections);
+        */
         return nodes;
     }
 
