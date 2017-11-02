@@ -33,8 +33,9 @@ export class DirectionsTool extends Tool {
 
     public onMouseMove(evt: MouseEvent) {
         if (this.panDragOrigin) {
-            this.modelSvc.panOffset.x = this.panDragOrigin.x - evt.x + this.dragOrigin.x;
-            this.modelSvc.panOffset.y = this.panDragOrigin.y - evt.y + this.dragOrigin.y;
+            const ratio = this.modelSvc.canvasSize.x / this.modelSvc.viewportSize.x;
+            this.modelSvc.panOffset.x = this.panDragOrigin.x - (evt.x - this.dragOrigin.x) * ratio;
+            this.modelSvc.panOffset.y = this.panDragOrigin.y - (evt.y - this.dragOrigin.y) * ratio;
         }
     }
 

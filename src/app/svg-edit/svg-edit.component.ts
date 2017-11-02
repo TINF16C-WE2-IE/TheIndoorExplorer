@@ -9,6 +9,7 @@ import 'rxjs/add/operator/switchMap';
 import { Mouse } from './mouse.class';
 import { MoveTool } from './toolbox/move-tool.class';
 import { SelectTool } from './toolbox/select-tool.class';
+import { DeleteTool } from './toolbox/delete-tool.class';
 import { LineTool } from './toolbox/line-tool.class';
 import { DirectionsTool } from './toolbox/directions-tool.class';
 import { Portal } from '../model/portal.class';
@@ -26,7 +27,8 @@ export class SvgEditComponent implements OnInit {
 
     public tools = [
         {'name': 'Move', 'icon': 'move'},
-        {'name': 'Label', 'icon': 'wall'},
+        {'name': 'Properties', 'icon': 'select'},
+        {'name': 'Delete', 'icon': 'delete'},
         {'name': 'Draw Wall', 'icon': 'wall'},
         {'name': 'Draw Portal', 'icon': 'portal'},
         {'name': 'Draw Stairs', 'icon': 'stairs'},
@@ -74,6 +76,8 @@ export class SvgEditComponent implements OnInit {
 
         iconRegistry.addSvgIcon('move', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/move.svg'));
         iconRegistry.addSvgIcon('wall', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/pencil.svg'));
+        iconRegistry.addSvgIcon('select', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/cursor.svg'));
+        iconRegistry.addSvgIcon('delete', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/delete.svg'));
         iconRegistry.addSvgIcon('portal', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/portal.svg'));
         iconRegistry.addSvgIcon('stairs', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/stairs.svg'));
         iconRegistry.addSvgIcon('elevator', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/elevator.svg'));
@@ -102,8 +106,11 @@ export class SvgEditComponent implements OnInit {
             case 'Move':
                 this.mouse.tool = new MoveTool(this.mouse, this.modelSvc);
                 break;
-            case 'Label':
+            case 'Properties':
                 this.mouse.tool = new SelectTool(this.mouse, this.modelSvc);
+                break;
+            case 'Delete':
+                this.mouse.tool = new DeleteTool(this.mouse, this.modelSvc);
                 break;
             case 'Draw Wall':
                 this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Wall});

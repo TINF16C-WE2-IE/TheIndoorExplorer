@@ -46,10 +46,10 @@
         {{floor?.getAllPoints().length || 0}} Points
     </p>
     <p>
-        <button mat-icon-button (click)="zoom(-1)">
+        <button mat-icon-button (click)="zoom(1.1)">
             <mat-icon aria-label="Zoom -">zoom_in</mat-icon>
         </button>
-        <button mat-icon-button (click)="zoom(1)">
+        <button mat-icon-button (click)="zoom(0.9)">
             <mat-icon aria-label="Zooom +">zoom_out</mat-icon>
         </button>
         <button mat-icon-button (click)="fitToViewport()">
@@ -69,6 +69,7 @@
      (mousemove)="mouse.onMouseMove($event)" (mouseleave)="mouse.onMouseLeave($event)"
      (touchend)="mouse.onMouseUp($event)" (touchstart)="mouse.onMouseDown($event)"
      (touchmove)="mouse.onMouseMove($event)"
+     (pinchmove)="mouse.onPinch($event)" (pinchend)="mouse.onPinchEnd($event)"
      (wheel)="mouse.onWheel($event)"
      xmlns:svg="http://www.w3.org/2000/svg" version="1.2">
 
@@ -98,7 +99,7 @@
                     [attr.x1]="portal.p1.x" [attr.y1]="portal.p1.y" [attr.x2]="portal.p2.x" [attr.y2]="portal.p2.y"
                     marker-end="url(#circle)" marker-start="url(#circle)"/>
             <svg:text *ngIf="showLabels" text-anchor="middle"
-                      [attr.x]="(portal.p1.x+portal.p2.x) / 2" [attr.y]="(portal.p1.y+portal.p2.y) / 2 + 20">
+                      [attr.x]="portal.center.x" [attr.y]="portal.center.y + 20">
                 {{portal.label}}
             </svg:text>
         </svg:g>
@@ -114,7 +115,7 @@
                       [attr.x2]="stairs.rearCenter.x" [attr.y2]="stairs.rearCenter.y"
                       marker-end="url(#solidArrow)"/>
             <svg:text *ngIf="showLabels" text-anchor="middle"
-                      [attr.x]="(stairs.p1.x+stairs.p2.x) / 2" [attr.y]="(stairs.p1.y+stairs.p2.y) / 2 + 20">
+                      [attr.x]="stairs.center.x" [attr.y]="stairs.center.y + 20">
                 {{stairs.label}}
             </svg:text>
         </svg:g>

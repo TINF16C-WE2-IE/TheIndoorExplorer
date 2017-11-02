@@ -5,6 +5,7 @@ import { HttpModule } from '@angular/http';
 import { routing } from './app.routing';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { HashLocationStrategy, Location, LocationStrategy } from '@angular/common';
+import { HammerGestureConfig, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 import { SvgEditComponent } from './svg-edit/svg-edit.component';
@@ -37,6 +38,12 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
 import { MapListComponent } from './home/map-list.component';
 import {MainComponent} from './home/main.component';
 
+export class MyHammerConfig extends HammerGestureConfig  {
+    overrides = <any>{
+        'pinch': {enable: true}
+    };
+}
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -52,7 +59,8 @@ import {MainComponent} from './home/main.component';
     ],
     providers: [
         Location, {provide: LocationStrategy, useClass: HashLocationStrategy}, RequestService, ModelService,
-        MessageService
+        MessageService,
+        { provide: HAMMER_GESTURE_CONFIG, useClass: MyHammerConfig }
     ],
     bootstrap: [AppComponent]
 })
