@@ -33,8 +33,9 @@ export class DirectionsTool extends Tool {
 
     public onMouseMove(evt: MouseEvent) {
         if (this.panDragOrigin) {
-            this.modelSvc.panOffset.x = this.panDragOrigin.x - evt.x + this.dragOrigin.x;
-            this.modelSvc.panOffset.y = this.panDragOrigin.y - evt.y + this.dragOrigin.y;
+            const ratio = this.modelSvc.canvasSize.x / this.modelSvc.viewportSize.x;
+            this.modelSvc.panOffset.x = this.panDragOrigin.x - (evt.x - this.dragOrigin.x) * ratio;
+            this.modelSvc.panOffset.y = this.panDragOrigin.y - (evt.y - this.dragOrigin.y) * ratio;
         }
     }
 
@@ -42,7 +43,7 @@ export class DirectionsTool extends Tool {
         // TS has no way of checking for an interface :(
         if (this.isSelectable(selected)) {
             if (this.modelSvc.selectedObjects.length) {
-                this.generatePath(this.modelSvc.selectedObjects[0].center(), selected.center());
+                this.generatePath(this.modelSvc.selectedObjects[0].center, selected.center);
                 this.modelSvc.selectedObjects = [];
             } else {
                 this.modelSvc.selectedObjects.push(selected);
@@ -64,7 +65,7 @@ export class DirectionsTool extends Tool {
         const path = this.pfinder.findPathFromTo(nodes,
             nodes.find(el => el.x === start.x && el.y === start.y),
             nodes.find(el => el.x === end.x && el.y === end.y));
-        this.modelSvc.movingPath = new Array();
+        this.modelSvc.movingPath = [];
         for (let i = 1; i < path.length; i++) {
             this.modelSvc.movingPath.push(new Line(
                 new Point(path[i].x, path[i].y, false),
