@@ -96,8 +96,8 @@ export class ModelService {
                                 {id: 5, label: 'main door', p1: {x: 500, y: 240}, p2: {x: 700, y: 400}},
                                 */
 
-                                {id: 5, label: 'main door', p1: {x: 400, y: 500}, p2: {x: 500, y: 500}},
-                                {id: 6, label: 'main door', p1: {x: 500, y: 400}, p2: {x: 500, y: 500}},
+                                {id: 5, label: 'main door', p1: {x: 500, y: 500}, p2: {x: 500, y: 600}},
+                                {id: 6, label: 'main door', p1: {x: 500, y: 500}, p2: {x: 600, y: 500}},
                                 // {id: 7, label: 'main door', p1: {x: 500, y: 600}, p2: {x: 400, y: 600}},
                                 // {id: 5, label: 'main door', p1: {x: 400, y: 600}, p2: {x: 400, y: 500}},
                     ],

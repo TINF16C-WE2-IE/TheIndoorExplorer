@@ -61,11 +61,11 @@ export class Polygon {
         let v2 = cpy2.vertex;
 
         // at starting point, we are outside the second polygon?
-        let is_entry = this.isBeginningPointInsideOther(cpy1, cpy2);
+        let is_entry = !this.isBeginningPointInsideOther(cpy1, cpy2);
         let intersectionPoints: {p: Point, dist: number, ref: VertexRef}[] = [];        // intersections per line on v1
 
         // ALL intersections, to prevent multiple intersections on the same point
-        const totalIntersectionPoints: {p: Point, p1Vertex: boolean, p2Vertex: boolean}[] = [];
+        const totalIntersectionPoints: {p: Point, p1Vertex: boolean, p1NextVertex: boolean, p2Vertex: boolean}[] = [];
 
 
         let weak = false; // weak mode is the case, if v1 is directly on a intersection point, which is a vertex of p1
@@ -120,7 +120,7 @@ export class Polygon {
                 // but be AWARE! specifically for endpoints we either have the split only on v1 or only on v2
 
                 console.log('our intersection is', nearest.p);
-                totalIntersectionPoints.push({p: nearest.p, p1Vertex: false, p2Vertex: false});
+                totalIntersectionPoints.push({p: nearest.p, p1Vertex: false, p1NextVertex: false, p2Vertex: false});
 
                 let ref1 = v1.next;
                 if (v1.point.equals(nearest.p)) {
@@ -131,7 +131,7 @@ export class Polygon {
                 }
                 if (v1.next.point.equals(nearest.p)) {
                     console.log('v1 has the intersection point as the next vertex ref.');
-                    totalIntersectionPoints[totalIntersectionPoints.length - 1].p1Vertex = true;
+                    totalIntersectionPoints[totalIntersectionPoints.length - 1].p1NextVertex = true;
                     ref1 = v1.next;
                 }
 
@@ -149,7 +149,8 @@ export class Polygon {
                 console.log('*** after checking ***', totalIntersectionPoints[totalIntersectionPoints.length - 1].p1Vertex,
                     totalIntersectionPoints[totalIntersectionPoints.length - 1].p2Vertex, v1.point, v2.point, rref2, nearest.ref);
 
-                if (!totalIntersectionPoints[totalIntersectionPoints.length - 1].p1Vertex) {
+                if (! (totalIntersectionPoints[totalIntersectionPoints.length - 1].p1Vertex ||
+                       totalIntersectionPoints[totalIntersectionPoints.length - 1].p1NextVertex) ) {
                     console.log('split v1!');
                     ref1 = new VertexRef(nearest.p, v1.next, v1);
                     v1.next.previous = ref1;
@@ -163,6 +164,25 @@ export class Polygon {
                     nearest.ref.next = ref2;
                 }
 
+                if (totalIntersectionPoints[totalIntersectionPoints.length - 1].p1Vertex) {
+                    if (totalIntersectionPoints[totalIntersectionPoints.length - 1].p2Vertex) {
+                        is_entry = null;
+                        console.log('is_entry is set to', is_entry, ', p1Vertex & p2Vertex');
+                    } else {
+                        is_entry = true;
+                        console.log('is_entry is set to', is_entry, ', p1Vertex & !p2Vertex');
+                    }
+                } else {
+                    if (totalIntersectionPoints[totalIntersectionPoints.length - 1].p2Vertex) {
+                        is_entry = false;
+                        console.log('is_entry is set to', is_entry, ', !p1Vertex & p2Vertex');
+                    } else {
+                        // nothing
+                        console.log('is_entry is not set.', is_entry, ', !p1Vertex & !p2Vertex');
+
+                    }
+                }
+
                 ref1.data = (totalIntersectionPoints[totalIntersectionPoints.length - 1].p2Vertex ?
                               v2.previous : v2.next); // save neighbour data
                 ref2.data = ref1;
@@ -173,6 +193,7 @@ export class Polygon {
                 is_entry = !is_entry;
             }
 
+            console.log('v1 is_entry? ', v1.entry_exit);
             if (!weak) {
                 v1 = v1.next;
             }
@@ -202,7 +223,8 @@ export class Polygon {
 
         // we can determine the outside/inside polygon question with the number of vertices touched?
         // HAS TO BE FALSE!
-        is_entry = !is_entry;
+        // !totalIntersectionPoints[0].p2Vertex && totalIntersectionPoints[0].p1Vertex
+        is_entry = (false) ? is_entry : !is_entry;
 
         console.log('check is now is_entry?', is_entry);
 
