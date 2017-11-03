@@ -1,6 +1,9 @@
-import {Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostListener, Inject, OnInit, ViewChild} from '@angular/core';
 import { RequestService } from '../svc/request.service';
 import { ModelService } from '../svc/model.service';
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material';
+import {MapnameDialogComponent} from './mapname-dialog.component';
+
 
 @Component({
   selector: 'app-toolbar',
@@ -11,8 +14,14 @@ export class ToolbarComponent implements OnInit {
 
     @ViewChild('appMenu') appMenu: ElementRef;
     public searchQuery = '';
+    mapname: string;
 
-    constructor(private rqstSvc: RequestService, public modelSvc: ModelService) {
+    constructor(private rqstSvc: RequestService, public modelSvc: ModelService, public dialog: MatDialog) {
+    }
+    openDialog(): void {
+        const dialogRef = this.dialog.open(MapnameDialogComponent, {
+            width: '250px',
+        });
     }
 
     public performLogin(provider: string): void {
@@ -39,3 +48,5 @@ export class ToolbarComponent implements OnInit {
     }
 
 }
+
+

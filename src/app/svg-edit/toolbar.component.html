@@ -1,17 +1,19 @@
 <mat-toolbar class="mat-elevation-z6">
+    <div (click)="openDialog()" id="openDialog">
+        <span>{{modelSvc.currentMap?.name}} </span>
+        <mat-icon id='editname' >mode_edit</mat-icon>
+    </div>
 
-
-
-        <mat-form-field>
-            <input matInput type="search" incremental name="search" [(ngModel)]="searchQuery" (search)="search()"
-                   placeholder="Search...">
-        </mat-form-field>
-
-    <mat-form-field>
-        <div>
-            <input matInput [ngModel] = "modelSvc.currentMap?.name" (ngModelChange)="modelSvc.currentMap.name = $event">
-        </div>
+    <!--<mat-form-field>
+        <input matInput type="search" incremental name="search" [(ngModel)]="searchQuery" (search)="search()"
+               placeholder="Search...">
     </mat-form-field>
+
+<mat-form-field>
+    <div>
+        <input id='mapname' matInput [ngModel] = "modelSvc.currentMap?.name" (ngModelChange)="modelSvc.currentMap.name = $event">
+    </div>
+</mat-form-field>-->
 
 
     <span class="example-fill-remaining-space"></span>
