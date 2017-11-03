@@ -1,4 +1,9 @@
 :host {
+    position: absolute;
+    top:80px;
+    bottom: 0;
+    left: 0;
+    right: 0;
     display: flex;
     flex-flow: row wrap;
     justify-content: space-around;
@@ -7,13 +12,22 @@
 }
 
 #editorCanvas {
-    width: 50%;
-    height: 500px;
+    width: 100%;
+    height: 100%;
+    position: absolute;
     background-color: white; 
     user-select: none;
     user-drag: none;
     -webkit-user-drag: none;
     box-sizing: content-box;
+}
+#toolbox {
+    width: 200px;
+    flex: initial;
+    margin: 0 2em;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .panel {
@@ -25,12 +39,43 @@
     color:#b71c1c;
 }
 
-.floor-buttons button.mat-button, .tool-buttons button.mat-button {
+.tool-buttons button.mat-button {
     display: block;
 }
+
 
 .edit-button {
     position: absolute;
     bottom:32px;
     right:32px;
+}
+
+.zoom-button {
+    min-width: unset;
+    line-height: unset;
+    padding: 2px;
+    display: block;
+    margin: 2px ;
+}
+#canvas-container{
+    position: relative;
+    flex: auto;
+}
+#zoom-button-container {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+}
+#viewer-container {
+    flex: 1 1 300px;
+    height: 100%;
+}
+#viewer-container > div {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#floor-button-container {
+    flex-basis: content;
 }
