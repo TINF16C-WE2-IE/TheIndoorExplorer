@@ -16,6 +16,7 @@ import { Portal } from '../model/portal.class';
 import { MatIconRegistry } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Stairs } from '../model/stairs.class';
+import {FormControl} from '@angular/forms';
 
 @Component({
     selector: 'app-svg-edit',
@@ -39,6 +40,13 @@ export class SvgEditComponent implements OnInit {
     public searchQuery = '';
     public showLabels = true;
     public backgroundImageDataURL = null;
+    toolBoxControl: FormControl = new FormControl();
+
+    options = [
+        'One',
+        'Two',
+        'Three'
+    ];
 
     get floor() {
         return this.modelSvc.currentFloor;
