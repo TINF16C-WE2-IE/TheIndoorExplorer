@@ -65,8 +65,6 @@ export class Polygon {
         let intersectionPoints: {p: Point, dist: number, ref: VertexRef}[] = [];        // intersections per line on v1
         const totalIntersectionPoints: Point[] = [];   // ALL intersections, to prevent multiple intersections on the same point
 
-        let debugCounter = 0;
-
         do {
             l1 = new Line(v1.point, v1.next.point);
             intersectionPoints = [];
@@ -122,7 +120,6 @@ export class Polygon {
                 if (v1.point.equals(nearest.p)) {
                     console.log('v1 has the intersection point as vertex ref.');
                     p1SegmentPoint = true;
-                    debugCounter++;
                     ref1 = v1;
                     weak = true;
                 }
@@ -151,7 +148,7 @@ export class Polygon {
                     v1.next.previous = ref1;
                     v1.next = ref1;
                 }
-                let ref2 = v2;
+                let ref2 = v2.previous;
                 if (!p2SegmentPoint) {
                     console.log('split v2!');
                     ref2 = new VertexRef(nearest.p, nearest.ref.next, nearest.ref);
@@ -159,14 +156,9 @@ export class Polygon {
                     nearest.ref.next = ref2;
                 }
 
-                // his is a special case. we have to be careful which points to connect.
-                if (p1SegmentPoint && p2SegmentPoint) {
-                    // TODO
-                }
-
-                console.log('connect both!');
-                ref1.data = (p2SegmentPoint) ? v2.previous : ref2; // save neighbour data
+                ref1.data = (p2SegmentPoint ?  v2.previous : v2.next); // save neighbour data
                 ref2.data = ref1;
+                console.log('connect both! (ref1, ref2, ref1-data, ref2-data)', ref1.point, ref2.point, ref1.data.point, ref2.data.point);
                 ref1.entry_exit = is_entry; // enter second polygon
                 ref2.entry_exit = is_entry;
                 is_entry = !is_entry;         // this was before the 2 lines above!!!! EDIT!!!
@@ -208,9 +200,8 @@ export class Polygon {
             }
             console.log('polygon on point: ', resultPolygon.vertex.point, 'next would be', v1.next);
 
-            debugCounter++;
             v1 = v1.next;
-        } while (v1 !== this.vertex && debugCounter < 10);
+        } while (v1 !== this.vertex);
 
         // connect one last time
         resultPolygon.vertex.next = first;
