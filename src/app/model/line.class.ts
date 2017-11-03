@@ -7,6 +7,10 @@ export class Line {
 
     public deleted: boolean;
 
+    public get center(): Point {
+        return new Point((this.p1.x + this.p2.x) / 2, (this.p1.y + this.p2.y) / 2, false);
+    }
+
     constructor(p1: Point, p2: Point) {
         this.p1 = p1;
         this.p2 = p2;

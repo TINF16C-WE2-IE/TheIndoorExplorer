@@ -1,0 +1,47 @@
+.mat-toolbar{
+    background-color: #4ABDAC;
+    position: fixed;
+    top:0;
+    left:0;
+    z-index: 550;
+}
+
+.example-fill-remaining-space {
+    flex: 1 1 auto;
+}
+mat-toolbar button {
+    padding: 0;
+}
+
+@media only screen and (max-width: 500px) {
+    .mat-toolbar .mat-button{
+        min-width: 35px;
+    }
+    .toolbar-text{
+        display: none;
+    }
+}
+
+.mat-form-field {
+    font-size: 0.5em;
+}
+
+#editname {
+    position: relative;
+    top: 5px;
+    left: 5px;
+}
+
+#openDialog {
+    cursor:pointer;
+}
+
+#openDialog .mat-icon {
+    opacity: 0;
+}
+
+#openDialog span:hover + .mat-icon {
+    transition: opacity 0.35s ease-in;
+    opacity: 1;
+}
+

@@ -4,6 +4,7 @@ import { Wall } from '../../model/wall.class';
 import { Portal } from '../../model/portal.class';
 import { Mouse } from '../mouse.class';
 import { ModelService } from '../../svc/model.service';
+import { Stairs } from '../../model/stairs.class';
 
 export class LineTool extends Tool {
     private point: Point = null;
@@ -19,6 +20,9 @@ export class LineTool extends Tool {
             }
             case Portal: {
                 return 'Draw Portal';
+            }
+            case Stairs: {
+                return 'Draw Stairs';
             }
         }
     }
@@ -39,7 +43,12 @@ export class LineTool extends Tool {
                 break;
             case Portal: {
                 const id = Math.max(0, ...this.floor.portals.map(portal => portal.id)) + 1;
-                this.floor.portals.push(new Portal(id, 'New Portal!', start, this.point));
+                this.floor.portals.push(new Portal(id, '', start, this.point));
+            }
+                break;
+            case Stairs: {
+                const id = Math.max(0, ...this.floor.stairways.map(stairs => stairs.id)) + 1;
+                this.floor.stairways.push(new Stairs(id, '', start, this.point));
             }
                 break;
         }

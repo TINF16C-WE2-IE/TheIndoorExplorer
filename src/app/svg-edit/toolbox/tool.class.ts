@@ -1,7 +1,8 @@
-import { Mouse } from '../mouse.class';
-import { Point } from '../../model/point.class';
-import { ModelService } from '../../svc/model.service';
-import { Line } from '../../model/line.class';
+import {Mouse} from '../mouse.class';
+import {Point} from '../../model/point.class';
+import {ModelService} from '../../svc/model.service';
+import {Line} from '../../model/line.class';
+import {Selectable} from '../../model/selectable.interface';
 
 export abstract class Tool {
     public get name() {
@@ -31,21 +32,27 @@ export abstract class Tool {
         return this.floor.getExistingOrThisPoint(new Point(this.mouse.x, this.mouse.y), exclude);
     }
 
-    protected getExistingObjectsBelowCursor(lineAccuracy = 5): Point[] {
+    protected getExistingObjectsBelowCursor(lineAccuracy = 5): { points: Point[], obj: any } {
         const point = this.floor.getExistingOrThisPoint(new Point(this.mouse.x, this.mouse.y), [], true);
         if (point) {
-            return [point];
+            return {points: [point], obj: null};
         }
         else {
-            const lines = ([...this.floor.walls, ...this.floor.portals] as Line[]).map(line => {
-                return {
-                    distance: this.pointDistance(this.mouse.x, this.mouse.y, line.p1.x, line.p1.y, line.p2.x, line.p2.y),
-                    line: line
-                };
-            });
-            const shortest = lines.reduce((prev, current) => prev.distance > current.distance ? current : prev);
-            return shortest.distance <= lineAccuracy ? [shortest.line.p1, shortest.line.p2] : [];
+            const lines = ([...this.floor.walls, ...this.floor.portals, ...this.floor.stairways] as Line[])
+                .map(line => {
+                    return {
+                        distance: this.pointDistance(this.mouse.x, this.mouse.y, line.p1.x, line.p1.y, line.p2.x, line.p2.y),
+                        line: line
+                    };
+                });
+            if (lines.length) {
+                const shortest = lines.reduce((prev, current) => prev.distance > current.distance ? current : prev);
+                if (shortest.distance <= lineAccuracy) {
+                    return {points: [shortest.line.p1, shortest.line.p2], obj: shortest.line};
+                }
+            }
         }
+        return {points: [], obj: null};
     }
 
     private pointDistance(x, y, x1, y1, x2, y2) {
@@ -69,5 +76,9 @@ export abstract class Tool {
             yy = y1 + param * (y2 - y1);
         }
         return Math.sqrt((x - xx) ** 2 + (y - yy) ** 2);
+    }
+
+    protected isSelectable(obj: Selectable | any): obj is Selectable {
+        return (obj && obj.id !== undefined && obj.label !== undefined);
     }
 }

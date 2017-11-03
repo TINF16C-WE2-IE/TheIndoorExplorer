@@ -1,19 +1,21 @@
-import { Map } from './../model/map.class';
 import { Floor } from './../model/floor.class';
+import { Selectable } from './../model/selectable.interface';
 import { Wall } from './../model/wall.class';
-import { Point } from './../model/point.class';
 import { Line } from './../model/line.class';
-import { Pathfinder } from './../lib/pathfinder.class';
 import { ModelService } from '../svc/model.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import 'rxjs/add/operator/switchMap';
 import { Mouse } from './mouse.class';
 import { MoveTool } from './toolbox/move-tool.class';
+import { SelectTool } from './toolbox/select-tool.class';
+import { DeleteTool } from './toolbox/delete-tool.class';
 import { LineTool } from './toolbox/line-tool.class';
+import { DirectionsTool } from './toolbox/directions-tool.class';
 import { Portal } from '../model/portal.class';
-import {MatIconRegistry} from '@angular/material';
-import {DomSanitizer} from '@angular/platform-browser';
+import { MatIconRegistry } from '@angular/material';
+import { DomSanitizer } from '@angular/platform-browser';
+import { Stairs } from '../model/stairs.class';
 
 @Component({
     selector: 'app-svg-edit',
@@ -25,16 +27,18 @@ export class SvgEditComponent implements OnInit {
 
     public tools = [
         {'name': 'Move', 'icon': 'move'},
+        {'name': 'Properties', 'icon': 'select'},
+        {'name': 'Delete', 'icon': 'delete'},
         {'name': 'Draw Wall', 'icon': 'wall'},
         {'name': 'Draw Portal', 'icon': 'portal'},
-        {'name': 'Insert Stairs', 'icon': 'stairs'},
-        {'name': 'Insert Lift', 'icon': 'elevator'},
+        {'name': 'Draw Stairs', 'icon': 'stairs'},
+        {'name': 'Draw Elevator', 'icon': 'elevator'}
     ];
     public selectedTool = 'Move';
+    public editMode = false;
+    public searchQuery = '';
+    public showLabels = true;
     public backgroundImageDataURL = null;
-
-    public movingPath: Line[];
-    public pfinder: Pathfinder;
 
     get floor() {
         return this.modelSvc.currentFloor;
@@ -45,13 +49,35 @@ export class SvgEditComponent implements OnInit {
         return null;
     }
 
+    get movingPath(): Line[] {
+        return this.modelSvc.movingPath;
+    }
+
+    get selectedObjects(): Selectable[] {
+        if (this.modelSvc.currentFloor) return this.modelSvc.selectedObjects.concat(this.modelSvc.currentFloor.searchResults);
+        return this.modelSvc.selectedObjects;
+    }
+
+    get singleSelectedObject(): Selectable {
+        if (this.modelSvc.selectedObjects.length === 1) {
+            return this.modelSvc.selectedObjects[0];
+        }
+        return null;
+    }
+
+    get hasWritePermission(): boolean {
+        return true;
+        // return this.modelSvc.currentMap.permission === 1;
+    }
+
+
     constructor(private modelSvc: ModelService, private route: ActivatedRoute, private router: Router,
-        iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
-        this.movingPath = [];
-        this.pfinder = new Pathfinder();
+                iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
 
         iconRegistry.addSvgIcon('move', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/move.svg'));
         iconRegistry.addSvgIcon('wall', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/pencil.svg'));
+        iconRegistry.addSvgIcon('select', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/cursor.svg'));
+        iconRegistry.addSvgIcon('delete', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/delete.svg'));
         iconRegistry.addSvgIcon('portal', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/portal.svg'));
         iconRegistry.addSvgIcon('stairs', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/stairs.svg'));
         iconRegistry.addSvgIcon('elevator', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/elevator.svg'));
@@ -60,51 +86,44 @@ export class SvgEditComponent implements OnInit {
     ngOnInit() {
         this.route.params.subscribe(
             params => {
-                this.modelSvc.loadMap(-1);
-                this.generatePath();
+                this.modelSvc.loadMap(Number.parseInt(params['mapId']));
             }
         );
 
         this.mouse = new Mouse(this.modelSvc);
-        this.selectTool('Move');
+        this.selectTool('Directions');
     }
 
-    generatePath() {
-
-        const start = new Point(400, 140, false);
-        const end = new Point(100, 450, false);
-
-        // create nodes graph
-        const nodes = this.pfinder.createLinkedGraph(
-            [...this.modelSvc.currentFloor.portals, ...this.modelSvc.currentFloor.walls]
-            , 15, start, end);
-
-        // find path in this node system
-        const path = this.pfinder.findPathFromTo(nodes,
-            nodes.find(el => el.x === start.x && el.y === start.y),
-            nodes.find(el => el.x === end.x && el.y === end.y));
-        this.movingPath = new Array();
-        for (let i = 1; i < path.length; i++) {
-            this.movingPath.push(new Line(
-                new Point(path[i].x, path[i].y, false),
-                new Point(path[i - 1].x, path[i - 1].y, false)
-            ));
-        }
-    }
+    // generatePath moved to directions-tool
 
     selectTool($event: any) {
         console.log($event);
+        // this.modelSvc.selectedObjects = [];
+        // this.modelSvc.searchResultFloors = [];
+
         this.selectedTool = $event;
         switch ($event) {
             case 'Move':
-              this.mouse.tool = new MoveTool(this.mouse, this.modelSvc);
-              break;
+                this.mouse.tool = new MoveTool(this.mouse, this.modelSvc);
+                break;
+            case 'Properties':
+                this.mouse.tool = new SelectTool(this.mouse, this.modelSvc);
+                break;
+            case 'Delete':
+                this.mouse.tool = new DeleteTool(this.mouse, this.modelSvc);
+                break;
             case 'Draw Wall':
-              this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Wall});
-              break;
+                this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Wall});
+                break;
             case 'Draw Portal':
-              this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Portal});
-              break;
+                this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Portal});
+                break;
+            case 'Draw Stairs':
+                this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Stairs});
+                break;
+            case 'Directions':
+                this.mouse.tool = new DirectionsTool(this.mouse, this.modelSvc);
+                break;
         }
     }
 
@@ -133,7 +152,7 @@ export class SvgEditComponent implements OnInit {
 
     viewBoxString() {
         return this.modelSvc.panOffset.x + ' ' + this.modelSvc.panOffset.y + ' '
-        + this.modelSvc.canvasSize.x + ' ' + this.modelSvc.canvasSize.y;
+            + this.modelSvc.canvasSize.x + ' ' + this.modelSvc.canvasSize.y;
     }
 
     zoom(direction: number) {
@@ -153,7 +172,7 @@ export class SvgEditComponent implements OnInit {
         const reader = new FileReader();
 
         const myThis = this;
-        reader.addEventListener('load', function () {
+        reader.addEventListener('load', function() {
             myThis.backgroundImageDataURL = reader.result;
         }, false);
 
@@ -162,4 +181,25 @@ export class SvgEditComponent implements OnInit {
         }
     }
 
+    search(event) {
+        this.modelSvc.currentMap.search(this.searchQuery);
+        this.modelSvc.currentMap.fitToViewport();
+    }
+
+    switchToEditMode() {
+        this.editMode = true;
+        this.selectTool('Move');
+    }
+
+    selectWaypoint(selected: Selectable) {
+        if (this.mouse.tool instanceof DirectionsTool) {
+            this.mouse.tool.selectWaypoint(selected);
+        }
+    }
+
+    @HostListener('window:resize', ['$event'])
+    onResize(event) {
+        console.log('resize');
+        this.modelSvc.currentMap.fitToViewport();
+    }
 }

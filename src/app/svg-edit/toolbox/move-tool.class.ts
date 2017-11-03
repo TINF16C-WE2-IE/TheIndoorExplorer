@@ -18,7 +18,7 @@ export class MoveTool extends Tool {
     public onMouseDown(evt: MouseEvent) {
         // grab point (or points defining lines) below cursor
         this.dragOrigin = {x: this.mouse.x, y: this.mouse.y};
-        this.selected = this.getExistingObjectsBelowCursor().map(point => {
+        this.selected = this.getExistingObjectsBelowCursor().points.map(point => {
             return {origin: point.clone(), current: point};
         });
         if (!this.selected.length) {
@@ -45,8 +45,9 @@ export class MoveTool extends Tool {
             );
         }
         if (this.panDragOrigin) {
-            this.modelSvc.panOffset.x = this.panDragOrigin.x - evt.x + this.dragOrigin.x;
-            this.modelSvc.panOffset.y = this.panDragOrigin.y - evt.y + this.dragOrigin.y;
+            const ratio = this.modelSvc.canvasSize.x / this.modelSvc.viewportSize.x;
+            this.modelSvc.panOffset.x = this.panDragOrigin.x - (evt.x - this.dragOrigin.x) * ratio;
+            this.modelSvc.panOffset.y = this.panDragOrigin.y - (evt.y - this.dragOrigin.y) * ratio;
         }
     }
 }

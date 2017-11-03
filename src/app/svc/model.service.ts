@@ -1,3 +1,5 @@
+import { Floor } from './../model/floor.class';
+import { Selectable } from './../model/selectable.interface';
 import { Point } from './../model/point.class';
 import { Line } from './../model/line.class';
 import { Pathfinder } from './../lib/pathfinder.class';
@@ -12,12 +14,15 @@ export class ModelService {
     public maps: {[id: number]: Map};
     public currentMapId: number;
     public currentFloorId: number;
+    public selectedObjects: Selectable[] = [];
+    public movingPath: Line[] = [];
     public userInfo: {id: number, username: string};
 
     public viewportSize: {x: number, y: number} = {x: 500, y: 500};
     public canvasSize: {x: number, y: number} = {x: 500, y: 500};
     public panOffset = new Point(0, 0);
     public bodyOffset = new Point(0, 0);
+    public zoom = 1;
 
     public get currentMap() {
         return this.maps[this.currentMapId];
@@ -75,38 +80,17 @@ export class ModelService {
 
     public loadMap(mapId: number) {
         if (mapId === -1) {
-            this.currentMap = new Map({
+            const newMap = new Map({
                 id: -1,
                 name: 'New Map',
-                floors: [{
-                    walls: [], /*{p1: {x: 50, y: 50}, p2: {x: 250, y: 50}}],*/
-                    portals: [
-
-                          // {id: 1, label: 'main door', p1: {x: 100, y: 260}, p2: {x: 300, y: 260}},
-                          // {id: 2, label: 'main door', p1: {x: 200, y: 100}, p2: {x: 200, y: 300}},
-
-                         // {id: 3, label: 'main door', p1: {x: 250, y: 300}, p2: {x: 400, y: 300}},
-                         // {id: 4, label: 'main door', p1: {x: 250, y: 300}, p2: {x: 50, y: 100}},
-
-                          /*
-                            {id: 1, label: 'main door', p1: {x: 100, y: 230}, p2: {x: 720, y: 100}},
-                            {id: 2, label: 'main door', p1: {x: 190, y: 160}, p2: {x: 190, y: 370}},
-                               {id: 3, label: 'main door', p1: {x: 250, y: 140}, p2: {x: 250, y: 250}},
-                                {id: 4, label: 'main door', p1: {x: 650, y: 240}, p2: {x: 600, y: 350}},
-                                {id: 5, label: 'main door', p1: {x: 500, y: 240}, p2: {x: 700, y: 400}},
-                                */
-
-                                {id: 5, label: 'main door', p1: {x: 500, y: 500}, p2: {x: 600, y: 500}},
-                                {id: 6, label: 'main door', p1: {x: 600, y: 500}, p2: {x: 600, y: 600}},
-                               {id: 7, label: 'main door', p1: {x: 600, y: 600}, p2: {x: 500, y: 600}},
-                               {id: 5, label: 'main door', p1: {x: 500, y: 600}, p2: {x: 500, y: 500}},
-                    ],
-                    label: ''
-                }],
+                floors: [],
                 favorite: false,
                 permission: 0,
                 visibility: 0
             }, this);
+            newMap.createFloor();
+            newMap.fitToViewport();
+            this.currentMap = newMap;
         }
         else {
             this.rqstSvc.get(RequestService.LIST_MAP_DETAILS, {'mapid': mapId})
