@@ -76,9 +76,13 @@ export class Map {
         this.updateCanvasSize(sizeX, 1, dangling);
     }
 
+    private getAllPoints() {
+        return this.floors.map(floor => floor.getAllPoints()).reduce((first, second) => first.concat(second), []);
+    }
+
     public fitToViewport() {
         this.getMapDimensions();
-        const allPoints = this.modelSvc.currentFloor.getAllPoints();
+        const allPoints = this.getAllPoints();
         if (allPoints.length) {
             const topLeft = allPoints[0].clone();
             const bottomRight = allPoints[0].clone();
