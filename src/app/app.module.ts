@@ -20,6 +20,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
     MatButtonModule,
     MatCardModule,
+    MatDialogModule,
     MatFormFieldModule,
     MatGridListModule,
     MatIconModule,
@@ -32,11 +33,13 @@ import {
     MatSnackBarModule,
     MatTableModule,
     MatToolbarModule,
+    MatTooltipModule,
     MatRadioModule
 } from '@angular/material';
-import { ToolbarComponent } from './toolbar/toolbar.component';
 import { MapListComponent } from './home/map-list.component';
 import {MainComponent} from './home/main.component';
+import { ToolbarComponent} from './svg-edit/toolbar.component';
+import { MapnameDialogComponent } from './svg-edit/mapname-dialog.component';
 
 export class MyHammerConfig extends HammerGestureConfig  {
     overrides = <any>{
@@ -48,13 +51,22 @@ export class MyHammerConfig extends HammerGestureConfig  {
     declarations: [
         AppComponent,
         SvgEditComponent,
-        UpdatesComponent, FooterComponent, ToolbarComponent, MapListComponent, MainComponent
+        UpdatesComponent,
+        FooterComponent,
+        MapListComponent,
+        MainComponent,
+        ToolbarComponent,
+        MapnameDialogComponent,
+        MapnameDialogComponent,
+    ],
+    entryComponents: [
+        MapnameDialogComponent
     ],
     imports: [
         BrowserModule, FormsModule, HttpModule, routing, BrowserAnimationsModule,
-        MatButtonModule, MatCardModule, MatMenuModule, MatToolbarModule, MatIconModule, MatSliderModule,
+        MatButtonModule, MatCardModule, MatDialogModule, MatMenuModule, MatToolbarModule, MatIconModule, MatSliderModule,
         MatSlideToggleModule, MatListModule, MatGridListModule, MatFormFieldModule,
-        MatInputModule, MatProgressSpinnerModule, MatTableModule, MatSnackBarModule, MatRadioModule,
+        MatInputModule, MatProgressSpinnerModule, MatTableModule, MatTooltipModule, MatSnackBarModule, MatRadioModule,
         FlexLayoutModule
     ],
     providers: [
