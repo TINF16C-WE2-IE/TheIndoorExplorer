@@ -1,3 +1,4 @@
+import { Pathfinder2 } from './../../lib/pathfinder2.class.';
 import { Tool } from './tool.class';
 import { Point } from '../../model/point.class';
 import { Selectable } from '../../model/selectable.interface';
@@ -6,7 +7,7 @@ import { Pathfinder } from '../../lib/pathfinder.class';
 
 export class DirectionsTool extends Tool {
 
-    public pfinder: Pathfinder;
+    public pfinder: Pathfinder2;
     private dragOrigin: {x: number, y: number};
     private panDragOrigin: {x: number, y: number};
 
@@ -54,11 +55,11 @@ export class DirectionsTool extends Tool {
     }
 
     generatePath(start: Point, end: Point) {
-        if (!this.pfinder) this.pfinder = new Pathfinder();
+        if (!this.pfinder) this.pfinder = new Pathfinder2();
 
         // create nodes graph
         const nodes = this.pfinder.createLinkedGraph(
-            [...this.modelSvc.currentFloor.portals, ...this.modelSvc.currentFloor.walls]
+            [...this.modelSvc.currentFloor.walls]
             , 15, start, end);
 
         // find path in this node system
