@@ -7,13 +7,8 @@
     <!--<mat-form-field>
         <input matInput type="search" incremental name="search" [(ngModel)]="searchQuery" (search)="search()"
                placeholder="Search...">
-    </mat-form-field>
+    </mat-form-field>-->
 
-<mat-form-field>
-    <div>
-        <input id='mapname' matInput [ngModel] = "modelSvc.currentMap?.name" (ngModelChange)="modelSvc.currentMap.name = $event">
-    </div>
-</mat-form-field>-->
 
 
     <span class="example-fill-remaining-space"></span>
@@ -21,17 +16,19 @@
     <div *ngIf="!modelSvc.userInfo?.id">
         <button mat-button [matMenuTriggerFor]="appMenu">
             <mat-icon id="toolbarNotLoggedIn">account_box</mat-icon>
-            <span>Login</span></button>
+            <span class="toolbar-text">Login</span>
+        </button>
     </div>
     <div *ngIf="modelSvc.userInfo?.id">
         <button mat-button [matMenuTriggerFor]="appMenu">
             <mat-icon id="toolbarLoggedIn">account_box</mat-icon>
-            <span>{{modelSvc.userInfo.username}}</span>
+            <span class="toolbar-text">{{modelSvc.userInfo.username}}</span>
         </button>
     </div>
     <button mat-button [routerLink]="['']">
         <mat-icon id="home" >home</mat-icon>
-        <span>Home</span>
+        <span class="toolbar-text" >Home</span>
+
     </button>
 </mat-toolbar>
 
