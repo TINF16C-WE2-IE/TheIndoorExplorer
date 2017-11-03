@@ -181,7 +181,8 @@ export class SvgEditComponent implements OnInit {
         }
     }
 
-    search(event) {
+    search() {
+        console.log('search', this.searchQuery);
         this.modelSvc.currentMap.search(this.searchQuery);
         this.modelSvc.currentMap.fitToViewport();
     }

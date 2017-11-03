@@ -18,7 +18,8 @@ export class Floor {
         portals: {id: number, label: string, p1: {x: number, y: number}, p2: {x: number, y: number}}[],
         stairways: {
             id: number, label: string, p1: {x: number, y: number}, p2: {x: number, y: number},
-            length: number, canEnter: boolean, canLeave: boolean
+            targets: {floorId: number, stairsId: number}[],
+            canEnter: boolean, canLeave: boolean, length: number
         }[]
         label: string
     }) {
@@ -36,7 +37,7 @@ export class Floor {
             const p1 = this.getExistingOrThisPoint(new Point(stairs_obj.p1.x, stairs_obj.p1.y));
             const p2 = this.getExistingOrThisPoint(new Point(stairs_obj.p2.x, stairs_obj.p2.y));
             this.stairways.push(new Stairs(stairs_obj.id, stairs_obj.label, p1, p2,
-                stairs_obj.length, stairs_obj.canEnter, stairs_obj.canLeave));
+                stairs_obj.targets, stairs_obj.canEnter, stairs_obj.canLeave, stairs_obj.length));
         }
         this.label = obj.label ? obj.label : '';
     }

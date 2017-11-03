@@ -3,7 +3,7 @@
 
 <form id="toolbox">
     <mat-form-field>
-        <input matInput type="search" incremental name="search" [(ngModel)]="searchQuery" (search)="search()"
+        <input matInput type="search" incremental name="search" [(ngModel)]="searchQuery" (keyup)="search()"
                placeholder="Search...">
     </mat-form-field>
 
@@ -32,19 +32,19 @@
             </button>
         </p>
 
-        <div *ngIf="editMode">
-            <h4>{{singleSelectedObject ? singleSelectedObject.constructor.name: 'Floor'}} Properties</h4>
-            <mat-form-field *ngIf="floor && !singleSelectedObject">
-                <input matInput name="floorname" [(ngModel)]="floor.label" placeholder="Floor Name">
-            </mat-form-field>
-            <mat-form-field *ngIf="singleSelectedObject">
-                <input matInput name="objname" [(ngModel)]="singleSelectedObject.label" placeholder="Object Name">
-            </mat-form-field>
-        </div>
+        <h4>{{(singleSelectedObject | type) || 'Floor'}} Properties</h4>
+        <mat-form-field *ngIf="floor && !singleSelectedObject">
+            <input matInput name="floorname" [(ngModel)]="floor.label" placeholder="Floor Name">
+        </mat-form-field>
+        <mat-form-field *ngIf="singleSelectedObject">
+            <input matInput name="objname" [(ngModel)]="singleSelectedObject.label" placeholder="Object Name">
+            <input *ngIf="singleSelectedObject | type:'Stairs'"
+                   matInput name="stairstargets" [(ngModel)]="singleSelectedObject.label" placeholder="Object Name">
+        </mat-form-field>
 
         <p>
-            Set a blueprint background image:<br> <input type="file" name="bgimg" (change)="backgroundImage($event)"
-                                                         accept="image/*">
+            Set a blueprint background image:<br>
+            <input type="file" name="bgimg" (change)="backgroundImage($event)" accept="image/*">
         </p>
         <div style="padding-top: 20px">
             <button mat-raised-button (click)="saveCurrentMap()" color="accent">
