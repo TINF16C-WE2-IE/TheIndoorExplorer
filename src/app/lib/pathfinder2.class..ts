@@ -120,7 +120,7 @@ export class Pathfinder2 {
         return intersects;
     }
 
-    private createNodesForWallEnd(p1: Point, p2: Point, radius: number, walls: Line[]): PathNode[] {
+    private createNodesForWallEnd(p1: Point, p2: Point, radius: number, walls: Line[], numResolution: number): PathNode[] {
 
         const nodes: PathNode[] = [];
 
@@ -141,15 +141,19 @@ export class Pathfinder2 {
 
             let nextAng = neighbours[(n + 1) % (neighbours.length)].a;
             if (n === neighbours.length - 1) nextAng += Math.PI * 2;
-            let midAng = nextAng + ((neighbours[n].a - nextAng) / 2);
 
-            // mirror the angle if the next neighbour has exactly the same angle!
-            if (midAng === neighbours[n].a) {
-                midAng = (midAng + Math.PI) % Math.PI * 2;
+
+            for (let b = 0; b < numResolution; b++) {
+                let midAng = nextAng + ((neighbours[n].a - nextAng) / (numResolution + 1)) * (b + 1);
+
+                // mirror the angle if the next neighbour has exactly the same angle!
+                if (midAng === neighbours[n].a) {
+                    midAng = (midAng + Math.PI) % Math.PI * 2;
+                }
+
+                const midV = new Vector(Math.cos(midAng) * radius, Math.sin(midAng) * radius);
+                nodes.push(new PathNode(p1.x + midV.x, p1.y + midV.y));
             }
-
-            const midV = new Vector(Math.cos(midAng) * radius, Math.sin(midAng) * radius);
-            nodes.push(new PathNode(p1.x + midV.x, p1.y + midV.y));
         }
 
         return nodes;
@@ -157,7 +161,7 @@ export class Pathfinder2 {
 
 
     // advanced approach: more complex in preparation, but less nodes, so cheaper for path finding.
-    public createLinkedGraph(walls: Line[], radius: number, start: Point = null, end: Point = null): PathNode[] {
+    public createLinkedGraph(walls: Line[], radius: number, resolution: number = 2, start: Point = null, end: Point = null): PathNode[] {
 
 
         // total nodes list
@@ -174,12 +178,12 @@ export class Pathfinder2 {
         for (const w of walls) {
 
             if (chckdP.find(el => el.equals(w.p1)) === undefined) {
-                nodes.push(...this.createNodesForWallEnd(w.p1, w.p2, radius, walls));
+                nodes.push(...this.createNodesForWallEnd(w.p1, w.p2, radius, walls, resolution));
                 chckdP.push(w.p1);
             }
 
             if (chckdP.find(el => el.equals(w.p2)) === undefined) {
-                nodes.push(...this.createNodesForWallEnd(w.p2, w.p1, radius, walls));
+                nodes.push(...this.createNodesForWallEnd(w.p2, w.p1, radius, walls, resolution));
                 chckdP.push(w.p2);
             }
         }

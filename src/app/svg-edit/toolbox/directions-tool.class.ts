@@ -60,7 +60,7 @@ export class DirectionsTool extends Tool {
         // create nodes graph
         const nodes = this.pfinder.createLinkedGraph(
             [...this.modelSvc.currentFloor.walls]
-            , 15, start, end);
+            , 45, 1, start, end);
 
         // find path in this node system
         const path = this.pfinder.findPathFromTo(nodes,
