@@ -61,9 +61,17 @@ export class Polygon {
         let v2 = cpy2.vertex;
 
         // at starting point, we are outside the second polygon?
-        let is_entry = !this.isBeginningPointInsideOther(cpy1, cpy2);
+        let is_entry = this.isBeginningPointInsideOther(cpy1, cpy2);
         let intersectionPoints: {p: Point, dist: number, ref: VertexRef}[] = [];        // intersections per line on v1
-        const totalIntersectionPoints: Point[] = [];   // ALL intersections, to prevent multiple intersections on the same point
+
+        // ALL intersections, to prevent multiple intersections on the same point
+        const totalIntersectionPoints: {p: Point, p1Vertex: boolean, p2Vertex: boolean}[] = [];
+
+
+        let weak = false; // weak mode is the case, if v1 is directly on a intersection point, which is a vertex of p1
+
+
+        console.log('is next point an entry? ', is_entry);
 
         do {
             l1 = new Line(v1.point, v1.next.point);
@@ -81,14 +89,15 @@ export class Polygon {
 
                 // avoid creating new intersection points on the same spot.
                 if (intersection !== null && (totalIntersectionPoints !== null ? (
-                        totalIntersectionPoints.every(el => !el.equals(intersection))
+                        totalIntersectionPoints.every(el => !el.p.equals(intersection))
                     ) : true)) {
                     intersectedAtLeastOnce = true;
                     intersectionPoints.push({p: intersection, dist:
                         Math.sqrt((intersection.x - v1.point.x) * (intersection.x - v1.point.x)
                           + (intersection.y - v1.point.y) * (intersection.y - v1.point.y)), ref: v2});
-                } else {
+                } else if (intersection === null) {
                     // lines have the same direction.
+
                 }
 
                 v2 = v2.next;
@@ -102,7 +111,7 @@ export class Polygon {
                 }
             }
 
-            let weak = false;
+            weak = false;
 
             if (nearest.p !== null) {
 
@@ -110,22 +119,19 @@ export class Polygon {
                 // to be able to split both there.
                 // but be AWARE! specifically for endpoints we either have the split only on v1 or only on v2
 
-                let p1SegmentPoint = false;
-                let p2SegmentPoint = false;
-
                 console.log('our intersection is', nearest.p);
-                totalIntersectionPoints.push(nearest.p);
+                totalIntersectionPoints.push({p: nearest.p, p1Vertex: false, p2Vertex: false});
 
                 let ref1 = v1.next;
                 if (v1.point.equals(nearest.p)) {
                     console.log('v1 has the intersection point as vertex ref.');
-                    p1SegmentPoint = true;
+                    totalIntersectionPoints[totalIntersectionPoints.length - 1].p1Vertex = true;
                     ref1 = v1;
                     weak = true;
                 }
                 if (v1.next.point.equals(nearest.p)) {
                     console.log('v1 has the intersection point as the next vertex ref.');
-                    p1SegmentPoint = true;
+                    totalIntersectionPoints[totalIntersectionPoints.length - 1].p1Vertex = true;
                     ref1 = v1.next;
                 }
 
@@ -135,39 +141,42 @@ export class Polygon {
                     console.log('checking on v2: ', v2.point);
                     if (nearest.p.equals(v2.point)) {
                         console.log('v2 has the intersection point as a vertex ref.');
-                        p2SegmentPoint = true;
+                        totalIntersectionPoints[totalIntersectionPoints.length - 1].p2Vertex = true;
                     }
                     v2 = v2.next;
-                } while (!v2.point.equals(rref2) && !p2SegmentPoint);
+                } while (!v2.point.equals(rref2) && !totalIntersectionPoints[totalIntersectionPoints.length - 1].p2Vertex);
 
-                console.log('*** after checking ***', p1SegmentPoint, p2SegmentPoint, v1.point, v2.point, rref2, nearest.ref);
+                console.log('*** after checking ***', totalIntersectionPoints[totalIntersectionPoints.length - 1].p1Vertex,
+                    totalIntersectionPoints[totalIntersectionPoints.length - 1].p2Vertex, v1.point, v2.point, rref2, nearest.ref);
 
-                if (!p1SegmentPoint) {
+                if (!totalIntersectionPoints[totalIntersectionPoints.length - 1].p1Vertex) {
                     console.log('split v1!');
                     ref1 = new VertexRef(nearest.p, v1.next, v1);
                     v1.next.previous = ref1;
                     v1.next = ref1;
                 }
                 let ref2 = v2.previous;
-                if (!p2SegmentPoint) {
+                if (!totalIntersectionPoints[totalIntersectionPoints.length - 1].p2Vertex) {
                     console.log('split v2!');
                     ref2 = new VertexRef(nearest.p, nearest.ref.next, nearest.ref);
                     nearest.ref.next.previous = ref2;
                     nearest.ref.next = ref2;
                 }
 
-                ref1.data = (p2SegmentPoint ?  v2.previous : v2.next); // save neighbour data
+                ref1.data = (totalIntersectionPoints[totalIntersectionPoints.length - 1].p2Vertex ?
+                              v2.previous : v2.next); // save neighbour data
                 ref2.data = ref1;
                 console.log('connect both! (ref1, ref2, ref1-data, ref2-data)', ref1.point, ref2.point, ref1.data.point, ref2.data.point);
                 ref1.entry_exit = is_entry; // enter second polygon
                 ref2.entry_exit = is_entry;
-                is_entry = !is_entry;         // this was before the 2 lines above!!!! EDIT!!!
+                console.log('point is entry?: ', ref1.point, ref2.point, is_entry);
+                is_entry = !is_entry;
             }
 
             if (!weak) {
                 v1 = v1.next;
             }
-        } while (v1 !== cpy1.vertex);
+        } while (v1 !== cpy1.vertex || weak);
 
         console.log('outside of routine');
 
@@ -186,22 +195,33 @@ export class Polygon {
         const resultPolygon = new Polygon(first);
         v1 = v1.next;
 
-        console.log(first, v1);
+        console.log('first polygon point', first.point, v1);
+        let debugCounter = 0;
+
+        console.log('is next point an entry? ', is_entry);
+
+        // we can determine the outside/inside polygon question with the number of vertices touched?
+        // HAS TO BE FALSE!
+        is_entry = !is_entry;
+
+        console.log('check is now is_entry?', is_entry);
 
         do {
             const ref = new VertexRef(v1.point);
             ref.previous = resultPolygon.vertex;
             ref.previous.next = ref;
             resultPolygon.vertex = ref;
-            if (v1.entry_exit !== null && v1.data !== null) {
+            console.log('polygon on point: ', resultPolygon.vertex.point, v1);
+            if (v1.entry_exit !== null && v1.data !== null && v1.entry_exit !== is_entry) {
                 console.log('switch sides.', is_entry);
                 v1 = v1.data;
+                console.log('v1 is now.', v1);
                 is_entry = !is_entry;
             }
-            console.log('polygon on point: ', resultPolygon.vertex.point, 'next would be', v1.next);
+            debugCounter++;
 
             v1 = v1.next;
-        } while (v1 !== this.vertex);
+        } while (!v1.point.equals(first.point) && debugCounter < 20);
 
         // connect one last time
         resultPolygon.vertex.next = first;
