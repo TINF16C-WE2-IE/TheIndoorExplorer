@@ -1,3 +1,4 @@
+import { Floor } from './../../model/floor.class';
 import { LinePath } from './../../lib/line-path.class';
 import { ModelService } from './../../svc/model.service';
 import { Mouse } from './../mouse.class';
@@ -53,7 +54,7 @@ export class DirectionsTool extends Tool {
         // TS has no way of checking for an interface :(
         if (this.isSelectable(selected)) {
             if (this.modelSvc.selectedObjects.length) {
-                this.generatePath(this.modelSvc.selectedObjects[0].center, selected.center);
+                this.generatePath(this.modelSvc.selectedObjects[0].center, selected.center, this.modelSvc.currentFloor);
                 this.modelSvc.selectedObjects = [];
             } else {
                 this.modelSvc.selectedObjects.push(selected);
@@ -73,18 +74,42 @@ export class DirectionsTool extends Tool {
         }
     }
 
-    generatePath(start: Point, end: Point) {
+    // finds the path globally through the whole building from start (floor1) to end (floor2)
+    public generateGlobalPath(point1: Point, floorIndex1: number, point2: Point, floorIndex2: number): void {
+        // TODO:
+        console.log('global path is todo!');
+    }
 
-        const cpy = Object.assign(this.modelSvc.currentFloor.floorGraph);
-        this.pfinder.insertPointsToFloorGraph([start, end], cpy, this.modelSvc.currentFloor.walls);
+    // finds path from start to end on the given floor
+    public generatePath(start: Point, end: Point, floor: Floor): void {
+
+        // work with a copy of the floorgraph.
+        const cpy = Object.assign(floor.floorGraph);
+
+        // optionally add start and end, if they are not already included
+        const additionalPoints = [];
+        const tolerance = 40;
+        if (  [...floor.stairways.map(ele => ele.center),
+              ...floor.portals.map(ele => ele.center)].find(
+                  el => Math.abs(Math.sqrt(el.x * el.x + el.y * el.y)) - Math.sqrt(start.x * start.x + start.y * start.y) < tolerance
+              ) === undefined) {
+              additionalPoints.push(start);
+        }
+        if (  [...floor.stairways.map(ele => ele.center),
+              ...floor.portals.map(ele => ele.center)].find(
+                  el => Math.abs(Math.sqrt(el.x * el.x + el.y * el.y)) - Math.sqrt(end.x * end.x + end.y * end.y) < tolerance
+              ) === undefined) {
+              additionalPoints.push(end);
+        }
+        this.pfinder.insertPointsToFloorGraph([start, end], cpy, floor.walls);
 
         // find path in this node system
         const path = this.pfinder.findPathFromTo(cpy.nodes,
             cpy.nodes.find(el => el.x === start.x && el.y === start.y),
             cpy.nodes.find(el => el.x === end.x && el.y === end.y));
-        this.modelSvc.currentFloor.floorGraph.path = new LinePath();
+        floor.floorGraph.path = new LinePath();
         for (let i = 1; i < path.length; i++) {
-            this.modelSvc.currentFloor.floorGraph.path.path.push(new Line(
+            floor.floorGraph.path.path.push(new Line(
                 new Point(path[i].x, path[i].y, false),
                 new Point(path[i - 1].x, path[i - 1].y, false)
             ));
