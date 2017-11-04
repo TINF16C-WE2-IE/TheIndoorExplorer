@@ -1,3 +1,4 @@
+import { LinePath } from './../lib/line-path.class';
 import { Floor } from './../model/floor.class';
 import { Selectable } from './../model/selectable.interface';
 import { Wall } from './../model/wall.class';
@@ -49,8 +50,8 @@ export class SvgEditComponent implements OnInit {
         return null;
     }
 
-    get movingPath(): Line[] {
-        return this.modelSvc.movingPath;
+    get movingPath(): LinePath {
+        return this.modelSvc.currentFloor.floorGraph.path;
     }
 
     get selectedObjects(): Selectable[] {
@@ -84,14 +85,19 @@ export class SvgEditComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.route.params.subscribe(
-            params => {
-                this.modelSvc.loadMap(Number.parseInt(params['mapId']));
-            }
-        );
 
         this.mouse = new Mouse(this.modelSvc);
         this.selectTool('Directions');
+
+        this.route.params.subscribe(
+            params => {
+                this.modelSvc.loadMap(Number.parseInt(params['mapId']),
+                    () => {
+                        (<DirectionsTool>this.mouse.tool).onMapLoaded();
+                    }
+                );
+            }
+        );
     }
 
     // generatePath moved to directions-tool

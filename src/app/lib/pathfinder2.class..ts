@@ -1,3 +1,4 @@
+import { FloorGraph } from './floor-graph.class';
 import { Vector } from './vector.class';
 import { VertexRef } from './vertex-ref.class';
 import { Polygon } from './polygon.class';
@@ -143,8 +144,9 @@ export class Pathfinder2 {
             if (n === neighbours.length - 1) nextAng += Math.PI * 2;
 
 
-            for (let b = 0; b < numResolution; b++) {
-                let midAng = nextAng + ((neighbours[n].a - nextAng) / (numResolution + 1)) * (b + 1);
+            // we only need this pathnode, if the max angle over it is > 180°
+            if (Math.abs(neighbours[n].a - nextAng) > Math.PI) {
+                let midAng = nextAng + ((neighbours[n].a - nextAng) / 2);
 
                 // mirror the angle if the next neighbour has exactly the same angle!
                 if (midAng === neighbours[n].a) {
@@ -161,12 +163,12 @@ export class Pathfinder2 {
 
 
     // advanced approach: more complex in preparation, but less nodes, so cheaper for path finding.
-    public createLinkedGraph(walls: Line[], radius: number, resolution: number = 2, start: Point = null, end: Point = null): PathNode[] {
+    public createLinkedFloorGraph(walls: Line[], radius: number, resolution: number = 2): FloorGraph {
 
 
         // total nodes list
         const nodes: PathNode[] = [];
-        this.connections = [];
+        this.connections = [];      // not needed anymore. DEPRECTAED. only for debug of the last calculatet floorgraph.
 
         // checked-links list, which contains checked links, but theese links were not worth it
         const chckd: Line[] = [];
@@ -228,45 +230,31 @@ export class Pathfinder2 {
             }
         }
 
+        // just return the basic graph. we didnt calculate the path yet.
+        return new FloorGraph(nodes, null);
+    }
 
-        // at last but not least, connect the start point to visible nodes!
-        if (start !== null && start !== undefined) {
-            if (start !== undefined && start !== null) {
-                const startn = new PathNode(start.x, start.y);
-                nodes.push(startn);
-                for (const n of nodes) {
+    // inserts start/end/stair points or something to the floor graph.
+    public insertPointsToFloorGraph(points: Point[], floorGraph: FloorGraph, walls: Line[]): void {
 
-                // if this link doesnt intersect any "polygon-borders" (connections)
-                if (!this.checkIntersectionOfLineWithLines(
-                        start.x, start.y, n.x, n.y, walls, 0.01)
-                ) {
+        // connect every point to visible nodes!
+        for (const p of points) {
+            if (p !== null && p !== undefined) {
+                const pn = new PathNode(p.x, p.y);
+                floorGraph.nodes.push(pn);
+                for (const n of floorGraph.nodes) {
 
-                        // we need this link!
-                        this.linkNodes(startn, n);
-                        this.connections.push(new Line(start, new Point(n.x, n.y, false)));
+                    // if this link doesnt intersect any "polygon-borders" (connections)
+                    if (!this.checkIntersectionOfLineWithLines(
+                            pn.x, pn.y, n.x, n.y, walls, 0.00001)
+                    ) {
+
+                            // we need this link!
+                            this.linkNodes(pn, n);
+                        }
                     }
-                }
             }
         }
-
-        // also connect endpoint
-        if (end !== undefined && end !== null) {
-            const endn = new PathNode(end.x, end.y);
-            nodes.push(endn);
-                for (const n of nodes) {
-
-                // if this link doesnt intersect any "polygon-borders" (connections)
-                if (!this.checkIntersectionOfLineWithLines(
-                        end.x, end.y, n.x, n.y, walls, 0.01)
-                ) {
-                        // we need this link!
-                        this.linkNodes(endn, n);
-                        this.connections.push(new Line(end, new Point(n.x, n.y, false)));
-                    }
-                }
-        }
-
-        return nodes;
     }
 
     public linkNodes (nn1: PathNode, nn2: PathNode): void {

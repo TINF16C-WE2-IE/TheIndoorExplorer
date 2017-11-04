@@ -1,3 +1,5 @@
+import { LinePath } from './../lib/line-path.class';
+import { FloorGraph } from './../lib/floor-graph.class';
 import { Floor } from './../model/floor.class';
 import { Selectable } from './../model/selectable.interface';
 import { Point } from './../model/point.class';
@@ -15,7 +17,6 @@ export class ModelService {
     public currentMapId: number;
     public currentFloorId: number;
     public selectedObjects: Selectable[] = [];
-    public movingPath: Line[] = [];
     public userInfo: {id: number, username: string};
 
     public viewportSize: {x: number, y: number} = {x: 500, y: 500};
@@ -36,8 +37,7 @@ export class ModelService {
     public get currentFloor() {
         if (this.currentMap && this.currentMap.floors) {
             return this.currentMap.floors[this.currentFloorId];
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -78,7 +78,7 @@ export class ModelService {
         );
     }
 
-    public loadMap(mapId: number) {
+    public loadMap(mapId: number, callback: () => void = () => {}) {
         if (mapId === -1) {
             const newMap = new Map({
                 id: -1,
@@ -91,16 +91,17 @@ export class ModelService {
             newMap.createFloor();
             newMap.fitToViewport();
             this.currentMap = newMap;
-        }
-        else {
-            this.rqstSvc.get(RequestService.LIST_MAP_DETAILS, {'mapid': mapId})
-                .subscribe(resp => {
-                    console.log('got response map details: ', resp);
+            callback();
+        } else {
+            this.rqstSvc.get(RequestService.LIST_MAP_DETAILS, {'mapid': mapId}).subscribe(
+                resp => {
                     if (resp !== null) {
                         this.currentMap = new Map(resp, this);
                         this.currentMap.fitToViewport();
+                        callback();
                     }
-                });
+                }
+            );
         }
     }
 

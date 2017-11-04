@@ -1,3 +1,4 @@
+import { FloorGraph } from './../lib/floor-graph.class';
 import { Portal } from './portal.class';
 import { Wall } from './wall.class';
 import { Point } from './point.class';
@@ -11,6 +12,7 @@ export class Floor {
     public walls: Wall[] = [];
     public stairways: Stairs[] = [];
     public searchResults: Selectable[] = [];
+    public floorGraph: FloorGraph = new FloorGraph();
     public label = '';
 
     constructor(obj: {
@@ -39,6 +41,7 @@ export class Floor {
                 stairs_obj.length, stairs_obj.canEnter, stairs_obj.canLeave));
         }
         this.label = obj.label ? obj.label : '';
+        this.floorGraph = new FloorGraph();
     }
 
     public getAllPoints(): Point[] {
