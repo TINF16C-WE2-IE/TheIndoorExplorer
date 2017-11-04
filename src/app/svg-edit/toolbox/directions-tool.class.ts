@@ -55,7 +55,11 @@ export class DirectionsTool extends Tool {
         // TS has no way of checking for an interface :(
         if (this.isSelectable(selected)) {
             if (this.modelSvc.selectedObjects.length) {
-                this.generatePath(this.modelSvc.selectedObjects[0].center, selected.center, this.modelSvc.currentFloor);
+                // DEPRECATED. but maybe we need this still here for debugging or testing
+                // this.pfinder.generatePath(this.modelSvc.selectedObjects[0].center, selected.center, this.modelSvc.currentFloor);
+
+                this.pfinder.generateGlobalPath(this.modelSvc.selectedObjects[0].center,
+                        this.modelSvc.currentFloorId, selected.center, this.modelSvc.currentFloorId, this.modelSvc.currentMap);
                 this.modelSvc.selectedObjects = [];
             } else {
                 this.modelSvc.selectedObjects.push(selected);
@@ -66,7 +70,6 @@ export class DirectionsTool extends Tool {
     }
 
     public onMapLoaded() {
-        console.log('would generate nodes on', this.modelSvc.currentMap);
 
         // create the basic nodegraph on each floor, and insert the static elevators and stairs
         for (const f of this.modelSvc.currentMap.floors) {
@@ -74,101 +77,6 @@ export class DirectionsTool extends Tool {
             this.pfinder.insertPointsToFloorGraph(f.stairways.map(el => el.center), f.floorGraph, f.walls);
         }
 
-        this.generateStairGraphOnCurrentMap();
-    }
-
-
-    public generateStairGraphOnCurrentMap() {
-
-        const totalNodes: StairNode[] = [];
-        const chckd = [];
-
-        for (const f of this.modelSvc.currentMap.floors) {
-
-            const nodes: StairNode[] = [];
-            for (const s1 of f.stairways) {
-                nodes.push(new StairNode(s1));
-            }
-
-
-            for (const n1 of nodes) {
-                for (const n2 of nodes) {
-                    this.generatePath(n1.stairs.center, n2.stairs.center, f);
-                    if (f.floorGraph.path.path.length > 0) {
-                        const length = f.floorGraph.path.getLength();
-                        n1.links.push(n2);
-                        n1.costs.push(length);
-                        n2.links.push(n1);
-                        n2.costs.push(length);
-                    }
-                }
-            }
-
-            totalNodes.push(...nodes);
-        }
-
-
-        // in the second part, we just link the stairs of individual floors together!
-        // TODO
-    }
-
-    // finds the path globally through the whole building from start (floor1) to end (floor2)
-    public generateGlobalPath(point1: Point, floorId1: number, point2: Point, floorId2: number): void {
-        // TODO:
-        console.log('global path is todo!');
-
-        // pre-check any easy conditions.
-        if (floorId1 === floorId2) {
-            this.generatePath(point1, point2, this.modelSvc.currentMap.floors[floorId1]);
-        }
-
-        // if we found the path already, all good.
-        if (this.floor.floorGraph.path.path.length > 0) {
-              return;
-        } else {
-
-            // now its getting more complex
-            // use the stairgraph of the map!
-            // TODO
-        }
-    }
-
-    // finds path from start to end on the given floor
-    public generatePath(start: Point, end: Point, floor: Floor): void {
-
-        // work with a copy of the floorgraph.
-        const cpy = Object.assign(floor.floorGraph);
-
-        // optionally add start and end, if they are not already included
-        const additionalPoints = [];
-        const tolerance = 40;
-        if (  [...floor.stairways.map(ele => ele.center),
-              ...floor.portals.map(ele => ele.center)].find(
-                  el => Math.abs(Math.sqrt(el.x * el.x + el.y * el.y)) - Math.sqrt(start.x * start.x + start.y * start.y) < tolerance
-              ) === undefined) {
-              additionalPoints.push(start);
-        }
-        if (  [...floor.stairways.map(ele => ele.center),
-              ...floor.portals.map(ele => ele.center)].find(
-                  el => Math.abs(Math.sqrt(el.x * el.x + el.y * el.y)) - Math.sqrt(end.x * end.x + end.y * end.y) < tolerance
-              ) === undefined) {
-              additionalPoints.push(end);
-        }
-        this.pfinder.insertPointsToFloorGraph([start, end], cpy, floor.walls);
-
-        // find path in this node system
-        const path = this.pfinder.findPathFromTo(cpy.nodes,
-            cpy.nodes.find(el => el.x === start.x && el.y === start.y),
-            cpy.nodes.find(el => el.x === end.x && el.y === end.y));
-
-       floor.floorGraph.path = new LinePath();
-        if (path !== null) {
-            for (let i = 1; i < path.length; i++) {
-                floor.floorGraph.path.path.push(new Line(
-                    new Point(path[i].x, path[i].y, false),
-                    new Point(path[i - 1].x, path[i - 1].y, false)
-                ));
-            }
-        }
+        this.pfinder.generateStairGraphOnMap(this.modelSvc.currentMap);
     }
 }

@@ -1,3 +1,8 @@
+import { Stairs } from './../model/stairs.class';
+import { Map } from './../model/map.class';
+import { StairNode } from './stair-node.class';
+import { Floor } from './../model/floor.class';
+import { LinePath } from './line-path.class';
 import { FloorGraph } from './floor-graph.class';
 import { Vector } from './vector.class';
 import { VertexRef } from './vertex-ref.class';
@@ -172,6 +177,16 @@ export class Pathfinder2 {
     }
 
 
+    public linkNodes (nn1: PathNode, nn2: PathNode): void {
+        const dist = Math.sqrt((nn1.x - nn2.x) * (nn1.x - nn2.x) + (nn1.y - nn2.y) * (nn1.y - nn2.y));
+        nn1.addLinkTo(nn2, dist);
+        nn2.addLinkTo(nn1, dist);
+    }
+
+
+
+    // ############################## Floor Graph #########################################
+
     // advanced approach: more complex in preparation, but less nodes, so cheaper for path finding.
     public createLinkedFloorGraph(walls: Line[], radius: number, resolution: number = 2): FloorGraph {
 
@@ -267,9 +282,287 @@ export class Pathfinder2 {
         }
     }
 
-    public linkNodes (nn1: PathNode, nn2: PathNode): void {
-        const dist = Math.sqrt((nn1.x - nn2.x) * (nn1.x - nn2.x) + (nn1.y - nn2.y) * (nn1.y - nn2.y));
-        nn1.addLinkTo(nn2, dist);
-        nn2.addLinkTo(nn1, dist);
+    // finds path from start to end on the given floor
+    public generatePath(start: Point, end: Point, floor: Floor, considerInsertingPoints: boolean = true): void {
+
+        // work with a copy of the floorgraph.
+        const cpy = Object.assign(floor.floorGraph);
+
+        if (considerInsertingPoints) {
+            // optionally add start and end, if they are not already included
+            const additionalPoints = [];
+            if (  [...floor.stairways.map(ele => ele.center),
+                  ...floor.portals.map(ele => ele.center)].find(
+                      el => el.x === start.x && el.y === start.y
+                  ) === undefined) {
+                  additionalPoints.push(start);
+            }
+            if (  [...floor.stairways.map(ele => ele.center),
+                  ...floor.portals.map(ele => ele.center)].find(
+                      el => el.x === end.x && el.y === end.y
+                  ) === undefined) {
+                  additionalPoints.push(end);
+            }
+            this.insertPointsToFloorGraph([start, end], cpy, floor.walls);
+        }
+
+        // find path in this node system
+        const path = this.findPathFromTo(cpy.nodes,
+            cpy.nodes.find(el => el.x === start.x && el.y === start.y),
+            cpy.nodes.find(el => el.x === end.x && el.y === end.y));
+
+        floor.floorGraph.path = new LinePath();
+        if (path !== null) {
+            for (let i = 1; i < path.length; i++) {
+                floor.floorGraph.path.path.push(new Line(
+                    new Point(path[i].x, path[i].y, false),
+                    new Point(path[i - 1].x, path[i - 1].y, false)
+                ));
+            }
+        }
+    }
+
+
+
+
+
+    // ############################## Stair Graph #########################################
+    public generateStairGraphOnMap(map: Map) {
+
+        const totalNodes: StairNode[] = [];
+        const chckdN: {p1: Point, p2: Point}[] = [];
+
+        // generate stair-linking for each floor individually
+        for (const f of map.floors) {
+
+            const nodes: StairNode[] = [];
+            for (const s1 of f.stairways) {
+                nodes.push(new StairNode(s1, map.floors.indexOf(f)));
+            }
+
+            for (const n1 of nodes) {
+                for (const n2 of nodes) {
+
+                    if (chckdN.find(el =>
+                          ((el.p1.x === n1.stairs.center.x && el.p1.y === n1.stairs.center.y)
+                          && (el.p2.x === n2.stairs.center.x && el.p2.y === n2.stairs.center.y))
+                          || ((el.p1.x === n2.stairs.center.x && el.p1.y === n2.stairs.center.y)
+                          && (el.p2.x === n1.stairs.center.x && el.p2.y === n1.stairs.center.y))
+                        ) === undefined) {
+
+                        this.generatePath(n1.stairs.center, n2.stairs.center, f);
+                        if (f.floorGraph.path.path.length > 0) {
+                            const length = f.floorGraph.path.getLength();
+                            n1.links.push(n2);
+                            n1.costs.push(length);
+                            n2.links.push(n1);
+                            n2.costs.push(length);
+                        }
+
+                        chckdN.push({p1: n1.stairs.center, p2: n2.stairs.center});
+                    }
+                }
+            }
+
+            totalNodes.push(...nodes);
+        }
+
+
+        // in the second part, we just link the stairs of individual floors together!
+        for (const n1 of totalNodes) {
+            for (const n2 of totalNodes) {
+                if (chckdN.find(el =>
+                          ((el.p1.x === n1.stairs.center.x && el.p1.y === n1.stairs.center.y)
+                          && (el.p2.x === n2.stairs.center.x && el.p2.y === n2.stairs.center.y))
+                          || ((el.p1.x === n2.stairs.center.x && el.p1.y === n2.stairs.center.y)
+                          && (el.p2.x === n1.stairs.center.x && el.p2.y === n1.stairs.center.y))
+                      ) === undefined) {
+
+                      // we need to check, if one stair has the other as target
+                      if (n1.stairs.targets.find(
+                              el => n2.stairs.targets.map(elm => elm.stairsId).indexOf(el.stairsId) >= 0
+                          ) !== undefined
+                          || n2.stairs.targets.find(
+                              el => n1.stairs.targets.map(elm => elm.stairsId).indexOf(el.stairsId) >= 0
+                          ) !== undefined) {
+
+                          // pythagoras value for this 3d length :D
+                          const hDist = Math.sqrt(
+                              (n2.stairs.center.x - n1.stairs.center.x) ** 2 + (n2.stairs.center.y - n1.stairs.center.y) ** 2
+                          );
+                          const vDist = n2.floorLevel - n1.floorLevel;
+                          const length = Math.sqrt(hDist ** 2 + vDist ** 2);
+
+                          n1.links.push(n2);
+                          n1.costs.push(length);
+                          n2.links.push(n1);
+                          n2.costs.push(length);
+                      }
+
+                      chckdN.push({p1: n1.stairs.center, p2: n2.stairs.center});
+                }
+            }
+        }
+
+        map.stairGraph = totalNodes;
+    }
+
+    // finds the path globally through the whole building from start (floor1) to end (floor2)
+    public generateGlobalPath(point1: Point, floorId1: number, point2: Point, floorId2: number,
+                                currentMap: Map): void {
+
+        // pre-check any easy conditions.
+        if (floorId1 === floorId2) {
+            this.generatePath(point1, point2, currentMap.floors[floorId1]);
+        }
+
+        // if we found the path already, all good.
+        if (currentMap.floors[floorId1].floorGraph.path.path.length > 0) {
+              return;
+        } else {
+
+            // create a copy of the stair graph. and add start and end.
+            const cpy: StairNode[] = Object.assign(currentMap.stairGraph);
+            const stnt = new StairNode(new Stairs(-1, 'start point', new Point(point1.x + 10, point1.y + 10, false),
+                                        new Point(point1.x - 10, point1.y - 10, false)), floorId1);
+            const ndnt = new StairNode(new Stairs(-2, 'end point', new Point(point2.x + 10, point2.y + 10, false),
+                                        new Point(point2.x - 10, point2.y - 10, false)), floorId2);
+
+            // connect the start and end with other stairs on the same floor
+            for (const st of cpy) {
+                if (st.floorLevel === floorId1) {
+                    this.generatePath(point1, st.stairs.center, currentMap.floors[floorId1]);
+                    if (currentMap.floors[floorId1].floorGraph.path.path.length > 0) {
+                        const length = currentMap.floors[floorId1].floorGraph.path.getLength();
+                        st.links.push(stnt);
+                        st.costs.push(length);
+                        stnt.links.push(st);
+                        stnt.costs.push(length);
+                    }
+                }
+
+                if (st.floorLevel === floorId2) {
+                    this.generatePath(point2, st.stairs.center, currentMap.floors[floorId2]);
+                    if (currentMap.floors[floorId2].floorGraph.path.path.length > 0) {
+                        const length = currentMap.floors[floorId1].floorGraph.path.getLength();
+                        st.links.push(ndnt);
+                        st.costs.push(length);
+                        ndnt.links.push(st);
+                        ndnt.costs.push(length);
+                    }
+                }
+            }
+            cpy.push(stnt, ndnt);
+
+
+            // now search the shortest global path from start to end
+            // this is kind of funny ;)
+            const stairPath = this.findStairPathFromTo(cpy, stnt, ndnt);
+            console.log('calculated stairPath', stairPath);
+
+            // now go through the global stairpath and just calculate the paths between the stairs on the same floor.
+            // its already ensured, that theese stairs have a connection on the same floor. so just calculate straightforward.
+            if (stairPath !== null && stairPath.length > 0) {
+                let curFloor = floorId1;
+                for (let i = 1; i < stairPath.length; i++) {
+                    if (stairPath[i].floorLevel === curFloor) {
+                        this.generatePath(stairPath[i - 1].stairs.center, stairPath[i].stairs.center, currentMap.floors[floorId1]);
+                    } else {
+                        curFloor = stairPath[i].floorLevel;
+                    }
+                }
+            } else {
+                console.log('this path is not possible!');
+            }
+        }
+    }
+
+    public findStairPathFromTo(nodes: StairNode[], from: StairNode, to: StairNode): StairNode[] {
+
+        if (from === to || nodes.indexOf(from) === nodes.indexOf(to)) return [from];
+
+        // open/closed nodes for pathfinding
+        const openList = [];
+        const closedList = [];
+
+
+        // assign initial costs for nodes, and create their parents for backtracking the best path.
+        const costs = new Array();
+        const parents = new Array();
+        for (let n = 0; n < nodes.length; n++) {
+            costs.push( nodes[n] === from ? 0 : Number.MAX_VALUE);
+            parents.push(nodes[n]);
+        }
+        closedList.push(from);
+
+        console.log('calculating stairpath now!', nodes, from, to, openList, closedList);
+        return this.calculateStairPath(nodes, costs, parents, openList, closedList, to);
+    }
+
+    // returns null, if this path is not possible
+    private calculateStairPath(nodes: StairNode[], costs: number[], parents: StairNode[],
+                            openList: StairNode[], closedList: StairNode[], end: StairNode): StairNode[] {
+
+        let min = Number.MAX_VALUE;
+        let curCost = min;
+        let foundNewNode = false;
+        let minClNode = null;
+        let minLinkIndex = -1;
+        for (const cl of closedList) {
+            for (let j = 0; j < cl.links.length; j++) {
+
+                // calculate cost
+                curCost = costs[nodes.indexOf(cl)] + cl.costs[j];
+
+                // take over the minimal cost
+                if (curCost < costs[nodes.indexOf(cl.links[j])]) {
+                    costs[nodes.indexOf(cl.links[j])] = curCost;
+                    parents[nodes.indexOf(cl.links[j])] = cl;
+                }
+
+                if (closedList.indexOf(cl.links[j]) < 0) {
+
+                    // add node to openlist, if necessary
+                    if (openList.indexOf(cl.links[j]) < 0) {
+
+                    foundNewNode = true;
+                        openList.push(cl.links[j]);
+                    }
+
+                    // from all the open links, select the best link with minimal cost
+                    if (curCost < min) {
+                        min = curCost;
+                        minClNode = cl;
+                        minLinkIndex = j;
+                    }
+                } else {
+                    // already in closed list
+                }
+            }
+        }
+
+        // cant generate path.
+        if (!foundNewNode) {
+            return null;
+        }
+
+        openList = openList.splice(openList.indexOf(minClNode.links[minLinkIndex]), 1);
+        closedList.push(minClNode.links[minLinkIndex]);
+
+        if (openList.length > 0 && closedList.indexOf(end) < 0) {
+            return this.calculateStairPath(nodes, costs, parents, openList, closedList, end);
+        } else {
+
+            // got the costs over the nodes. now back-track.
+            // start at end node and backtrack over the parent for each node.
+            // while the last node in backtracking-path has a valid parent (means: not themselves), go on.
+            const resultPath = new Array();
+            resultPath.push(end);
+            while (!parents[nodes.indexOf(resultPath[resultPath.length - 1])].equals(resultPath[resultPath.length - 1])) {
+                resultPath.push(parents[nodes.indexOf(resultPath[resultPath.length - 1])]);
+            }
+            resultPath.reverse();
+            return resultPath;
+        }
     }
 }
