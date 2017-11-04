@@ -41,14 +41,14 @@
             <input *ngIf="singleSelectedObject | type:'Stairs'"
                    matInput name="stairstargets" [(ngModel)]="singleSelectedObject.label" placeholder="Object Name">
         </mat-form-field>
-        <mat-form-field>
+        <!-- <mat-form-field>
             <input type="text" placeholder="Link stairs" aria-label="text" matInput [matAutocomplete]="auto">
             <mat-autocomplete #auto="matAutocomplete">
                 <mat-option *ngFor="let option of options" [value]="option">
                     {{ option }}
                 </mat-option>
             </mat-autocomplete>
-        </mat-form-field>
+        </mat-form-field> -->
 
 
         <p>
