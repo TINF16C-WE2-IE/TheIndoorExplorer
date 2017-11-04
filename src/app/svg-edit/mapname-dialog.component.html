@@ -2,7 +2,7 @@
 <mat-dialog-content>
     <mat-form-field>
         <div>
-            <input id='mapname' matInput [(ngModel)] = "mapname"  >
+            <input id='mapname' matInput [(ngModel)] = "mapname" (keyup.enter)="onSubmitClick()">
         </div>
     </mat-form-field>
 </mat-dialog-content>
