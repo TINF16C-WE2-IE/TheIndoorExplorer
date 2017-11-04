@@ -1,3 +1,4 @@
+import { StairNode } from './../lib/stair-node.class';
 import { FloorGraph } from './../lib/floor-graph.class';
 import { Floor } from './floor.class';
 import { ModelService } from '../svc/model.service';
@@ -8,6 +9,7 @@ export class Map {
     public id: number;
     public name: string;
     public floors: Floor[];
+    public stairGraph: StairNode[];
     public favorite: boolean;
     public permission: number;
     public visibility: number;
@@ -24,6 +26,7 @@ export class Map {
         this.favorite = obj.favorite;
         this.permission = obj.permission;
         this.visibility = obj.visibility;
+        this.stairGraph = [];
     }
 
 

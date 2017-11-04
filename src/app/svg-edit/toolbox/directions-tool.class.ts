@@ -1,3 +1,4 @@
+import { StairNode } from './../../lib/stair-node.class';
 import { Floor } from './../../model/floor.class';
 import { LinePath } from './../../lib/line-path.class';
 import { ModelService } from './../../svc/model.service';
@@ -72,12 +73,64 @@ export class DirectionsTool extends Tool {
             f.floorGraph = this.pfinder.createLinkedFloorGraph([...f.walls], 45, 1);
             this.pfinder.insertPointsToFloorGraph(f.stairways.map(el => el.center), f.floorGraph, f.walls);
         }
+
+        this.generateStairGraphOnCurrentMap();
+    }
+
+
+    public generateStairGraphOnCurrentMap() {
+
+        const totalNodes: StairNode[] = [];
+        const chckd = [];
+
+        for (const f of this.modelSvc.currentMap.floors) {
+
+            const nodes: StairNode[] = [];
+            for (const s1 of f.stairways) {
+                nodes.push(new StairNode(s1));
+            }
+
+
+            for (const n1 of nodes) {
+                for (const n2 of nodes) {
+                    this.generatePath(n1.stairs.center, n2.stairs.center, f);
+                    if (f.floorGraph.path.path.length > 0) {
+                        const length = f.floorGraph.path.getLength();
+                        n1.links.push(n2);
+                        n1.costs.push(length);
+                        n2.links.push(n1);
+                        n2.costs.push(length);
+                    }
+                }
+            }
+
+            totalNodes.push(...nodes);
+        }
+
+
+        // in the second part, we just link the stairs of individual floors together!
+        // TODO
     }
 
     // finds the path globally through the whole building from start (floor1) to end (floor2)
-    public generateGlobalPath(point1: Point, floorIndex1: number, point2: Point, floorIndex2: number): void {
+    public generateGlobalPath(point1: Point, floorId1: number, point2: Point, floorId2: number): void {
         // TODO:
         console.log('global path is todo!');
+
+        // pre-check any easy conditions.
+        if (floorId1 === floorId2) {
+            this.generatePath(point1, point2, this.modelSvc.currentMap.floors[floorId1]);
+        }
+
+        // if we found the path already, all good.
+        if (this.floor.floorGraph.path.path.length > 0) {
+              return;
+        } else {
+
+            // now its getting more complex
+            // use the stairgraph of the map!
+            // TODO
+        }
     }
 
     // finds path from start to end on the given floor
@@ -107,12 +160,15 @@ export class DirectionsTool extends Tool {
         const path = this.pfinder.findPathFromTo(cpy.nodes,
             cpy.nodes.find(el => el.x === start.x && el.y === start.y),
             cpy.nodes.find(el => el.x === end.x && el.y === end.y));
-        floor.floorGraph.path = new LinePath();
-        for (let i = 1; i < path.length; i++) {
-            floor.floorGraph.path.path.push(new Line(
-                new Point(path[i].x, path[i].y, false),
-                new Point(path[i - 1].x, path[i - 1].y, false)
-            ));
+
+       floor.floorGraph.path = new LinePath();
+        if (path !== null) {
+            for (let i = 1; i < path.length; i++) {
+                floor.floorGraph.path.path.push(new Line(
+                    new Point(path[i].x, path[i].y, false),
+                    new Point(path[i - 1].x, path[i - 1].y, false)
+                ));
+            }
         }
     }
 }

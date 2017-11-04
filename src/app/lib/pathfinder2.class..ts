@@ -40,11 +40,13 @@ export class Pathfinder2 {
         return this.calculatePath(nodes, costs, parents, openList, closedList, to);
     }
 
+    // returns null, if this path is not possible
     private calculatePath(nodes: PathNode[], costs: number[], parents: PathNode[],
                             openList: PathNode[], closedList: PathNode[], end: PathNode): PathNode[] {
 
         let min = Number.MAX_VALUE;
         let curCost = min;
+        let foundNewNode = false;
         let minClNode = null;
         let minLinkIndex = -1;
         for (const cl of closedList) {
@@ -59,11 +61,12 @@ export class Pathfinder2 {
                     parents[nodes.indexOf(cl.links[j])] = cl;
                 }
 
-
                 if (closedList.indexOf(cl.links[j]) < 0) {
 
                     // add node to openlist, if necessary
                     if (openList.indexOf(cl.links[j]) < 0) {
+
+                    foundNewNode = true;
                         openList.push(cl.links[j]);
                     }
 
@@ -73,8 +76,15 @@ export class Pathfinder2 {
                         minClNode = cl;
                         minLinkIndex = j;
                     }
+                } else {
+                    // already in closed list
                 }
             }
+        }
+
+        // cant generate path.
+        if (!foundNewNode) {
+            return null;
         }
 
         openList = openList.splice(openList.indexOf(minClNode.links[minLinkIndex]), 1);
