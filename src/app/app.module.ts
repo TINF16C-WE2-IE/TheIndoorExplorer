@@ -18,6 +18,7 @@ import { MessageService } from './svc/message.service';
 // Angular Material
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
+    MatAutocompleteModule,
     MatButtonModule,
     MatCardModule,
     MatDialogModule,
@@ -34,11 +35,12 @@ import {
     MatTableModule,
     MatToolbarModule,
     MatTooltipModule,
-    MatRadioModule
+    MatRadioModule,
 } from '@angular/material';
 import { MapListComponent } from './home/map-list.component';
 import {MainComponent} from './home/main.component';
 import { ToolbarComponent} from './svg-edit/toolbar.component';
+import { TypeNamePipe } from './svg-edit/type-name.pipe';
 import { MapnameDialogComponent } from './svg-edit/mapname-dialog.component';
 
 export class MyHammerConfig extends HammerGestureConfig  {
@@ -57,13 +59,13 @@ export class MyHammerConfig extends HammerGestureConfig  {
         MainComponent,
         ToolbarComponent,
         MapnameDialogComponent,
-        MapnameDialogComponent,
+        TypeNamePipe
     ],
     entryComponents: [
         MapnameDialogComponent
     ],
     imports: [
-        BrowserModule, FormsModule, HttpModule, routing, BrowserAnimationsModule,
+        BrowserModule, FormsModule, HttpModule, routing, BrowserAnimationsModule, MatAutocompleteModule,
         MatButtonModule, MatCardModule, MatDialogModule, MatMenuModule, MatToolbarModule, MatIconModule, MatSliderModule,
         MatSlideToggleModule, MatListModule, MatGridListModule, MatFormFieldModule,
         MatInputModule, MatProgressSpinnerModule, MatTableModule, MatTooltipModule, MatSnackBarModule, MatRadioModule,
