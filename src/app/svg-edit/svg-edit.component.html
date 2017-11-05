@@ -141,9 +141,9 @@
                     <svg:line *ngFor="let path of movingPath?.path" stroke="red" stroke-width="3"
                               [attr.x1]="path.p1.x" [attr.y1]="path.p1.y" [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
                               marker-end="url(#circle)" marker-start="url(#circle)"/>
-                    <svg:line *ngFor="let path of mouse.tool.pfinder?.connections" stroke="grey" stroke-width="2"
+                    <!-- <svg:line *ngFor="let path of mouse.tool.pfinder?.connections" stroke="grey" stroke-width="2"
                               [attr.x1]="path.p1.x" [attr.y1]="path.p1.y" [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
-                              marker-end="url(#circle)" marker-start="url(#circle)"/>
+                              marker-end="url(#circle)" marker-start="url(#circle)"/> -->
 
                     <svg:circle *ngIf="mouse.xs !== null && mouse.ys !== null"
                                 [attr.cx]="mouse.xs" [attr.cy]="mouse.ys" r="5" style="stroke:red; fill:none"/>

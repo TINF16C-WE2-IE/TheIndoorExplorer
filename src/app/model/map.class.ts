@@ -1,5 +1,5 @@
-import { StairNode } from './../lib/stair-node.class';
-import { FloorGraph } from './../lib/floor-graph.class';
+import { StairNode } from './../pathlib/stair-node.class';
+import { FloorGraph } from './../pathlib/floor-graph.class';
 import { Floor } from './floor.class';
 import { ModelService } from '../svc/model.service';
 import { Mouse } from '../svg-edit/mouse.class';

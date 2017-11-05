@@ -1,10 +1,10 @@
-import { LinePath } from './../lib/line-path.class';
-import { FloorGraph } from './../lib/floor-graph.class';
+import { LinePath } from './../pathlib/line-path.class';
+import { FloorGraph } from './../pathlib/floor-graph.class';
 import { Floor } from './../model/floor.class';
 import { Selectable } from './../model/selectable.interface';
 import { Point } from './../model/point.class';
 import { Line } from './../model/line.class';
-import { Pathfinder } from './../lib/pathfinder.class';
+import { Pathfinder } from './../pathlib/pathfinder.class';
 import { Map } from '../model/map.class';
 import { Injectable } from '@angular/core';
 import { RequestService } from './request.service';

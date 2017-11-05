@@ -2,7 +2,7 @@ import {RouterModule, Routes} from '@angular/router';
 
 
 import {SvgEditComponent} from './svg-edit/svg-edit.component';
-import {MainComponent} from './home/main.component';
+import {MainComponent} from './main/main.component';
 
 export const routes: Routes = [
 

@@ -1,4 +1,4 @@
-import { FloorGraph } from './../lib/floor-graph.class';
+import { FloorGraph } from './../pathlib/floor-graph.class';
 import { Portal } from './portal.class';
 import { Wall } from './wall.class';
 import { Point } from './point.class';

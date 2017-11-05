@@ -1,4 +1,4 @@
-import { LinePath } from './../lib/line-path.class';
+import { LinePath } from './../pathlib/line-path.class';
 import { Floor } from './../model/floor.class';
 import { Selectable } from './../model/selectable.interface';
 import { Wall } from './../model/wall.class';

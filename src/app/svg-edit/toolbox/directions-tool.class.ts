@@ -1,14 +1,14 @@
-import { StairNode } from './../../lib/stair-node.class';
+import { StairNode } from './../../pathlib/stair-node.class';
 import { Floor } from './../../model/floor.class';
-import { LinePath } from './../../lib/line-path.class';
+import { LinePath } from './../../pathlib/line-path.class';
 import { ModelService } from './../../svc/model.service';
 import { Mouse } from './../mouse.class';
-import { Pathfinder2 } from './../../lib/pathfinder2.class.';
+import { Pathfinder2 } from './../../pathlib/pathfinder2.class.';
 import { Tool } from './tool.class';
 import { Point } from '../../model/point.class';
 import { Selectable } from '../../model/selectable.interface';
 import { Line } from '../../model/line.class';
-import { Pathfinder } from '../../lib/pathfinder.class';
+import { Pathfinder } from '../../pathlib/pathfinder.class';
 
 export class DirectionsTool extends Tool {
 
@@ -74,8 +74,8 @@ export class DirectionsTool extends Tool {
         // create the basic nodegraph on each floor, and insert the static elevators and stairs
         for (const f of this.modelSvc.currentMap.floors) {
 
-            // you can set smooth to true.
-            // This will result in a bit smoother paths, but also in twice as much nodes and quadratic more calculation cost!
+            // you can set smooth to true. This will result in a bit smoother paths,
+            // but also (in the worst case) in twice as much nodes and therefore quadratic more calculation cost!
             f.floorGraph = this.pfinder.createLinkedFloorGraph([...f.walls], 45, false);
             this.pfinder.insertPointsToFloorGraph(f.stairways.map(el => el.center), f.floorGraph, f.walls);
         }

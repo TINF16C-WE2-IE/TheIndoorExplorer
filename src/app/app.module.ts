@@ -9,8 +9,6 @@ import { HammerGestureConfig, HAMMER_GESTURE_CONFIG } from '@angular/platform-br
 
 import { AppComponent } from './app.component';
 import { SvgEditComponent } from './svg-edit/svg-edit.component';
-import { UpdatesComponent } from './cmp/updates.component';
-import { FooterComponent } from './cmp/footer.component';
 
 import { RequestService } from './svc/request.service';
 import { ModelService } from './svc/model.service';
@@ -37,8 +35,8 @@ import {
     MatTooltipModule,
     MatRadioModule,
 } from '@angular/material';
-import { MapListComponent } from './home/map-list.component';
-import {MainComponent} from './home/main.component';
+import { MapListComponent } from './main/map-list.component';
+import {MainComponent} from './main/main.component';
 import { ToolbarComponent} from './svg-edit/toolbar.component';
 import { TypeNamePipe } from './svg-edit/type-name.pipe';
 import { MapnameDialogComponent } from './svg-edit/mapname-dialog.component';
@@ -53,8 +51,6 @@ export class MyHammerConfig extends HammerGestureConfig  {
     declarations: [
         AppComponent,
         SvgEditComponent,
-        UpdatesComponent,
-        FooterComponent,
         MapListComponent,
         MainComponent,
         ToolbarComponent,
