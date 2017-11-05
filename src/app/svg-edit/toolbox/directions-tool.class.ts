@@ -73,7 +73,10 @@ export class DirectionsTool extends Tool {
 
         // create the basic nodegraph on each floor, and insert the static elevators and stairs
         for (const f of this.modelSvc.currentMap.floors) {
-            f.floorGraph = this.pfinder.createLinkedFloorGraph([...f.walls], 45, 1);
+
+            // you can set smooth to true.
+            // This will result in a bit smoother paths, but also in twice as much nodes and quadratic more calculation cost!
+            f.floorGraph = this.pfinder.createLinkedFloorGraph([...f.walls], 45, false);
             this.pfinder.insertPointsToFloorGraph(f.stairways.map(el => el.center), f.floorGraph, f.walls);
         }
 

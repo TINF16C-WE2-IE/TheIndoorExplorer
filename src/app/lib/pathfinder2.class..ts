@@ -136,7 +136,7 @@ export class Pathfinder2 {
         return intersects;
     }
 
-    private createNodesForWallEnd(p1: Point, p2: Point, radius: number, walls: Line[], numResolution: number): PathNode[] {
+    private createNodesForWallEnd(p1: Point, p2: Point, radius: number, walls: Line[], smooth: boolean = false): PathNode[] {
 
         const nodes: PathNode[] = [];
 
@@ -153,23 +153,30 @@ export class Pathfinder2 {
         }
 
         neighbours.sort((a, b) => (b.a - a.a));
+
         for (let n = 0; n < neighbours.length; n++) {
 
             let nextAng = neighbours[(n + 1) % (neighbours.length)].a;
             if (n === neighbours.length - 1) nextAng += Math.PI * 2;
 
 
-            // we only need this pathnode, if the max angle over it is > 180°
+            // we only need 1 pathnode, if the max angle over it is > 180°
+            // if the angle is > 270, it looks more natural to have actually 2 nodes here!
+            // but thats a thing of beauty. in the worst case, if we smooth we have twice as much nodes!!!
             if (Math.abs(neighbours[n].a - nextAng) > Math.PI) {
-                let midAng = nextAng + ((neighbours[n].a - nextAng) / 2);
 
-                // mirror the angle if the next neighbour has exactly the same angle!
-                if (midAng === neighbours[n].a) {
-                    midAng = (midAng + Math.PI) % Math.PI * 2;
+                const res = Math.abs(neighbours[n].a - nextAng) > Math.PI * 1.5 ? (smooth ? 3 : 2) : 2;
+                for (let b = 1; b < res; b++) {
+                    let midAng = nextAng + ((neighbours[n].a - nextAng) / res) * b;
+
+                    // mirror the angle if the next neighbour has exactly the same angle!
+                    if (midAng === neighbours[n].a) {
+                        midAng = (midAng + Math.PI) % Math.PI * 2;
+                    }
+
+                    const midV = new Vector(Math.cos(midAng) * radius, Math.sin(midAng) * radius);
+                    nodes.push(new PathNode(p1.x + midV.x, p1.y + midV.y));
                 }
-
-                const midV = new Vector(Math.cos(midAng) * radius, Math.sin(midAng) * radius);
-                nodes.push(new PathNode(p1.x + midV.x, p1.y + midV.y));
             }
         }
 
@@ -188,7 +195,7 @@ export class Pathfinder2 {
     // ############################## Floor Graph #########################################
 
     // advanced approach: more complex in preparation, but less nodes, so cheaper for path finding.
-    public createLinkedFloorGraph(walls: Line[], radius: number, resolution: number = 2): FloorGraph {
+    public createLinkedFloorGraph(walls: Line[], radius: number, smooth: boolean = false): FloorGraph {
 
 
         // total nodes list
@@ -205,12 +212,12 @@ export class Pathfinder2 {
         for (const w of walls) {
 
             if (chckdP.find(el => el.equals(w.p1)) === undefined) {
-                nodes.push(...this.createNodesForWallEnd(w.p1, w.p2, radius, walls, resolution));
+                nodes.push(...this.createNodesForWallEnd(w.p1, w.p2, radius, walls, smooth));
                 chckdP.push(w.p1);
             }
 
             if (chckdP.find(el => el.equals(w.p2)) === undefined) {
-                nodes.push(...this.createNodesForWallEnd(w.p2, w.p1, radius, walls, resolution));
+                nodes.push(...this.createNodesForWallEnd(w.p2, w.p1, radius, walls, smooth));
                 chckdP.push(w.p2);
             }
         }
@@ -233,7 +240,7 @@ export class Pathfinder2 {
 
                                 // if this link doesnt intersect any walls
                                 if (!this.checkIntersectionOfLineWithLines(
-                                        n1.x, n1.y, n2.x, n2.y, walls, 0.0)
+                                        n1.x, n1.y, n2.x, n2.y, walls, -0.00001)
                                 ) {
                                     this.linkNodes(
                                         nodes.find(el => el.x === n1.x && el.y === n1.y),
@@ -271,7 +278,7 @@ export class Pathfinder2 {
 
                     // if this link doesnt intersect any "polygon-borders" (connections)
                     if (!this.checkIntersectionOfLineWithLines(
-                            pn.x, pn.y, n.x, n.y, walls, 0.00001)
+                            pn.x, pn.y, n.x, n.y, walls, -0.00001)
                     ) {
 
                             // we need this link!
