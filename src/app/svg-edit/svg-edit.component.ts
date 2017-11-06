@@ -40,9 +40,11 @@ export class SvgEditComponent implements OnInit {
     public editMode = false;
     public searchQuery = '';
     public startQuery = '';
+    public endQuery = '';
     public showLabels = true;
     public backgroundImageDataURL = null;
     public sideNavMode = 'over';
+    public startpoint = true;
     toolBoxControl: FormControl = new FormControl();
     routeControl: FormControl = new FormControl();
     @ViewChild('sidenav') sidenav: MatSidenav;
