@@ -37,11 +37,6 @@ export class Stairs extends Portal {
         this.length = length;
     }
 
-    public equals(another: Stairs): boolean {
-        return this.id === another.id;
-    }
-
-
     private calcNormalVector(): {x: number, y: number} {
         const [dx, dy] = [this.p2.x - this.p1.x, this.p2.y - this.p1.y];
         const len = Math.sqrt(dx ** 2 + dy ** 2);

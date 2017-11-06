@@ -14,6 +14,6 @@ export class StairNode {
     }
 
     public equals(another: StairNode): boolean {
-        return this.stairs.equals(another.stairs);
+        return this.stairs.id === another.stairs.id && this.floorLevel === another.floorLevel;
     }
 }

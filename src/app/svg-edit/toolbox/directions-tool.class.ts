@@ -55,8 +55,6 @@ export class DirectionsTool extends Tool {
         // TS has no way of checking for an interface :(
         if (this.isSelectable(selected)) {
             if (this.modelSvc.selectedObjects.length) {
-                // DEPRECATED. but maybe we need this still here for debugging or testing
-                // this.pfinder.generatePath(this.modelSvc.selectedObjects[0].center, selected.center, this.modelSvc.currentFloor);
 
                 this.pfinder.generateGlobalPath(this.modelSvc.selectedObjects[0].center,
                         this.modelSvc.currentFloorId, selected.center, this.modelSvc.currentFloorId, this.modelSvc.currentMap);
@@ -67,6 +65,18 @@ export class DirectionsTool extends Tool {
         } else {
             this.modelSvc.selectedObjects = [];
         }
+
+        // just debug test, selecting points on different floors. Of course only works on maps with a floor above the selected point
+        /*
+        if (this.isSelectable(selected)) {
+                this.pfinder.generateGlobalPath(selected.center,
+                        this.modelSvc.currentFloorId, selected.center, this.modelSvc.currentFloorId + 1, this.modelSvc.currentMap);
+                this.modelSvc.selectedObjects = [];
+
+        } else {
+            this.modelSvc.selectedObjects = [];
+        }
+        */
     }
 
     public onMapLoaded() {
@@ -81,5 +91,7 @@ export class DirectionsTool extends Tool {
         }
 
         this.pfinder.generateStairGraphOnMap(this.modelSvc.currentMap);
+
+        console.log('got map', this.modelSvc.currentMap);
     }
 }
