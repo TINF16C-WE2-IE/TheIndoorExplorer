@@ -37,23 +37,23 @@
             <input matInput name="floorname" [(ngModel)]="floor.label" placeholder="Floor Name">
         </mat-form-field>
         <mat-form-field *ngIf="singleSelectedObject">
-            <input matInput name="objname" [(ngModel)]="singleSelectedObject.label" placeholder="Object Name">
-            <input *ngIf="singleSelectedObject | type:'Stairs'"
-                   matInput name="stairstargets" [(ngModel)]="singleSelectedObject.label" placeholder="Object Name">
+            <input matInput name="objname" [(ngModel)]="singleSelectedObject.label" placeholder="Object Name"> <input
+                *ngIf="singleSelectedObject | type:'Stairs'"
+                matInput name="stairstargets" [(ngModel)]="singleSelectedObject.label" placeholder="Object Name">
         </mat-form-field>
-        <!-- <mat-form-field>
+        <mat-form-field>
             <input type="text" placeholder="Link stairs" aria-label="text" matInput [matAutocomplete]="auto">
             <mat-autocomplete #auto="matAutocomplete">
-                <mat-option *ngFor="let option of options" [value]="option">
-                    {{ option }}
+                <mat-option *ngFor="let stairs of getConnectibleStairs()" [value]="stairs">
+                    {{stairs ? stairs.floorName + ': ' + stairs.label + ' (' + stairs.id + ')': 'none'}}
                 </mat-option>
             </mat-autocomplete>
-        </mat-form-field> -->
+        </mat-form-field>
 
 
         <p>
-            Set a blueprint background image:<br>
-            <input type="file" name="bgimg" (change)="backgroundImage($event)" accept="image/*">
+            Set a blueprint background image:<br> <input type="file" name="bgimg" (change)="backgroundImage($event)"
+                                                         accept="image/*">
         </p>
         <div style="padding-top: 20px">
             <button mat-raised-button (click)="saveCurrentMap()" color="accent">
@@ -63,8 +63,7 @@
     </div>
 
 
-
-                    <pre *ngIf="movingPaths">
+    <pre *ngIf="movingPaths">
                         {{movingPaths | json}}
                     </pre>
 
@@ -144,7 +143,8 @@
                     </svg:g>
                     <svg:g *ngFor="let paths of movingPaths">
                         <svg:line *ngFor="let path of paths.path" stroke="red" stroke-width="3"
-                                  [attr.x1]="path.p1.x" [attr.y1]="path.p1.y" [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
+                                  [attr.x1]="path.p1.x" [attr.y1]="path.p1.y" [attr.x2]="path.p2.x"
+                                  [attr.y2]="path.p2.y"
                                   marker-end="url(#circle)" marker-start="url(#circle)"/>
                     </svg:g>
 
