@@ -18,6 +18,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
     MatAutocompleteModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatCardModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -62,7 +63,7 @@ export class MyHammerConfig extends HammerGestureConfig  {
     ],
     imports: [
         BrowserModule, FormsModule, HttpModule, routing, BrowserAnimationsModule, MatAutocompleteModule,
-        MatButtonModule, MatCardModule, MatDialogModule, MatMenuModule, MatToolbarModule, MatIconModule, MatSliderModule,
+        MatButtonModule, MatButtonToggleModule, MatCardModule, MatDialogModule, MatMenuModule, MatToolbarModule, MatIconModule, MatSliderModule,
         MatSlideToggleModule, MatListModule, MatGridListModule, MatFormFieldModule,
         MatInputModule, MatProgressSpinnerModule, MatTableModule, MatTooltipModule, MatSnackBarModule, MatRadioModule,
         FlexLayoutModule

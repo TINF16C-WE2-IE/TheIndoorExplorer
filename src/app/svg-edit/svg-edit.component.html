@@ -70,6 +70,7 @@
     </p>
 
     <!--<pre>{{this?.floor | json}}</pre>-->
+    <button mat-raised-button *ngIf="!editMode && hasWritePermission" (click)="switchToEditMode()">Edit map </button>
 </form>
 <div id="viewer-container">
     <div>
@@ -166,11 +167,16 @@
             </div>
         </div>
         <div id="floor-button-container">
-            <button mat-icon-button *ngFor="let f of floors; let i = index" class="floor-button"
+            <mat-button-toggle-group #group = "matButtonToggleGroup" value="floors[0]">
+                <mat-button-toggle *ngFor="let f of floors; let i = index"  [class.mat-raised-button]="floor == f" [class.search-result-floor]="f.searchResults.length"
+                                   (click)="selectFloor(i)">
+                    {{f.label.length ? f.label : i+1}}</mat-button-toggle>
+            </mat-button-toggle-group>
+            <!--<button mat-icon-button *ngFor="let f of floors; let i = index" class="floor-button"
                     [class.mat-raised-button]="floor == f" [class.search-result-floor]="f.searchResults.length"
                     (click)="selectFloor(i)">
                 {{f.label.length ? f.label : i+1}}
-            </button>
+            </button>-->
             <div *ngIf="editMode" class="floor-buttons">
                 <button mat-button (click)="createFloor()">
                     <mat-icon>add_circle_outline</mat-icon>
