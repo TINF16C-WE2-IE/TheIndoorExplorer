@@ -3,10 +3,10 @@ import { PathNode } from './path-node.class';
 export class FloorGraph {
 
     public nodes: PathNode[];
-    public path: LinePath;
+    public paths: LinePath[];
 
-    constructor(nodes: PathNode[] = [], path: LinePath = null) {
+    constructor(nodes: PathNode[] = [], paths: LinePath[] = []) {
         this.nodes = nodes;
-        this.path = path;
+        this.paths = paths;
     }
 }

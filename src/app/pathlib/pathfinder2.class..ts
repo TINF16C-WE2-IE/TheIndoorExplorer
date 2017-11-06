@@ -321,10 +321,10 @@ export class Pathfinder2 {
             cpy.nodes.find(el => el.x === start.x && el.y === start.y),
             cpy.nodes.find(el => el.x === end.x && el.y === end.y));
 
-        floor.floorGraph.path = new LinePath();
+        floor.floorGraph.paths.push(new LinePath());
         if (path !== null) {
             for (let i = 1; i < path.length; i++) {
-                floor.floorGraph.path.path.push(new Line(
+                floor.floorGraph.paths[floor.floorGraph.paths.length - 1].path.push(new Line(
                     new Point(path[i].x, path[i].y, false),
                     new Point(path[i - 1].x, path[i - 1].y, false)
                 ));
@@ -349,6 +349,9 @@ export class Pathfinder2 {
         // generate stair-linking for each floor individually
         for (const f of map.floors) {
 
+            // clear the paths on the map!
+            f.floorGraph.paths = [];
+
             const nodes: StairNode[] = [];
             for (const s1 of f.stairways) {
                 nodes.push(new StairNode(s1, map.floors.indexOf(f)));
@@ -367,8 +370,8 @@ export class Pathfinder2 {
 
 
                             this.generatePath(n1.stairs.center, n2.stairs.center, f);
-                            if (f.floorGraph.path.path.length > 0) {
-                                const length = f.floorGraph.path.getLength();
+                            if (f.floorGraph.paths[f.floorGraph.paths.length - 1].path.length > 0) {
+                                const length = f.floorGraph.paths[f.floorGraph.paths.length - 1].getLength();
                                 n1.links.push(n2);
                                 n1.costs.push(length);
                                 n2.links.push(n1);
@@ -430,15 +433,20 @@ export class Pathfinder2 {
     public generateGlobalPath(point1: Point, floorId1: number, point2: Point, floorId2: number,
                                 currentMap: Map): void {
 
-        // pre-check any easy conditions.
-        if (floorId1 === floorId2) {
-            this.generatePath(point1, point2, currentMap.floors[floorId1]);
-            if (currentMap.floors[floorId1].floorGraph.path.path.length === 0) {
-                console.log('this path is not possible!');
-            }
-            return;
+
+        // first, clear all paths on the whole map!
+        for (const f of currentMap.floors) {
+            f.floorGraph.paths = [];
         }
 
+
+        // pre-check any easy conditions!
+        if (floorId1 === floorId2) {
+            this.generatePath(point1, point2, currentMap.floors[floorId1]);
+            if (currentMap.floors[floorId1].floorGraph.paths[currentMap.floors[floorId1].floorGraph.paths.length - 1].path.length > 0) {
+                return;
+            }
+        }
 
         // create a copy of the stair graph. and add start and end.
         const cpy: StairNode[] = [];
@@ -452,8 +460,10 @@ export class Pathfinder2 {
         for (const st of cpy) {
             if (st.floorLevel === floorId1) {
                 this.generatePath(point1, st.stairs.center, currentMap.floors[floorId1]);
-                if (currentMap.floors[floorId1].floorGraph.path.path.length > 0) {
-                    const length = currentMap.floors[floorId1].floorGraph.path.getLength();
+                if (currentMap.floors[floorId1].floorGraph.paths[currentMap.floors[floorId1].floorGraph.paths.length - 1].path.length > 0) {
+                    const length = currentMap.floors[floorId1].floorGraph.paths[
+                          currentMap.floors[floorId1].floorGraph.paths.length - 1
+                    ].getLength();
                     st.links.push(stnt);
                     st.costs.push(length);
                     stnt.links.push(st);
@@ -464,8 +474,10 @@ export class Pathfinder2 {
             if (st.floorLevel === floorId2) {
 
                 this.generatePath(point2, st.stairs.center, currentMap.floors[floorId2]);
-                if (currentMap.floors[floorId2].floorGraph.path.path.length > 0) {
-                    const length = currentMap.floors[floorId1].floorGraph.path.getLength();
+                if (currentMap.floors[floorId2].floorGraph.paths[currentMap.floors[floorId1].floorGraph.paths.length - 1].path.length > 0) {
+                    const length = currentMap.floors[floorId1].floorGraph.paths[
+                        currentMap.floors[floorId1].floorGraph.paths.length - 1
+                    ].getLength();
                     st.links.push(ndnt);
                     st.costs.push(length);
                     ndnt.links.push(st);

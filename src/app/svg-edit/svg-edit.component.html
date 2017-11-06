@@ -63,6 +63,11 @@
     </div>
 
 
+
+                    <pre *ngIf="movingPaths">
+                        {{movingPaths | json}}
+                    </pre>
+
     <p>Selected: {{mouse.tool.name}} ({{mouse.x}} | {{mouse.y}})</p>
     <p>
         Stats: {{floor?.walls.length || 0}} Walls, {{floor?.portals.length || 0}} Portals,
@@ -137,13 +142,11 @@
                             {{stairs.label}}
                         </svg:text>
                     </svg:g>
-
-                    <svg:line *ngFor="let path of movingPath?.path" stroke="red" stroke-width="3"
-                              [attr.x1]="path.p1.x" [attr.y1]="path.p1.y" [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
-                              marker-end="url(#circle)" marker-start="url(#circle)"/>
-                    <svg:line *ngFor="let path of mouse.tool.pfinder?.connections" stroke="grey" stroke-width="2"
-                              [attr.x1]="path.p1.x" [attr.y1]="path.p1.y" [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
-                              marker-end="url(#circle)" marker-start="url(#circle)"/>
+                    <svg:g *ngFor="let paths of movingPaths">
+                        <svg:line *ngFor="let path of paths.path" stroke="red" stroke-width="3"
+                                  [attr.x1]="path.p1.x" [attr.y1]="path.p1.y" [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
+                                  marker-end="url(#circle)" marker-start="url(#circle)"/>
+                    </svg:g>
 
                     <svg:circle *ngIf="mouse.xs !== null && mouse.ys !== null"
                                 [attr.cx]="mouse.xs" [attr.cy]="mouse.ys" r="5" style="stroke:red; fill:none"/>
@@ -153,6 +156,8 @@
                     Bitte warten...
                 </text>
             </svg>
+
+
             <div id="zoom-button-container">
                 <button class="zoom-button" mat-raised-button (click)="zoom(1.1)">
                     <mat-icon aria-label="Zoom +">zoom_in</mat-icon>

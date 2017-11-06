@@ -58,8 +58,8 @@ export class SvgEditComponent implements OnInit {
         return null;
     }
 
-    get movingPath(): LinePath {
-        return this.modelSvc.currentFloor.floorGraph.path;
+    get movingPaths(): LinePath[] {
+        return (this.modelSvc.currentFloor) ? this.modelSvc.currentFloor.floorGraph.paths : null;
     }
 
     get selectedObjects(): Selectable[] {
