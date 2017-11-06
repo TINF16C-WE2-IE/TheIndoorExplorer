@@ -11,23 +11,30 @@
     align-content: space-around;
 }
 
+
 #editorCanvas {
     width: 100%;
     height: 100%;
     position: absolute;
-    background-color: white; 
+    background-color: white;
     user-select: none;
     user-drag: none;
     -webkit-user-drag: none;
     box-sizing: content-box;
+
 }
+
 #toolbox {
-    width: 200px;
+    width: 250px;
     flex: initial;
-    margin: 0 2em;
+    margin: 0 0 0 1%;
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+#toolbox .mat-nav-list{
+    /*background-color: white;*/
 }
 
 .panel {
@@ -45,9 +52,9 @@
 
 
 .edit-button {
-    position: absolute;
-    bottom:32px;
-    right:32px;
+   position: absolute;
+    right: 0;
+    bottom: 0;
 }
 
 .zoom-button {
@@ -98,3 +105,35 @@
 .floor-button {
     margin: 3px;
 }
+
+
+.mat-sidenav-container{
+    height: 100%;
+    width: 100%;
+    background-color: #4ABDAC;
+    z-index: 0;
+}
+.left-sidenav {
+    padding: 20px;
+}
+#search-button{
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    z-index: 550;
+}
+
+.left-sidenav .mat-form-field .mat-icon{
+    position: relative;
+    /* Adjust these values accordingly */
+    top: 5px;
+    left: 5px;
+}
+#tools{
+    padding: 3px;
+    background-color: #EEEEEE;
+
+}
+
+
+

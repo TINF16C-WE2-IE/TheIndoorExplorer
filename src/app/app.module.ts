@@ -30,6 +30,7 @@ import {
     MatSliderModule,
     MatSlideToggleModule,
     MatListModule,
+    MatSidenavModule,
     MatSnackBarModule,
     MatTableModule,
     MatToolbarModule,
@@ -63,7 +64,8 @@ export class MyHammerConfig extends HammerGestureConfig  {
     ],
     imports: [
         BrowserModule, FormsModule, HttpModule, routing, BrowserAnimationsModule, MatAutocompleteModule,
-        MatButtonModule, MatButtonToggleModule, MatCardModule, MatDialogModule, MatMenuModule, MatToolbarModule, MatIconModule, MatSliderModule,
+        MatButtonModule, MatButtonToggleModule, MatCardModule, MatDialogModule, MatMenuModule, MatToolbarModule,
+        MatIconModule, MatSliderModule, MatSidenavModule,
         MatSlideToggleModule, MatListModule, MatGridListModule, MatFormFieldModule,
         MatInputModule, MatProgressSpinnerModule, MatTableModule, MatTooltipModule, MatSnackBarModule, MatRadioModule,
         FlexLayoutModule
