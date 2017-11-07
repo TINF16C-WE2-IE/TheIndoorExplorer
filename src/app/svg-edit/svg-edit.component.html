@@ -137,7 +137,8 @@
                         </svg:text>
                     </svg:g>
                     <svg:g *ngFor="let paths of movingPaths">
-                        <svg:line *ngFor="let path of paths.path" stroke="red" stroke-width="3"
+                        <svg:line *ngFor="let path of paths.path" stroke="red" stroke-width="3" stroke-linecap="round"
+                                  stroke-linejoin="bevel" stroke-dasharray="50,10" fill="none"
                                   [attr.x1]="path.p1.x" [attr.y1]="path.p1.y" [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
                                   marker-end="url(#circle)" marker-start="url(#circle)"/>
                     </svg:g>
