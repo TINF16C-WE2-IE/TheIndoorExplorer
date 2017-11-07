@@ -1,15 +1,12 @@
-import { Stairs } from './../model/stairs.class';
-import { Map } from './../model/map.class';
+import { Stairs } from '../model/stairs.class';
+import { Map } from '../model/map.class';
 import { StairNode } from './stair-node.class';
-import { Floor } from './../model/floor.class';
+import { Floor } from '../model/floor.class';
 import { LinePath } from './line-path.class';
 import { FloorGraph } from './floor-graph.class';
 import { Vector } from './vector.class';
-import { VertexRef } from './vertex-ref.class';
-import { Polygon } from './polygon.class';
-import { Line } from './../model/line.class';
-import { Wall } from './../model/wall.class';
-import { Point } from './../model/point.class';
+import { Line } from '../model/line.class';
+import { Point } from '../model/point.class';
 import { PathNode } from './path-node.class';
 
 export class Pathfinder2 {
@@ -34,10 +31,10 @@ export class Pathfinder2 {
 
 
         // assign initial costs for nodes, and create their parents for backtracking the best path.
-        const costs = new Array();
-        const parents = new Array();
+        const costs = [];
+        const parents = [];
         for (let n = 0; n < nodes.length; n++) {
-            costs.push( nodes[n] === from ? 0 : Number.MAX_VALUE);
+            costs.push(nodes[n] === from ? 0 : Number.MAX_VALUE);
             parents.push(nodes[n]);
         }
         closedList.push(from);
@@ -47,7 +44,7 @@ export class Pathfinder2 {
 
     // returns null, if this path is not possible
     private calculatePath(nodes: PathNode[], costs: number[], parents: PathNode[],
-                            openList: PathNode[], closedList: PathNode[], end: PathNode): PathNode[] {
+                          openList: PathNode[], closedList: PathNode[], end: PathNode): PathNode[] {
 
         let min = Number.MAX_VALUE;
         let curCost = min;
@@ -71,7 +68,7 @@ export class Pathfinder2 {
                     // add node to openlist, if necessary
                     if (openList.indexOf(cl.links[j]) < 0) {
 
-                    foundNewNode = true;
+                        foundNewNode = true;
                         openList.push(cl.links[j]);
                     }
 
@@ -102,7 +99,7 @@ export class Pathfinder2 {
             // got the costs over the nodes. now back-track.
             // start at end node and backtrack over the parent for each node.
             // while the last node in backtracking-path has a valid parent (means: not themselves), go on.
-            const resultPath = new Array();
+            const resultPath = [];
             resultPath.push(end);
             while (!parents[nodes.indexOf(resultPath[resultPath.length - 1])].equals(resultPath[resultPath.length - 1])) {
                 resultPath.push(parents[nodes.indexOf(resultPath[resultPath.length - 1])]);
@@ -113,7 +110,7 @@ export class Pathfinder2 {
     }
 
     private checkIntersectionOfLineWithLines(p1x, p1y, p2x, p2y, lines: Line[], endpointTolerance: number,
-                                              debug: boolean = false): boolean {
+                                             debug: boolean = false): boolean {
 
         let intersects = false;
         for (const w of lines) {
@@ -121,13 +118,13 @@ export class Pathfinder2 {
 
             // find the parameter values (s, t) for the intersection point of theese 2 lines
             const s = ( -(p2y - p1y) * (p1x - w.p1.x)
-                        + (p2x - p1x) * (p1y - w.p1.y))
-                      / (-vWall.x * (p2y - p1y) + (p2x - p1x) * vWall.y);
+                + (p2x - p1x) * (p1y - w.p1.y))
+                / (-vWall.x * (p2y - p1y) + (p2x - p1x) * vWall.y);
             const t = ( vWall.x * (p1y - w.p1.y)
-                        - vWall.y * (p1x - w.p1.x))
-                      / (-vWall.x * (p2y - p1y) + (p2x - p1x) * vWall.y);
+                - vWall.y * (p1x - w.p1.x))
+                / (-vWall.x * (p2y - p1y) + (p2x - p1x) * vWall.y);
 
-            if (s >= 0 + endpointTolerance && s <= 1 - endpointTolerance && t >= 0 + endpointTolerance && t <= 1 - endpointTolerance) {
+            if (s >= endpointTolerance && s <= 1 - endpointTolerance && t >= endpointTolerance && t <= 1 - endpointTolerance) {
                 intersects = true;
                 break;
             }
@@ -147,7 +144,7 @@ export class Pathfinder2 {
         // loop through lines with the same endpoint as p1 and create vectors
         for (const l of walls.filter(el => el.p2.equals(p1) || el.p1.equals(p1))) {
             const vv = (l.p1.equals(p1) ? new Vector(l.p2.x - l.p1.x, l.p2.y - l.p1.y)
-                                          : new Vector(l.p1.x - l.p2.x, l.p1.y - l.p2.y));
+                : new Vector(l.p1.x - l.p2.x, l.p1.y - l.p2.y));
             vv.nor();
             neighbours.push({v: vv, a: vv.angle()});
         }
@@ -184,12 +181,11 @@ export class Pathfinder2 {
     }
 
 
-    public linkNodes (nn1: PathNode, nn2: PathNode): void {
+    public linkNodes(nn1: PathNode, nn2: PathNode): void {
         const dist = Math.sqrt((nn1.x - nn2.x) * (nn1.x - nn2.x) + (nn1.y - nn2.y) * (nn1.y - nn2.y));
         nn1.addLinkTo(nn2, dist);
         nn2.addLinkTo(nn1, dist);
     }
-
 
 
     // ############################## Floor Graph #########################################
@@ -230,31 +226,31 @@ export class Pathfinder2 {
                     // check for any link between the nodes
 
 
-                            // move onto the next, in case we already checked this link.
-                            if (chckd.find(el =>
-                                (el.p1.x === n1.x && el.p1.y === n1.y && el.p2.x === n2.x && el.p2.y === n2.y)
-                                || (el.p1.x === n2.x && el.p1.y === n2.y && el.p2.x === n1.x && el.p2.y === n1.y)) === undefined) {
+                    // move onto the next, in case we already checked this link.
+                    if (chckd.find(el =>
+                            (el.p1.x === n1.x && el.p1.y === n1.y && el.p2.x === n2.x && el.p2.y === n2.y)
+                            || (el.p1.x === n2.x && el.p1.y === n2.y && el.p2.x === n1.x && el.p2.y === n1.y)) === undefined) {
 
-                                const p1 = new Point(n1.x, n1.y, false);
-                                const p2 = new Point(n2.x, n2.y, false);
+                        const p1 = new Point(n1.x, n1.y, false);
+                        const p2 = new Point(n2.x, n2.y, false);
 
-                                // if this link doesnt intersect any walls
-                                if (!this.checkIntersectionOfLineWithLines(
-                                        n1.x, n1.y, n2.x, n2.y, walls, -0.00001)
-                                ) {
-                                    this.linkNodes(
-                                        nodes.find(el => el.x === n1.x && el.y === n1.y),
-                                        nodes.find(el => el.x === n2.x && el.y === n2.y)
-                                    );
-                                    this.connections.push(new Line(p1, p2));
-                                } else {
+                        // if this link doesnt intersect any walls
+                        if (!this.checkIntersectionOfLineWithLines(
+                                n1.x, n1.y, n2.x, n2.y, walls, -0.00001)
+                        ) {
+                            this.linkNodes(
+                                nodes.find(el => el.x === n1.x && el.y === n1.y),
+                                nodes.find(el => el.x === n2.x && el.y === n2.y)
+                            );
+                            this.connections.push(new Line(p1, p2));
+                        } else {
 
-                                    // just and mark as checked.
-                                    chckd.push(new Line(p1, p2));
-                                }
-                            } else {
-                                // already checked.
-                            }
+                            // just and mark as checked.
+                            chckd.push(new Line(p1, p2));
+                        }
+                    } else {
+                        // already checked.
+                    }
 
                 } else {
                     // dont check the same node.
@@ -281,10 +277,10 @@ export class Pathfinder2 {
                             pn.x, pn.y, n.x, n.y, walls, -0.00001)
                     ) {
 
-                            // we need this link!
-                            this.linkNodes(pn, n);
-                        }
+                        // we need this link!
+                        this.linkNodes(pn, n);
                     }
+                }
             }
         }
     }
@@ -301,17 +297,17 @@ export class Pathfinder2 {
         if (considerInsertingPoints) {
             // optionally add start and end, if they are not already included
             const additionalPoints = [];
-            if (  [...floor.stairways.map(ele => ele.center),
-                  ...floor.portals.map(ele => ele.center)].find(
-                      el => el.x === start.x && el.y === start.y
-                  ) === undefined) {
-                  additionalPoints.push(start);
+            if ([...floor.stairways.map(ele => ele.center),
+                    ...floor.portals.map(ele => ele.center)].find(
+                    el => el.x === start.x && el.y === start.y
+                ) === undefined) {
+                additionalPoints.push(start);
             }
-            if (  [...floor.stairways.map(ele => ele.center),
-                  ...floor.portals.map(ele => ele.center)].find(
-                      el => el.x === end.x && el.y === end.y
-                  ) === undefined) {
-                  additionalPoints.push(end);
+            if ([...floor.stairways.map(ele => ele.center),
+                    ...floor.portals.map(ele => ele.center)].find(
+                    el => el.x === end.x && el.y === end.y
+                ) === undefined) {
+                additionalPoints.push(end);
             }
             this.insertPointsToFloorGraph([start, end], cpy, floor.walls);
         }
@@ -333,9 +329,6 @@ export class Pathfinder2 {
 
         }
     }
-
-
-
 
 
     // ############################## Stair Graph #########################################
@@ -360,10 +353,10 @@ export class Pathfinder2 {
 
                     if (!n1.equals(n2)) {
                         if (chckdN.find(el =>
-                              ((el.p1.x === n1.stairs.center.x && el.p1.y === n1.stairs.center.y)
-                              && (el.p2.x === n2.stairs.center.x && el.p2.y === n2.stairs.center.y))
-                              || ((el.p1.x === n2.stairs.center.x && el.p1.y === n2.stairs.center.y)
-                              && (el.p2.x === n1.stairs.center.x && el.p2.y === n1.stairs.center.y))
+                                ((el.p1.x === n1.stairs.center.x && el.p1.y === n1.stairs.center.y)
+                                    && (el.p2.x === n2.stairs.center.x && el.p2.y === n2.stairs.center.y))
+                                || ((el.p1.x === n2.stairs.center.x && el.p1.y === n2.stairs.center.y)
+                                && (el.p2.x === n1.stairs.center.x && el.p2.y === n1.stairs.center.y))
                             ) === undefined) {
 
 
@@ -376,8 +369,10 @@ export class Pathfinder2 {
                                 n2.costs.push(length);
                             }
 
-                            chckdN.push({p1: n1.stairs.center, p2: n2.stairs.center,
-                                        lvl1: map.floors.indexOf(f), lvl2: map.floors.indexOf(f)});
+                            chckdN.push({
+                                p1: n1.stairs.center, p2: n2.stairs.center,
+                                lvl1: map.floors.indexOf(f), lvl2: map.floors.indexOf(f)
+                            });
                         }
                     }
                 }
@@ -393,32 +388,36 @@ export class Pathfinder2 {
                 if (!n1.equals(n2) && n1.floorLevel !== n2.floorLevel) {
 
                     if (chckdN.find(el =>
-                              ((el.p1.x === n1.stairs.center.x && el.p1.y === n1.stairs.center.y)
-                              && (el.p2.x === n2.stairs.center.x && el.p2.y === n2.stairs.center.y)
-                              && (el.lvl1 === n1.floorLevel && el.lvl2 === n2.floorLevel))
-                              || ((el.p1.x === n2.stairs.center.x && el.p1.y === n2.stairs.center.y)
-                              && (el.p2.x === n1.stairs.center.x && el.p2.y === n1.stairs.center.y)
-                              && (el.lvl1 === n2.floorLevel && el.lvl2 === n1.floorLevel))
-                          ) === undefined) {
+                            ((el.p1.x === n1.stairs.center.x && el.p1.y === n1.stairs.center.y)
+                                && (el.p2.x === n2.stairs.center.x && el.p2.y === n2.stairs.center.y)
+                                && (el.lvl1 === n1.floorLevel && el.lvl2 === n2.floorLevel))
+                            || ((el.p1.x === n2.stairs.center.x && el.p1.y === n2.stairs.center.y)
+                            && (el.p2.x === n1.stairs.center.x && el.p2.y === n1.stairs.center.y)
+                            && (el.lvl1 === n2.floorLevel && el.lvl2 === n1.floorLevel))
+                        ) === undefined) {
 
-                          // we need to check, if one stair has the other as target
-                          if (n2.stairs.targets.map(elm => elm.stairsId).indexOf(n1.stairs.id) >= 0
-                              || n1.stairs.targets.map(elm => elm.stairsId).indexOf(n2.stairs.id) >= 0) {
+                        // we need to check, if one stair has the other as target
+                        if (n2.stairs.target === n1.stairs || n1.stairs.target === n2.stairs) {
 
-                              // pythagoras value for this 3d length :D
-                              const hDist = Math.sqrt(
-                                  (n2.stairs.center.x - n1.stairs.center.x) ** 2 + (n2.stairs.center.y - n1.stairs.center.y) ** 2
-                              );
-                              const vDist = (n2.floorLevel - n1.floorLevel) * 500;  // just some random value.
-                              const length = Math.sqrt(hDist ** 2 + vDist ** 2);
+                            // pythagoras value for this 3d length :D
+                            const hDist = Math.sqrt(
+                                (n2.stairs.center.x - n1.stairs.center.x) ** 2 + (n2.stairs.center.y - n1.stairs.center.y) ** 2
+                            );
+                            const vDist = (n2.floorLevel - n1.floorLevel) * 500;  // just some random value.
+                            const length = Math.sqrt(hDist ** 2 + vDist ** 2);
 
-                              n1.links.push(n2);
-                              n1.costs.push(length);
-                              n2.links.push(n1);
-                              n2.costs.push(length);
-                          }
+                            n1.links.push(n2);
+                            n1.costs.push(length);
+                            n2.links.push(n1);
+                            n2.costs.push(length);
+                        }
 
-                          chckdN.push({p1: n1.stairs.center, p2: n2.stairs.center, lvl1: n1.floorLevel, lvl2: n2.floorLevel});
+                        chckdN.push({
+                            p1: n1.stairs.center,
+                            p2: n2.stairs.center,
+                            lvl1: n1.floorLevel,
+                            lvl2: n2.floorLevel
+                        });
                     }
                 }
             }
@@ -429,7 +428,7 @@ export class Pathfinder2 {
 
     // finds the path globally through the whole building from start (floor1) to end (floor2)
     public generateGlobalPath(point1: Point, floorId1: number, point2: Point, floorId2: number,
-                                currentMap: Map): void {
+                              currentMap: Map): void {
 
 
         // first, clear all paths on the whole map!
@@ -453,10 +452,14 @@ export class Pathfinder2 {
         // create a copy of the stair graph. and add start and end.
         const cpy: StairNode[] = [];
         Object.assign(cpy, currentMap.stairGraph);
-        const stnt = new StairNode(new Stairs(-1, 'start point', new Point(point1.x + 10, point1.y + 10, false),
-                                    new Point(point1.x - 10, point1.y - 10, false)), floorId1);
-        const ndnt = new StairNode(new Stairs(-2, 'end point', new Point(point2.x + 10, point2.y + 10, false),
-                                    new Point(point2.x - 10, point2.y - 10, false)), floorId2);
+        const stnt = new StairNode(new Stairs(
+            currentMap.floors[floorId1], -1, 'start point', new Point(point1.x + 10, point1.y + 10, false),
+            new Point(point1.x - 10, point1.y - 10, false)
+        ), floorId1);
+        const ndnt = new StairNode(new Stairs(
+            currentMap.floors[floorId2], -2, 'end point', new Point(point2.x + 10, point2.y + 10, false),
+            new Point(point2.x - 10, point2.y - 10, false)
+        ), floorId2);
 
         // connect the start and end with other stairs on the same floor
         for (const st of cpy) {
@@ -464,8 +467,8 @@ export class Pathfinder2 {
                 this.generatePath(point1, st.stairs.center, currentMap.floors[floorId1]);
                 if (currentMap.floors[floorId1].floorGraph.paths[currentMap.floors[floorId1].floorGraph.paths.length - 1].path.length > 0) {
                     const length = currentMap.floors[floorId1].floorGraph.paths[
-                          currentMap.floors[floorId1].floorGraph.paths.length - 1
-                    ].getLength();
+                    currentMap.floors[floorId1].floorGraph.paths.length - 1
+                        ].getLength();
                     st.links.push(stnt);
                     st.costs.push(length);
                     stnt.links.push(st);
@@ -478,8 +481,8 @@ export class Pathfinder2 {
                 this.generatePath(point2, st.stairs.center, currentMap.floors[floorId2]);
                 if (currentMap.floors[floorId2].floorGraph.paths[currentMap.floors[floorId1].floorGraph.paths.length - 1].path.length > 0) {
                     const length = currentMap.floors[floorId1].floorGraph.paths[
-                        currentMap.floors[floorId1].floorGraph.paths.length - 1
-                    ].getLength();
+                    currentMap.floors[floorId1].floorGraph.paths.length - 1
+                        ].getLength();
                     st.links.push(ndnt);
                     st.costs.push(length);
                     ndnt.links.push(st);
@@ -526,10 +529,10 @@ export class Pathfinder2 {
 
 
         // assign initial costs for nodes, and create their parents for backtracking the best path.
-        const costs = new Array();
-        const parents = new Array();
+        const costs = [];
+        const parents = [];
         for (let n = 0; n < nodes.length; n++) {
-            costs.push( nodes[n] === from ? 0 : Number.MAX_VALUE);
+            costs.push(nodes[n] === from ? 0 : Number.MAX_VALUE);
             parents.push(nodes[n]);
         }
         closedList.push(from);
@@ -539,7 +542,7 @@ export class Pathfinder2 {
 
     // returns null, if this path is not possible
     private calculateStairPath(nodes: StairNode[], costs: number[], parents: StairNode[],
-                            openList: StairNode[], closedList: StairNode[], end: StairNode): StairNode[] {
+                               openList: StairNode[], closedList: StairNode[], end: StairNode): StairNode[] {
 
         let min = Number.MAX_VALUE;
         let curCost = min;
@@ -563,7 +566,7 @@ export class Pathfinder2 {
                     // add node to openlist, if necessary
                     if (openList.indexOf(cl.links[j]) < 0) {
 
-                    foundNewNode = true;
+                        foundNewNode = true;
                         openList.push(cl.links[j]);
                     }
 
@@ -594,7 +597,7 @@ export class Pathfinder2 {
             // got the costs over the nodes. now back-track.
             // start at end node and backtrack over the parent for each node.
             // while the last node in backtracking-path has a valid parent (means: not themselves), go on.
-            const resultPath = new Array();
+            const resultPath = [];
             resultPath.push(end);
             while (!parents[nodes.indexOf(resultPath[resultPath.length - 1])].equals(resultPath[resultPath.length - 1])) {
                 resultPath.push(parents[nodes.indexOf(resultPath[resultPath.length - 1])]);

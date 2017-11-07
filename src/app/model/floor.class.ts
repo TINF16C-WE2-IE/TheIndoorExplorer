@@ -20,7 +20,7 @@ export class Floor {
         portals: {id: number, label: string, p1: {x: number, y: number}, p2: {x: number, y: number}}[],
         stairways: {
             id: number, label: string, p1: {x: number, y: number}, p2: {x: number, y: number},
-            targets: {floorId: number, stairsId: number}[],
+            target: Stairs,
             canEnter: boolean, canLeave: boolean, length: number
         }[]
         label: string
@@ -38,8 +38,8 @@ export class Floor {
         for (const stairs_obj of obj.stairways) {
             const p1 = this.getExistingOrThisPoint(new Point(stairs_obj.p1.x, stairs_obj.p1.y));
             const p2 = this.getExistingOrThisPoint(new Point(stairs_obj.p2.x, stairs_obj.p2.y));
-            this.stairways.push(new Stairs(stairs_obj.id, stairs_obj.label, p1, p2,
-                stairs_obj.targets, stairs_obj.canEnter, stairs_obj.canLeave, stairs_obj.length));
+            this.stairways.push(new Stairs(this, stairs_obj.id, stairs_obj.label, p1, p2,
+                stairs_obj.target, stairs_obj.canEnter, stairs_obj.canLeave, stairs_obj.length));
         }
         this.label = obj.label ? obj.label : '';
         this.floorGraph = new FloorGraph();

@@ -48,7 +48,7 @@ export class LineTool extends Tool {
                 break;
             case Stairs: {
                 const id = Math.max(0, ...this.floor.stairways.map(stairs => stairs.id)) + 1;
-                this.floor.stairways.push(new Stairs(id, '', start, this.point));
+                this.floor.stairways.push(new Stairs(this.floor, id, '', start, this.point));
             }
                 break;
         }

@@ -1,15 +1,22 @@
 import { Point } from './point.class';
 import { Portal } from './portal.class';
+import { Floor } from './floor.class';
 
 export class Stairs extends Portal {
 
     public length: number;
     public canEnter: boolean;
     public canLeave: boolean;
-    public targets: {floorId: number, stairsId: number}[];
+    public target: Stairs;
+
+    public floor: Floor;
 
     public get width(): number {
         return Math.sqrt((this.p2.x - this.p1.x) ** 2 + (this.p2.y - this.p1.y) ** 2);
+    }
+
+    public get prettyName(): string {
+        return (this.floor.label || 'Floor ? ') + ': ' + (this.label || 'Unnamed stairs') + ' (' + this.id + ')';
     }
 
     public get rearCenter(): {x: number, y: number} {
@@ -28,13 +35,15 @@ export class Stairs extends Portal {
     }
 
 
-    constructor(id: number, label: string, p1: Point, p2: Point, targets: {floorId: number, stairsId: number}[] = [],
+    constructor(floor: Floor, id: number, label: string, p1: Point, p2: Point, target: Stairs = null,
                 canEnter: boolean = true, canLeave: boolean = true, length: number = 30) {
         super(id, label, p1, p2);
-        this.targets = targets;
+        this.target = target;
         this.canEnter = canEnter;
         this.canLeave = canLeave;
         this.length = length;
+
+        this.floor = floor;
     }
 
     private calcNormalVector(): {x: number, y: number} {
@@ -46,7 +55,7 @@ export class Stairs extends Portal {
 
     public forExport() {
         return Object.assign(super.forExport(), {
-            targets: this.targets,
+            target: this.target,
             canEnter: this.canEnter,
             canLeave: this.canLeave,
             length: this.length

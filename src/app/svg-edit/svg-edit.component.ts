@@ -1,11 +1,10 @@
-import { LinePath } from './../pathlib/line-path.class';
-import { Floor } from './../model/floor.class';
-import { Selectable } from './../model/selectable.interface';
-import { Wall } from './../model/wall.class';
-import { Line } from './../model/line.class';
+import { LinePath } from '../pathlib/line-path.class';
+import { Floor } from '../model/floor.class';
+import { Selectable } from '../model/selectable.interface';
+import { Wall } from '../model/wall.class';
 import { ModelService } from '../svc/model.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import 'rxjs/add/operator/switchMap';
 import { Mouse } from './mouse.class';
 import { MoveTool } from './toolbox/move-tool.class';
@@ -14,10 +13,10 @@ import { DeleteTool } from './toolbox/delete-tool.class';
 import { LineTool } from './toolbox/line-tool.class';
 import { DirectionsTool } from './toolbox/directions-tool.class';
 import { Portal } from '../model/portal.class';
-import { MatIconRegistry } from '@angular/material';
+import { MatAutocompleteSelectedEvent, MatIconRegistry, MatSidenav } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Stairs } from '../model/stairs.class';
-import {FormControl} from '@angular/forms';
+import { FormControl } from '@angular/forms';
 
 @Component({
     selector: 'app-svg-edit',
@@ -39,15 +38,15 @@ export class SvgEditComponent implements OnInit {
     public selectedTool = 'Move';
     public editMode = false;
     public searchQuery = '';
+    public startQuery = '';
+    public endQuery = '';
     public showLabels = true;
     public backgroundImageDataURL = null;
+    public sideNavMode = 'over';
+    public startpoint = true;
     toolBoxControl: FormControl = new FormControl();
-
-    options = [
-        'One',
-        'Two',
-        'Three'
-    ];
+    routeControl: FormControl = new FormControl();
+    @ViewChild('sidenav') sidenav: MatSidenav;
 
     get floor() {
         return this.modelSvc.currentFloor;
@@ -195,15 +194,25 @@ export class SvgEditComponent implements OnInit {
         }
     }
 
-    search() {
-        console.log('search', this.searchQuery);
-        this.modelSvc.currentMap.search(this.searchQuery);
+    search(query: string) {
+        console.log('search', query);
+        this.modelSvc.currentMap.search(query);
         this.modelSvc.currentMap.fitToViewport();
     }
 
     switchToEditMode() {
         this.editMode = true;
         this.selectTool('Move');
+        this.sideNavMode = 'side';
+        this.sidenav.open();
+
+    }
+
+    switchToViewMode() {
+        this.editMode = false;
+        this.selectTool('Directions');
+        this.sideNavMode = 'over';
+        this.sidenav.close();
     }
 
     selectWaypoint(selected: Selectable) {
@@ -212,9 +221,33 @@ export class SvgEditComponent implements OnInit {
         }
     }
 
+    getStairsDisplayName(stairs: Stairs) {
+        return stairs ? stairs.prettyName : 'none';
+    }
+
+    getConnectibleStairs(): Stairs[] {
+        return this.modelSvc.currentMap.floors.map(floor => floor.stairways)
+                   .reduce((prev, current) => prev.concat(current))
+                   .filter(stairs => stairs.target === null && stairs.floor !== this.floor).concat([null]);
+    }
+
+    connectStairs(event: MatAutocompleteSelectedEvent) {
+        if (this.singleSelectedObject instanceof Stairs) {
+            const stairs: Stairs = event.option.value as Stairs;
+            if (this.singleSelectedObject.target) {
+                this.singleSelectedObject.target.target = null;
+            }
+            this.singleSelectedObject.target = stairs;
+            if (stairs) {
+                stairs.target = this.singleSelectedObject;
+            }
+        }
+    }
+
     @HostListener('window:resize', ['$event'])
     onResize(event) {
         console.log('resize');
         this.modelSvc.currentMap.fitToViewport();
     }
+
 }
