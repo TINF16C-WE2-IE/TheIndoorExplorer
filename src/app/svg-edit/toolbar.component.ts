@@ -14,7 +14,6 @@ export class ToolbarComponent implements OnInit {
 
     @ViewChild('appMenu') appMenu: ElementRef;
     public searchQuery = '';
-    mapname: string;
 
     constructor(private rqstSvc: RequestService, public modelSvc: ModelService, public dialog: MatDialog) {
     }

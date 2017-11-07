@@ -4,7 +4,7 @@ import { Selectable } from './../model/selectable.interface';
 import { Wall } from './../model/wall.class';
 import { ModelService } from '../svc/model.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, HostListener, OnInit } from '@angular/core';
+import {Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
 import 'rxjs/add/operator/switchMap';
 import { Mouse } from './mouse.class';
 import { MoveTool } from './toolbox/move-tool.class';
@@ -13,7 +13,7 @@ import { DeleteTool } from './toolbox/delete-tool.class';
 import { LineTool } from './toolbox/line-tool.class';
 import { DirectionsTool } from './toolbox/directions-tool.class';
 import { Portal } from '../model/portal.class';
-import { MatAutocompleteSelectedEvent, MatIconRegistry } from '@angular/material';
+import { MatAutocompleteSelectedEvent, MatIconRegistry, MatSidenav } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Stairs } from '../model/stairs.class';
 import { FormControl } from '@angular/forms';
@@ -38,15 +38,21 @@ export class SvgEditComponent implements OnInit {
     public selectedTool = 'Move';
     public editMode = false;
     public searchQuery = '';
+    public startQuery = '';
+    public endQuery = '';
     public showLabels = true;
     public backgroundImageDataURL = null;
+    public sideNavMode = 'over';
+    public startpoint = true;
     toolBoxControl: FormControl = new FormControl();
-
+    routeControl: FormControl = new FormControl();
+    @ViewChild('sidenav') sidenav: MatSidenav;
     options = [
         'One',
         'Two',
         'Three'
     ];
+
 
     get floor() {
         return this.modelSvc.currentFloor;
@@ -194,15 +200,24 @@ export class SvgEditComponent implements OnInit {
         }
     }
 
-    search() {
-        console.log('search', this.searchQuery);
-        this.modelSvc.currentMap.search(this.searchQuery);
+    search(query: string) {
+        console.log('search', query);
+        this.modelSvc.currentMap.search(query);
         this.modelSvc.currentMap.fitToViewport();
     }
 
     switchToEditMode() {
         this.editMode = true;
         this.selectTool('Move');
+        this.sideNavMode = 'side';
+        this.sidenav.open();
+
+    }
+    switchToViewMode() {
+        this.editMode = false;
+        this.selectTool('Directions');
+        this.sideNavMode = 'over';
+        this.sidenav.close();
     }
 
     selectWaypoint(selected: Selectable) {
