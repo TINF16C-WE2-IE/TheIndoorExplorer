@@ -444,6 +444,10 @@ export class Pathfinder2 {
             if (currentMap.floors[floorId1].floorGraph.paths[currentMap.floors[floorId1].floorGraph.paths.length - 1].path.length > 0) {
                 return;
             }
+
+            if (point1.equals(point2)) {
+                return;
+            }
         }
 
         // create a copy of the stair graph. and add start and end.
