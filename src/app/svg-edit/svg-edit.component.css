@@ -56,11 +56,7 @@
     text-align: left;
 }
 
-.edit-button {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-}
+
 
 .zoom-button {
     min-width: unset;
@@ -125,7 +121,9 @@
 }
 
 .left-sidenav {
-    padding: 20px;
+    padding: 12px;
+    padding-top: 0;
+
 }
 
 #search-button {
@@ -146,4 +144,7 @@
     padding: 10px;
     margin: 10px 0;
     background-color: #EEEEEE;
+}
+#floor-spacer {
+    flex-grow: 1 ;
 }

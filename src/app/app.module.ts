@@ -41,7 +41,7 @@ import { MapListComponent } from './main/map-list.component';
 import {MainComponent} from './main/main.component';
 import { ToolbarComponent} from './svg-edit/toolbar.component';
 import { TypeNamePipe } from './svg-edit/type-name.pipe';
-import { MapnameDialogComponent } from './svg-edit/mapname-dialog.component';
+import { MapnameDialogComponent } from './svg-edit/dialogs/mapname-dialog.component';
 
 export class MyHammerConfig extends HammerGestureConfig  {
     overrides = <any>{

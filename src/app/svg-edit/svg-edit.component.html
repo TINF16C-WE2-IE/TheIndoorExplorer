@@ -2,7 +2,7 @@
 
 <mat-sidenav-container class="example-container">
     <mat-sidenav #sidenav mode="{{sideNavMode}}" [disableClose]="editMode" class="left-sidenav">
-        <mat-form-field id='searchField'>
+        <mat-form-field id='search-field'>
             <input matInput type="search" incremental name="search" [(ngModel)]="searchQuery"
                    (keyup)="search(searchQuery)"
                    placeholder="Search...">
@@ -201,6 +201,7 @@
                                        (click)="selectFloor(i)">
                         {{f.label.length ? f.label : i+1}}
                     </mat-button-toggle>
+                    <div id="floor-spacer"></div>
                     <button mat-raised-button color="accent" *ngIf="!editMode && hasWritePermission"
                             (click)="switchToEditMode()" class="edit-button">
                         <mat-icon aria-label="Edit">edit</mat-icon>

@@ -2,7 +2,7 @@ import {Component, ElementRef, HostListener, Inject, OnInit, ViewChild} from '@a
 import { RequestService } from '../svc/request.service';
 import { ModelService } from '../svc/model.service';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material';
-import {MapnameDialogComponent} from './mapname-dialog.component';
+import {MapnameDialogComponent} from './dialogs/mapname-dialog.component';
 
 
 @Component({

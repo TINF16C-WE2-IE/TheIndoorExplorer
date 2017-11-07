@@ -1,6 +1,6 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {ModelService} from '../svc/model.service';
+import {ModelService} from '../../svc/model.service';
 
 @Component({
     selector: 'app-mapname-dialog',
