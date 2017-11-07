@@ -43,9 +43,10 @@
         </mat-form-field>
         <mat-form-field>
             <input type="text" placeholder="Link stairs" aria-label="text" matInput [matAutocomplete]="auto">
-            <mat-autocomplete #auto="matAutocomplete">
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="connectStairs($event)"
+                              [displayWith]="getStairsDisplayName">
                 <mat-option *ngFor="let stairs of getConnectibleStairs()" [value]="stairs">
-                    {{stairs ? stairs.floorName + ': ' + stairs.label + ' (' + stairs.id + ')': 'none'}}
+                    {{getStairsDisplayName(stairs)}}
                 </mat-option>
             </mat-autocomplete>
         </mat-form-field>
@@ -90,8 +91,7 @@
                  xmlns:svg="http://www.w3.org/2000/svg" version="1.2">
 
                 <svg:image *ngIf="backgroundImageDataURL" [attr.xlink:href]="backgroundImageDataURL" x="0" y="0"
-                           width="2000"
-                           height="2000" opacity="0.5" preserveAspectRatio="xMinYMin meet"/>
+                           width="2000" height="2000" opacity="0.5" preserveAspectRatio="xMinYMin meet"/>
 
                 <svg:g *ngIf="floor">
                     <svg:defs>

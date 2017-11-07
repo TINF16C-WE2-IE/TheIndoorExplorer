@@ -1,22 +1,22 @@
-import {LinePath} from './../pathlib/line-path.class';
-import {Floor} from './../model/floor.class';
-import {Selectable} from './../model/selectable.interface';
-import {Wall} from './../model/wall.class';
-import {ModelService} from '../svc/model.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import {Component, HostListener, OnInit} from '@angular/core';
+import { LinePath } from './../pathlib/line-path.class';
+import { Floor } from './../model/floor.class';
+import { Selectable } from './../model/selectable.interface';
+import { Wall } from './../model/wall.class';
+import { ModelService } from '../svc/model.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Component, HostListener, OnInit } from '@angular/core';
 import 'rxjs/add/operator/switchMap';
-import {Mouse} from './mouse.class';
-import {MoveTool} from './toolbox/move-tool.class';
-import {SelectTool} from './toolbox/select-tool.class';
-import {DeleteTool} from './toolbox/delete-tool.class';
-import {LineTool} from './toolbox/line-tool.class';
-import {DirectionsTool} from './toolbox/directions-tool.class';
-import {Portal} from '../model/portal.class';
-import {MatIconRegistry} from '@angular/material';
-import {DomSanitizer} from '@angular/platform-browser';
-import {Stairs} from '../model/stairs.class';
-import {FormControl} from '@angular/forms';
+import { Mouse } from './mouse.class';
+import { MoveTool } from './toolbox/move-tool.class';
+import { SelectTool } from './toolbox/select-tool.class';
+import { DeleteTool } from './toolbox/delete-tool.class';
+import { LineTool } from './toolbox/line-tool.class';
+import { DirectionsTool } from './toolbox/directions-tool.class';
+import { Portal } from '../model/portal.class';
+import { MatAutocompleteSelectedEvent, MatIconRegistry } from '@angular/material';
+import { DomSanitizer } from '@angular/platform-browser';
+import { Stairs } from '../model/stairs.class';
+import { FormControl } from '@angular/forms';
 
 @Component({
     selector: 'app-svg-edit',
@@ -185,7 +185,7 @@ export class SvgEditComponent implements OnInit {
         const reader = new FileReader();
 
         const myThis = this;
-        reader.addEventListener('load', function () {
+        reader.addEventListener('load', function() {
             myThis.backgroundImageDataURL = reader.result;
         }, false);
 
@@ -211,9 +211,23 @@ export class SvgEditComponent implements OnInit {
         }
     }
 
+    getStairsDisplayName(stairs: Stairs) {
+        return stairs ? stairs.prettyName : 'none';
+    }
+
     getConnectibleStairs(): Stairs[] {
         return this.modelSvc.currentMap.floors.map(floor => floor.stairways)
-            .filter(stairs => stairs.target == null).concat([null]);
+                   .reduce((prev, current) => prev.concat(current))
+                   .filter(stairs => stairs.target === null && stairs.floor !== this.floor).concat([null]);
+    }
+
+    connectStairs(event: MatAutocompleteSelectedEvent) {
+        if (this.singleSelectedObject instanceof Stairs) {
+            const stairs: Stairs = event.option.value as Stairs;
+            console.log(event, stairs);
+            this.singleSelectedObject.target = stairs;
+            stairs.target = this.singleSelectedObject;
+        }
     }
 
     @HostListener('window:resize', ['$event'])
