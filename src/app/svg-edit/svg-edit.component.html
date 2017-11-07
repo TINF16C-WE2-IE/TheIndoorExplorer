@@ -35,12 +35,12 @@
                 </button>
             </p>
             <p style="display: none">
-                Set a blueprint background image:<br>
-                <input type="file" name="bgimg" id="img-upload" (change)="backgroundImage($event)" accept="image/*">
+                <input #fileUploadButton type="file" name="bgimg" id="img-upload" (change)="backgroundImage($event)"
+                       accept="image/*">
             </p>
             <p>
                 <button mat-button
-                        onclick="document.getElementById('img-upload').click();">
+                        onclick="fileUploadButton.click();">
                     <mat-icon>add_a_photo</mat-icon>
                     <span>Add image</span>
                 </button>
@@ -72,10 +72,8 @@
             </mat-form-field>
             <mat-form-field *ngIf="singleSelectedObject">
                 <input matInput name="objname" [(ngModel)]="singleSelectedObject.label" placeholder="Object Name">
-                <input *ngIf="singleSelectedObject | type:'Stairs'"
-                       matInput name="stairstargets" [(ngModel)]="singleSelectedObject.label" placeholder="Object Name">
             </mat-form-field>
-            <mat-form-field>
+            <mat-form-field *ngIf="singleSelectedObject | type:'Stairs'">
                 <input type="text" placeholder="Link stairs" aria-label="text" matInput [matAutocomplete]="auto">
                 <mat-autocomplete #auto="matAutocomplete" (optionSelected)="connectStairs($event)"
                                   [displayWith]="getStairsDisplayName">

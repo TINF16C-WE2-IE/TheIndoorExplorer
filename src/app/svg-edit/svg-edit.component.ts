@@ -1,10 +1,10 @@
-import { LinePath } from './../pathlib/line-path.class';
-import { Floor } from './../model/floor.class';
-import { Selectable } from './../model/selectable.interface';
-import { Wall } from './../model/wall.class';
+import { LinePath } from '../pathlib/line-path.class';
+import { Floor } from '../model/floor.class';
+import { Selectable } from '../model/selectable.interface';
+import { Wall } from '../model/wall.class';
 import { ModelService } from '../svc/model.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import {Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import 'rxjs/add/operator/switchMap';
 import { Mouse } from './mouse.class';
 import { MoveTool } from './toolbox/move-tool.class';
@@ -47,12 +47,6 @@ export class SvgEditComponent implements OnInit {
     toolBoxControl: FormControl = new FormControl();
     routeControl: FormControl = new FormControl();
     @ViewChild('sidenav') sidenav: MatSidenav;
-    options = [
-        'One',
-        'Two',
-        'Three'
-    ];
-
 
     get floor() {
         return this.modelSvc.currentFloor;
@@ -213,6 +207,7 @@ export class SvgEditComponent implements OnInit {
         this.sidenav.open();
 
     }
+
     switchToViewMode() {
         this.editMode = false;
         this.selectTool('Directions');
@@ -239,9 +234,13 @@ export class SvgEditComponent implements OnInit {
     connectStairs(event: MatAutocompleteSelectedEvent) {
         if (this.singleSelectedObject instanceof Stairs) {
             const stairs: Stairs = event.option.value as Stairs;
-            console.log(event, stairs);
+            if (this.singleSelectedObject.target) {
+                this.singleSelectedObject.target.target = null;
+            }
             this.singleSelectedObject.target = stairs;
-            stairs.target = this.singleSelectedObject;
+            if (stairs) {
+                stairs.target = this.singleSelectedObject;
+            }
         }
     }
 
@@ -250,4 +249,5 @@ export class SvgEditComponent implements OnInit {
         console.log('resize');
         this.modelSvc.currentMap.fitToViewport();
     }
+
 }
