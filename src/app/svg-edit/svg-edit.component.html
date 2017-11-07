@@ -62,12 +62,6 @@
         </div>
     </div>
 
-
-
-                    <pre *ngIf="movingPaths">
-                        {{movingPaths | json}}
-                    </pre>
-
     <p>Selected: {{mouse.tool.name}} ({{mouse.x}} | {{mouse.y}})</p>
     <p>
         Stats: {{floor?.walls.length || 0}} Walls, {{floor?.portals.length || 0}} Portals,

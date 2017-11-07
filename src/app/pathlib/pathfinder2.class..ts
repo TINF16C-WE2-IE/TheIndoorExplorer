@@ -330,9 +330,7 @@ export class Pathfinder2 {
                 ));
             }
         } else {
-            // cant generate path
-            // this path is not possible. There is only 1 path per floor. you cannot have multiple paths on the same floor
-            //                therefore i dont calculate with any stairs yet, if the points are on the same floor!
+
         }
     }
 
@@ -504,7 +502,13 @@ export class Pathfinder2 {
                 }
             }
         } else {
+
             console.log('this path is not possible!');
+
+            // Again, clear all paths on the whole map!
+            for (const f of currentMap.floors) {
+                f.floorGraph.paths = [];
+            }
         }
     }
 

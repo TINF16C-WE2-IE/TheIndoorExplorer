@@ -92,6 +92,10 @@ export class DirectionsTool extends Tool {
 
         this.pfinder.generateStairGraphOnMap(this.modelSvc.currentMap);
 
+        for (const f of this.modelSvc.currentMap.floors) {
+            f.floorGraph.paths = [];
+        }
+
         console.log('got map', this.modelSvc.currentMap);
     }
 }
