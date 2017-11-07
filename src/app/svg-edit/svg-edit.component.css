@@ -52,9 +52,7 @@
 
 
 .edit-button {
-   position: absolute;
-    right: 0;
-    bottom: 0;
+    align-self: flex-end;
 }
 
 .zoom-button {
@@ -114,7 +112,9 @@
     z-index: 0;
 }
 .left-sidenav {
-    padding: 20px;
+    padding: 12px;
+    padding-top: 0;
+
 }
 #search-button{
     position: absolute;
@@ -130,10 +130,10 @@
     left: 5px;
 }
 #tools{
-    padding: 3px;
+    padding: 12px;
     background-color: #EEEEEE;
 
 }
-
-
-
+#floor-spacer {
+    flex-grow: 1 ;
+}
