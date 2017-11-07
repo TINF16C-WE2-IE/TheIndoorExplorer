@@ -13,7 +13,7 @@ import { DeleteTool } from './toolbox/delete-tool.class';
 import { LineTool } from './toolbox/line-tool.class';
 import { DirectionsTool } from './toolbox/directions-tool.class';
 import { Portal } from '../model/portal.class';
-import { MatAutocompleteSelectedEvent, MatIconRegistry, MatSidenav } from '@angular/material';
+import { MatAutocomplete, MatAutocompleteSelectedEvent, MatIconRegistry, MatSidenav } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Stairs } from '../model/stairs.class';
 import { FormControl } from '@angular/forms';
@@ -47,6 +47,7 @@ export class SvgEditComponent implements OnInit {
     toolBoxControl: FormControl = new FormControl();
     routeControl: FormControl = new FormControl();
     @ViewChild('sidenav') sidenav: MatSidenav;
+    @ViewChild('auto') auto: MatAutocomplete;
 
     get floor() {
         return this.modelSvc.currentFloor;
