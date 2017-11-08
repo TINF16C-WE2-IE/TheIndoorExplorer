@@ -53,7 +53,7 @@ export class ToolbarComponent implements OnInit {
     }
 
     public performLogout(): void {
-        this.rqstSvc.get('logout', {}).subscribe(
+        this.rqstSvc.get(RequestService.LOGOUT, {}).subscribe(
             resp => {
                 if (resp) {
                     console.log('Logout response:', resp);

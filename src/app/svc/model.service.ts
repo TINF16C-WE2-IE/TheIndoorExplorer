@@ -93,7 +93,7 @@ export class ModelService {
             this.currentMap = newMap;
             callback();
         } else {
-            this.rqstSvc.get(RequestService.LIST_MAP_DETAILS, {'mapid': mapId}).subscribe(
+            this.rqstSvc.get(RequestService.LIST_MAP_DETAILS + mapId, {}).subscribe(
                 resp => {
                     if (resp !== null) {
                         this.currentMap = new Map(resp, this);
@@ -106,7 +106,7 @@ export class ModelService {
     }
 
     public saveMap() {
-        this.rqstSvc.post(RequestService.LIST_MAP_SAVE, this.currentMap.forExport())
+        this.rqstSvc.post(RequestService.LIST_MAP_SAVE + this.currentMapId, this.currentMap.forExport())
             .subscribe(resp => {
                 console.log('got response map-save: ', resp);
                 if (resp !== null) {
@@ -115,5 +115,14 @@ export class ModelService {
             });
     }
 
+    public deleteMap() {
+        this.rqstSvc.delete(RequestService.DELETE_MAP + this.currentMapId, {})
+            .subscribe(resp => {
+                console.log('got response map-save: ', resp);
+                if (resp !== null) {
+                    // TODO
+                }
+            });
+    }
 
 }
