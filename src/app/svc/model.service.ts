@@ -1,29 +1,36 @@
-import { LinePath } from './../pathlib/line-path.class';
-import { FloorGraph } from './../pathlib/floor-graph.class';
-import { Floor } from './../model/floor.class';
-import { Selectable } from './../model/selectable.interface';
-import { Point } from './../model/point.class';
-import { Line } from './../model/line.class';
-import { Pathfinder } from './../pathlib/pathfinder.class';
-import { Map } from '../model/map.class';
-import { Injectable } from '@angular/core';
-import { RequestService } from './request.service';
+import {LinePath} from './../pathlib/line-path.class';
+import {FloorGraph} from './../pathlib/floor-graph.class';
+import {Floor} from './../model/floor.class';
+import {Selectable} from './../model/selectable.interface';
+import {Point} from './../model/point.class';
+import {Line} from './../model/line.class';
+import {Pathfinder} from './../pathlib/pathfinder.class';
+import {Map} from '../model/map.class';
+import {Injectable} from '@angular/core';
+import {RequestService} from './request.service';
 
 
 @Injectable()
 export class ModelService {
 
-    public maps: {[id: number]: Map};
+    public maps: { [id: number]: Map };
     public currentMapId: number;
     public currentFloorId: number;
     public selectedObjects: Selectable[] = [];
-    public userInfo: {id: number, username: string};
+    public userInfo: { id: number, username: string };
 
-    public viewportSize: {x: number, y: number} = {x: 500, y: 500};
-    public canvasSize: {x: number, y: number} = {x: 500, y: 500};
+    public viewportSize: { x: number, y: number } = {x: 500, y: 500};
+    public canvasSize: { x: number, y: number } = {x: 500, y: 500};
     public panOffset = new Point(0, 0);
     public bodyOffset = new Point(0, 0);
     public zoom = 1;
+
+    constructor(private rqstSvc: RequestService) {
+        this.maps = {};
+        this.currentMapId = 0;
+        this.currentFloorId = 0;
+        this.userInfo = null;
+    }
 
     public get currentMap() {
         return this.maps[this.currentMapId];
@@ -46,13 +53,6 @@ export class ModelService {
         this.currentFloorId = id;
     }
 
-    constructor(private rqstSvc: RequestService) {
-        this.maps = {};
-        this.currentMapId = 0;
-        this.currentFloorId = 0;
-        this.userInfo = null;
-    }
-
     public loadUserInfo() {
         this.rqstSvc.get(RequestService.INFO_USER, {}).subscribe(
             resp => {
@@ -69,7 +69,7 @@ export class ModelService {
             resp => {
                 if (resp) {
                     for (const mapInfo of resp as [
-                        {id: number, name: string, favorite; boolean, permission: number, visibility: number}
+                        { id: number, name: string, favorite; boolean, permission: number, visibility: number }
                         ]) {
                         this.maps[mapInfo.id] = new Map(mapInfo, this);
                     }
@@ -78,7 +78,8 @@ export class ModelService {
         );
     }
 
-    public loadMap(mapId: number, callback: () => void = () => {}) {
+    public loadMap(mapId: number, callback: () => void = () => {
+    }) {
         if (mapId === -1) {
             const newMap = new Map({
                 id: -1,
@@ -117,6 +118,16 @@ export class ModelService {
 
     public deleteMap() {
         this.rqstSvc.delete(RequestService.DELETE_MAP + this.currentMapId, {})
+            .subscribe(resp => {
+                console.log('got response map-save: ', resp);
+                if (resp !== null) {
+                    // TODO
+                }
+            });
+    }
+
+    public publishMap() {
+        this.rqstSvc.post(RequestService.PUBLISH + this.currentMapId + '/publish', {})
             .subscribe(resp => {
                 console.log('got response map-save: ', resp);
                 if (resp !== null) {

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import {ModelService} from '../../svc/model.service';
+import {MatDialogRef} from '@angular/material';
 
 @Component({
   selector: 'app-publish-map-dialog',
@@ -7,9 +9,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PublishMapDialogComponent implements OnInit {
 
-  constructor() { }
+  constructor(private modelSvc: ModelService, public dialogRef: MatDialogRef<PublishMapDialogComponent>) { }
 
   ngOnInit() {
   }
 
+  public publishMap() {
+      this.modelSvc.publishMap();
+      this.dialogRef.close();
+  }
 }

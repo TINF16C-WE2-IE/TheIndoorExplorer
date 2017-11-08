@@ -4,7 +4,7 @@
     <p class="mat-body-1">Your map will be validated by our team. This process may take a few days.</p>
 </mat-dialog-content>
 <mat-dialog-actions>
-    <button mat-button>No</button>
-    <button mat-button>Yes</button>
+    <button mat-button [mat-dialog-close]="true">No</button>
+    <button mat-button (click)="publishMap()">Yes</button>
 </mat-dialog-actions>
 

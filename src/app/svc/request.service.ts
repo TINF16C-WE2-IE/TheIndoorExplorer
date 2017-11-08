@@ -14,6 +14,7 @@ export class RequestService {
     public static readonly INFO_USER = 'user';
     public static readonly  DELETE_MAP = 'map/';
     public static readonly LOGOUT = 'user/logout'
+    public static readonly PUBLISH = 'map/';
 
     private options: RequestOptions;
 
@@ -69,7 +70,6 @@ export class RequestService {
                 str += '&' + encodeURI(key) + '=' + encodeURIComponent(obj[key]);
             }
         }
-
         return str;
     }
 }
