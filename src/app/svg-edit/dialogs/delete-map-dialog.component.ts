@@ -1,5 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {ModelService} from '../../svc/model.service';
+import {Router} from '@angular/router';
+import {MatDialogRef} from '@angular/material';
+
 
 @Component({
     selector: 'app-delete-map-dialog',
@@ -8,7 +11,7 @@ import {ModelService} from '../../svc/model.service';
 })
 export class DeleteMapDialogComponent implements OnInit {
 
-    constructor(private modelSvc: ModelService) {
+    constructor(private modelSvc: ModelService, private router: Router, public dialogRef: MatDialogRef<DeleteMapDialogComponent>) {
     }
 
     ngOnInit() {
@@ -16,5 +19,6 @@ export class DeleteMapDialogComponent implements OnInit {
 
     public deleteMap() {
         this.modelSvc.deleteMap();
+        location.href = '/';
     }
 }
