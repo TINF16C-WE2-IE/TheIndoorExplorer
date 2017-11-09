@@ -43,9 +43,9 @@ export class Map {
 
     moveFloor(floor: Floor, direction: number): number {
         const floorId = this.floors.indexOf(floor);
-        if (direction === 1 && floorId > -1 && floorId < this.floors.length - 1) {
+        if (floorId + direction > -1 && floorId + direction < this.floors.length) {
             const tmpFloor = this.floors[floorId];
-            const newFloorId = floorId + 1;
+            const newFloorId = floorId + direction;
             this.floors[floorId] = this.floors[newFloorId];
             this.floors[newFloorId] = tmpFloor;
             return newFloorId;
@@ -74,7 +74,10 @@ export class Map {
     public zoom(scale: number, mouse: Mouse = null, x: number = null, y: number = null, dangling = false) {
         const startCanvasWidth = 2000 / this.modelSvc.zoom;
         let sizeX = startCanvasWidth / scale;
-        if (sizeX < 100) sizeX = 100;
+        if (sizeX < 200 || sizeX > 10000) {
+            sizeX = Math.min(Math.max(sizeX, 200), 10000);
+            scale = startCanvasWidth / sizeX;
+        }
         if (mouse && x && y) {
             const ratio = startCanvasWidth / this.modelSvc.viewportSize.x;
             this.modelSvc.panOffset.x = mouse.x - (x - this.modelSvc.bodyOffset.x) * ratio / scale;
@@ -100,12 +103,14 @@ export class Map {
                 if (point.y > bottomRight.y) bottomRight.y = point.y;
             }
             const margin = 100;
-            this.modelSvc.panOffset.setCoords(topLeft.x - margin, topLeft.y - margin);
+            this.modelSvc.panOffset.x = topLeft.x - margin;
+            this.modelSvc.panOffset.y = topLeft.y - margin;
             const width = bottomRight.x - topLeft.x + 2 * margin;
             const height = bottomRight.y - topLeft.y + 2 * margin;
             this.updateCanvasSize(width, height);
         } else {
-            this.modelSvc.panOffset.setCoords(0, 0);
+            this.modelSvc.panOffset.x = 0;
+            this.modelSvc.panOffset.y = 0;
             this.updateCanvasSize(2000, 1);
         }
     }

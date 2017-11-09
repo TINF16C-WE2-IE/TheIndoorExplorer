@@ -32,7 +32,7 @@ export class Mouse {
         const mEvt: MouseEvent = this.convertTouchEvent(evt);
         this.mapToCanvas(mEvt);
 
-        if (this.tool) {
+        if (this.tool && mEvt) {
             this.tool.onMouseDown(mEvt);
         }
         return false; // disallow browser from dragging the svg image
@@ -40,7 +40,7 @@ export class Mouse {
 
     public onMouseUp(evt: any) {
         const mEvt: MouseEvent = this.convertTouchEvent(evt);
-        if (this.tool) {
+        if (this.tool && mEvt) {
             this.tool.onMouseUp(mEvt);
         }
     }
@@ -49,7 +49,7 @@ export class Mouse {
         const mEvt: MouseEvent = this.convertTouchEvent(evt);
         this.mapToCanvas(mEvt);
 
-        if (this.tool) {
+        if (this.tool && mEvt) {
             this.tool.onMouseMove(mEvt);
         }
     }
@@ -70,7 +70,7 @@ export class Mouse {
     }
 
     public onWheel(evt: WheelEvent) {
-        const scale = (- evt.deltaY / Math.abs(evt.deltaY)) * 0.1 + 1;
+        const scale = (- evt.deltaY / Math.abs(evt.deltaY)) * 0.05 + 1;
         this.modelSvc.currentMap.zoom(scale, this, evt.x, evt.y);
         this.onMouseMove(evt);
     }

@@ -55,7 +55,7 @@ export class Floor {
     }
 
     public getAllSelectables(): Selectable[] {
-        return this.portals;
+        return [...this.portals, ...this.stairways];
     }
 
     public getExistingOrThisPoint(p: Point, exclude: Point[] = [], nullIfNotFound = false) {

@@ -36,20 +36,22 @@ export class LineTool extends Tool {
     public onMouseDown(evt: MouseEvent) {
         const start = this.getFloorPointBelowCursor();
         this.point = start.clone();
+        let newSelectable;
         switch (this.lineType) {
             case Wall: {
                 this.floor.walls.push(new Wall(start, this.point));
             }
                 break;
             case Portal: {
-                this.floor.portals.push(new Portal('New Portal', start, this.point));
+                this.floor.portals.push(newSelectable = new Portal('New Portal', start, this.point));
             }
                 break;
             case Stairs: {
-                this.floor.stairways.push(new Stairs('New Stairs', start, this.point));
+                this.floor.stairways.push(newSelectable = new Stairs('New Stairs', start, this.point));
             }
                 break;
         }
+        if (newSelectable) this.modelSvc.selectedObjects = [newSelectable];
         return true;
     }
 

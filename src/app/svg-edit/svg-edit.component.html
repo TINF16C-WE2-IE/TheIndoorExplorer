@@ -40,7 +40,7 @@
             </p>
             <p>
                 <button mat-button
-                        onclick="fileUploadButton.click();">
+                        (click)="fileUploadButton.click();">
                     <mat-icon>add_a_photo</mat-icon>
                     <span>Add image</span>
                 </button>
@@ -115,7 +115,7 @@
                         <svg:defs>
                             <svg:marker id="circle" markerWidth="10" markerHeight="10" refX="5" refY="5"
                                         markerUnits="userSpaceOnUse">
-                                <svg:circle cx="5" cy="5" r="4" style="stroke: none; fill:#000000;"/>
+                                <svg:circle *ngIf="editMode" cx="5" cy="5" r="4" style="stroke: none; fill:#000000;"/>
                             </svg:marker>
 
                             <svg:marker id="solidArrow" markerWidth="13" markerHeight="13" refX="2" refY="6"
@@ -125,13 +125,14 @@
                         </svg:defs>
 
                         <svg:line *ngFor="let wall of floor.walls" stroke="black"
+                                  stroke-width="3" stroke-linecap="round"                        
                                   [attr.x1]="wall.p1.x" [attr.y1]="wall.p1.y" [attr.x2]="wall.p2.x"
                                   [attr.y2]="wall.p2.y"
                                   marker-end="url(#circle)" marker-start="url(#circle)"/>
 
                         <svg:g *ngFor="let portal of floor.portals">
                             <svg:line
-                                    [attr.stroke]="selectedObjects.indexOf(portal) !== -1 ? '#b71c1c' : '#afafaf'"
+                                    [attr.stroke]="getSelectableColor(portal)"
                                     stroke-width="10"
                                     stroke-dasharray="2, 5"
                                     [attr.x1]="portal.p1.x" [attr.y1]="portal.p1.y" [attr.x2]="portal.p2.x"
@@ -145,7 +146,7 @@
 
                         <svg:g *ngFor="let stairs of floor.stairways">
                             <svg:line
-                                    [attr.stroke]="selectedObjects.indexOf(stairs) !== -1 ? '#b71c1c' : '#afafaf'"
+                                    [attr.stroke]="getSelectableColor(stairs)"
                                     stroke-width="10" stroke-dasharray="2, 5"
                                     [attr.x1]="stairs.p1.x" [attr.y1]="stairs.p1.y"
                                     [attr.x2]="stairs.p2.x" [attr.y2]="stairs.p2.y"
@@ -229,6 +230,10 @@
                     <button mat-button (click)="moveFloor(floor, 1)">
                         <mat-icon>vertical_align_top</mat-icon>
                         Move up
+                    </button>
+                    <button mat-button (click)="moveFloor(floor, -1)">
+                        <mat-icon>vertical_align_bottom</mat-icon>
+                        Move down
                     </button>
                 </div>
             </div>

@@ -48,6 +48,7 @@ export class SvgEditComponent implements OnInit {
     public startpoint = true;
 
     @ViewChild('sidenav') sidenav: MatSidenav;
+    @ViewChild('fileUploadButton') fileUploadButton: ElementRef;
     @ViewChild('editorCanvas') editorCanvas: ElementRef;
 
     get floor() {
@@ -63,16 +64,17 @@ export class SvgEditComponent implements OnInit {
         return (this.modelSvc.currentFloor) ? this.modelSvc.currentFloor.floorGraph.paths : null;
     }
 
-    get selectedObjects(): Selectable[] {
-        if (this.modelSvc.currentFloor) return this.modelSvc.selectedObjects.concat(this.modelSvc.currentFloor.searchResults);
-        return this.modelSvc.selectedObjects;
-    }
-
     get singleSelectedObject(): Selectable {
         if (this.modelSvc.selectedObjects.length === 1) {
             return this.modelSvc.selectedObjects[0];
         }
         return null;
+    }
+
+    public getSelectableColor(obj: Selectable) {
+        if (this.modelSvc.selectedObjects.indexOf(obj) !== -1) return '#0d47a1';
+        if (this.modelSvc.currentFloor.searchResults.indexOf(obj) !== -1) return '#b71c1c';
+        return '#afafaf';
     }
 
     get connectibleStairsGroups() {
@@ -116,8 +118,6 @@ export class SvgEditComponent implements OnInit {
 
     selectTool($event: any) {
         console.log($event);
-        // this.modelSvc.selectedObjects = [];
-        // this.modelSvc.searchResultFloors = [];
 
         this.selectedTool = $event;
         switch ($event) {
