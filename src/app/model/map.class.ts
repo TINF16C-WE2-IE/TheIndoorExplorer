@@ -1,5 +1,4 @@
-import { StairNode } from './../pathlib/stair-node.class';
-import { FloorGraph } from './../pathlib/floor-graph.class';
+import { StairNode } from '../pathlib/stair-node.class';
 import { Floor } from './floor.class';
 import { ModelService } from '../svc/model.service';
 import { Mouse } from '../svg-edit/mouse.class';
@@ -32,7 +31,11 @@ export class Map {
 
     public createFloor(cloneFrom: Floor = null) {
         if (!cloneFrom) {
-            this.floors.push(new Floor({walls: [], portals: [], stairways: [], label: ''}));
+            this.floors.push(new Floor({
+                walls: [], portals: [], stairways: [],
+                label: String(Math.max(0, ...this.floors.map(floor => Number.parseInt(floor.label, 10))
+                                                 .filter(n => !Number.isNaN(n))) + 1)
+            }));
         } else {
             this.floors.push(new Floor(cloneFrom.forExport()));
         }
@@ -119,11 +122,19 @@ export class Map {
     }
 
     public getMapDimensions() {
-        const domElement = document.getElementById('editorCanvas').getBoundingClientRect();
-        this.modelSvc.viewportSize.x = domElement.width;
-        this.modelSvc.viewportSize.y = domElement.height;
-        this.modelSvc.bodyOffset.x = domElement.left;
-        this.modelSvc.bodyOffset.y = domElement.top;
+        const domElement = this.modelSvc.editorCanvas.nativeElement.getBoundingClientRect();
+        if (
+            this.modelSvc.viewportSize.x !== domElement.width ||
+            this.modelSvc.viewportSize.y !== domElement.height ||
+            this.modelSvc.bodyOffset.x !== domElement.left ||
+            this.modelSvc.bodyOffset.y !== domElement.top
+        ) {
+            this.modelSvc.viewportSize.x = domElement.width;
+            this.modelSvc.viewportSize.y = domElement.height;
+            this.modelSvc.bodyOffset.x = domElement.left;
+            this.modelSvc.bodyOffset.y = domElement.top;
+            this.updateCanvasSize(this.modelSvc.canvasSize.x, 1);
+        }
     }
 
     public search(query: string) {

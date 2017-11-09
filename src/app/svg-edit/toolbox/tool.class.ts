@@ -79,6 +79,6 @@ export abstract class Tool {
     }
 
     protected isSelectable(obj: Selectable | any): obj is Selectable {
-        return (obj && obj.id !== undefined && obj.label !== undefined);
+        return (obj && obj.label !== undefined);
     }
 }

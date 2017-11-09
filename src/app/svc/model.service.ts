@@ -1,13 +1,9 @@
-import { LinePath } from './../pathlib/line-path.class';
-import { FloorGraph } from './../pathlib/floor-graph.class';
-import { Floor } from './../model/floor.class';
 import { Selectable } from './../model/selectable.interface';
 import { Point } from './../model/point.class';
-import { Line } from './../model/line.class';
-import { Pathfinder } from './../pathlib/pathfinder.class';
 import { Map } from '../model/map.class';
-import { Injectable } from '@angular/core';
+import { ElementRef, Injectable } from '@angular/core';
 import { RequestService } from './request.service';
+import { Stairs } from '../model/stairs.class';
 
 
 @Injectable()
@@ -16,9 +12,12 @@ export class ModelService {
     public maps: {[id: number]: Map};
     public currentMapId: number;
     public currentFloorId: number;
-    public selectedObjects: Selectable[] = [];
     public userInfo: {id: number, username: string};
 
+    private _selectedObjects: Selectable[] = [];
+    public connectibleStairsGroups: StairsGroup[] = [];
+
+    public editorCanvas: ElementRef;
     public viewportSize: {x: number, y: number} = {x: 500, y: 500};
     public canvasSize: {x: number, y: number} = {x: 500, y: 500};
     public panOffset = new Point(0, 0);
@@ -40,6 +39,15 @@ export class ModelService {
         } else {
             return null;
         }
+    }
+
+    public get selectedObjects(): Selectable[] {
+        return this._selectedObjects;
+    }
+
+    public set selectedObjects(value: Selectable[]) {
+        this._selectedObjects = value;
+        this.updateConnectibleStairsGroups();
     }
 
     public setCurrentFloor(id: number) {
@@ -78,7 +86,8 @@ export class ModelService {
         );
     }
 
-    public loadMap(mapId: number, callback: () => void = () => {}) {
+    public loadMap(mapId: number, callback: () => void = () => {
+    }) {
         if (mapId === -1) {
             const newMap = new Map({
                 id: -1,
@@ -115,5 +124,26 @@ export class ModelService {
             });
     }
 
+    updateConnectibleStairsGroups() {
+        const stairsGroups: StairsGroup[] = [];
+        for (const stairs of this.currentMap.floors
+                                 .reduce((stairsList, floor) => stairsList.concat(floor.stairways), []) as Stairs[]) {
+            if (stairs.group !== null) {
+                const foundGroup = stairsGroups.find(grp => grp.group === stairs.group);
+                if (foundGroup) {
+                    foundGroup.stairways.push(stairs);
+                }
+                else {
+                    stairsGroups.push({group: stairs.group, stairways: [stairs]});
+                }
+            }
+        }
+        this.connectibleStairsGroups = stairsGroups;
+    }
+}
 
+
+export interface StairsGroup {
+    group: number;
+    stairways: Stairs[];
 }

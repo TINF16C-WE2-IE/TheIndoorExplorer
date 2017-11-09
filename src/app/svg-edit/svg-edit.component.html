@@ -74,13 +74,14 @@
                 <input matInput name="objname" [(ngModel)]="singleSelectedObject.label" placeholder="Object Name">
             </mat-form-field>
             <mat-form-field *ngIf="singleSelectedObject | type:'Stairs'">
-                <input type="text" placeholder="Link stairs" aria-label="text" matInput [matAutocomplete]="auto">
-                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="connectStairs($event)"
-                                  [displayWith]="getStairsDisplayName">
-                    <mat-option *ngFor="let stairs of getConnectibleStairs()" [value]="stairs">
-                        {{getStairsDisplayName(stairs)}}
+                <mat-select [value]="singleSelectedObject.group" (change)="setStairsGroup($event)"
+                            placeholder="Connect stairs">
+                    <mat-option [value]="null">None</mat-option>
+                    <mat-option [value]="undefined">New group</mat-option>
+                    <mat-option *ngFor="let stairsGroup of connectibleStairsGroups" [value]="stairsGroup.group">
+                        {{getStairsGroupDisplayName(stairsGroup)}}
                     </mat-option>
-                </mat-autocomplete>
+                </mat-select>
             </mat-form-field>
         </div>
         <div *ngIf="editMode" style="padding-top: 20px">
@@ -100,7 +101,7 @@
             </button>
             <div id="canvas-container">
 
-                <svg id="editorCanvas"
+                <svg id="editorCanvas" #editorCanvas
                      [attr.viewBox]="viewBoxString()"
                      [style.cursor]="mouse.tool.cursorShape"
                      (mouseup)="mouse.onMouseUp($event)" (mousedown)="mouse.onMouseDown($event)"
@@ -147,29 +148,31 @@
                             </svg:text>
                         </svg:g>
 
-                    <svg:g *ngFor="let stairs of floor.stairways">
-                        <svg:line
-                                [attr.stroke]="selectedObjects.indexOf(stairs) !== -1 ? '#b71c1c' : '#afafaf'"
-                                stroke-width="10"
-                                stroke-dasharray="2, 5"
-                                [attr.x1]="stairs.p1.x" [attr.y1]="stairs.p1.y" [attr.x2]="stairs.p2.x"
-                                [attr.y2]="stairs.p2.y"
-                                marker-end="url(#circle)" marker-start="url(#circle)"/>
-                        <svg:line stroke="grey" [attr.stroke-width]="stairs.width" stroke-dasharray="4, 8"
-                                  [attr.x1]="stairs.center.x" [attr.y1]="stairs.center.y"
-                                  [attr.x2]="stairs.rearCenter.x" [attr.y2]="stairs.rearCenter.y"
-                                  marker-end="url(#solidArrow)"/>
-                        <svg:text *ngIf="showLabels" text-anchor="middle"
-                                  [attr.x]="stairs.center.x" [attr.y]="stairs.center.y + 20">
-                            {{stairs.label}}
-                        </svg:text>
-                    </svg:g>
-                    <svg:g *ngFor="let paths of movingPaths">
-                        <svg:line *ngFor="let path of paths.path" stroke="red" stroke-width="3" stroke-linecap="round"
-                                  stroke-linejoin="bevel" stroke-dasharray="50,10" fill="none"
-                                  [attr.x1]="path.p1.x" [attr.y1]="path.p1.y" [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
-                                  marker-end="url(#circle)" marker-start="url(#circle)"/>
-                    </svg:g>
+                        <svg:g *ngFor="let stairs of floor.stairways">
+                            <svg:line
+                                    [attr.stroke]="selectedObjects.indexOf(stairs) !== -1 ? '#b71c1c' : '#afafaf'"
+                                    stroke-width="10" stroke-dasharray="2, 5"
+                                    [attr.x1]="stairs.p1.x" [attr.y1]="stairs.p1.y"
+                                    [attr.x2]="stairs.p2.x" [attr.y2]="stairs.p2.y"
+                                    marker-end="url(#circle)" marker-start="url(#circle)"/>
+                            <svg:line stroke="grey" [attr.stroke-width]="stairs.width" stroke-dasharray="4, 8"
+                                      [attr.x1]="stairs.center.x" [attr.y1]="stairs.center.y"
+                                      [attr.x2]="stairs.rearCenter.x" [attr.y2]="stairs.rearCenter.y"
+                                      marker-end="url(#solidArrow)"/>
+                            <svg:text *ngIf="showLabels" text-anchor="middle"
+                                      [attr.x]="stairs.center.x" [attr.y]="stairs.center.y + 20">
+                                {{stairs.label}}
+                            </svg:text>
+                        </svg:g>
+
+                        <svg:g *ngFor="let paths of movingPaths">
+                            <svg:line *ngFor="let path of paths.path" stroke="red" stroke-width="3"
+                                      stroke-linecap="round" stroke-linejoin="bevel"
+                                      stroke-dasharray="50,10" fill="none"
+                                      [attr.x1]="path.p1.x" [attr.y1]="path.p1.y"
+                                      [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
+                                      marker-end="url(#circle)" marker-start="url(#circle)"/>
+                        </svg:g>
 
                         <svg:circle *ngIf="mouse.xs !== null && mouse.ys !== null"
                                     [attr.cx]="mouse.xs" [attr.cy]="mouse.ys" r="5" style="stroke:red; fill:none"/>
@@ -199,7 +202,7 @@
                     <mat-button-toggle *ngFor="let f of floors; let i = index" [class.mat-raised-button]="floor == f"
                                        [class.search-result-floor]="f.searchResults.length"
                                        (click)="selectFloor(i)">
-                        {{f.label.length ? f.label : i+1}}
+                        {{f.label || '?'}}
                     </mat-button-toggle>
                     <div id="floor-spacer"></div>
                     <button mat-raised-button color="accent" *ngIf="!editMode && hasWritePermission"

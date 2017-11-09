@@ -1,4 +1,4 @@
-import { Stairs } from './../model/stairs.class';
+import { Stairs } from '../model/stairs.class';
 
 export class StairNode {
     public stairs: Stairs;
@@ -13,7 +13,4 @@ export class StairNode {
         this.costs = costs;
     }
 
-    public equals(another: StairNode): boolean {
-        return this.stairs.id === another.stairs.id && this.floorLevel === another.floorLevel;
-    }
 }

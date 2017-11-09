@@ -2,9 +2,9 @@ import { LinePath } from '../pathlib/line-path.class';
 import { Floor } from '../model/floor.class';
 import { Selectable } from '../model/selectable.interface';
 import { Wall } from '../model/wall.class';
-import { ModelService } from '../svc/model.service';
+import { ModelService, StairsGroup } from '../svc/model.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import 'rxjs/add/operator/switchMap';
 import { Mouse } from './mouse.class';
 import { MoveTool } from './toolbox/move-tool.class';
@@ -13,10 +13,9 @@ import { DeleteTool } from './toolbox/delete-tool.class';
 import { LineTool } from './toolbox/line-tool.class';
 import { DirectionsTool } from './toolbox/directions-tool.class';
 import { Portal } from '../model/portal.class';
-import { MatAutocomplete, MatAutocompleteSelectedEvent, MatIconRegistry, MatSidenav } from '@angular/material';
+import { MatIconRegistry, MatSelectChange, MatSidenav } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Stairs } from '../model/stairs.class';
-import { FormControl } from '@angular/forms';
 
 @Component({
     selector: 'app-svg-edit',
@@ -44,10 +43,9 @@ export class SvgEditComponent implements OnInit {
     public backgroundImageDataURL = null;
     public sideNavMode = 'over';
     public startpoint = true;
-    toolBoxControl: FormControl = new FormControl();
-    routeControl: FormControl = new FormControl();
+
     @ViewChild('sidenav') sidenav: MatSidenav;
-    @ViewChild('auto') auto: MatAutocomplete;
+    @ViewChild('editorCanvas') editorCanvas: ElementRef;
 
     get floor() {
         return this.modelSvc.currentFloor;
@@ -74,6 +72,10 @@ export class SvgEditComponent implements OnInit {
         return null;
     }
 
+    get connectibleStairsGroups() {
+        return this.modelSvc.connectibleStairsGroups;
+    }
+
     get hasWritePermission(): boolean {
         return true;
         // return this.modelSvc.currentMap.permission === 1;
@@ -93,13 +95,14 @@ export class SvgEditComponent implements OnInit {
     }
 
     ngOnInit() {
-
         this.mouse = new Mouse(this.modelSvc);
         this.selectTool('Directions');
 
+        this.modelSvc.editorCanvas = this.editorCanvas;
         this.route.params.subscribe(
             params => {
-                this.modelSvc.loadMap(Number.parseInt(params['mapId']),
+                this.modelSvc.loadMap(
+                    Number.parseInt(params['mapId']),
                     () => {
                         (<DirectionsTool>this.mouse.tool).onMapLoaded();
                     }
@@ -107,8 +110,6 @@ export class SvgEditComponent implements OnInit {
             }
         );
     }
-
-    // generatePath moved to directions-tool
 
     selectTool($event: any) {
         console.log($event);
@@ -165,8 +166,8 @@ export class SvgEditComponent implements OnInit {
     }
 
     viewBoxString() {
-        return this.modelSvc.panOffset.x + ' ' + this.modelSvc.panOffset.y + ' '
-            + this.modelSvc.canvasSize.x + ' ' + this.modelSvc.canvasSize.y;
+        return (this.modelSvc.panOffset.x || 0) + ' ' + (this.modelSvc.panOffset.y || 0) + ' '
+            + (this.modelSvc.canvasSize.x || 0) + ' ' + (this.modelSvc.canvasSize.y || 0);
     }
 
     zoom(direction: number) {
@@ -222,27 +223,35 @@ export class SvgEditComponent implements OnInit {
         }
     }
 
-    getStairsDisplayName(stairs: Stairs) {
-        return stairs ? stairs.prettyName : 'none';
+    getStairsGroupDisplayName(stairsGroup: StairsGroup) {
+        return 'Group ' + stairsGroup.group + ': ' +
+            stairsGroup.stairways.map(stairs => {
+                const floor = this.modelSvc.currentMap.floors.find(fl => fl.stairways.indexOf(stairs) !== -1);
+                const floorIndex = this.modelSvc.currentMap.floors.indexOf(floor);
+                return {index: floorIndex, floorLabel: (floor.label || '?'), stairsLabel: (stairs.label || '?')};
+            }).sort((a, b) => {
+                return (a.index - b.index) || a.stairsLabel.toUpperCase().localeCompare(b.stairsLabel.toUpperCase());
+            }).map(obj => {
+                return obj.stairsLabel + '(' + obj.floorLabel + ')';
+            }).join(', ');
     }
 
-    getConnectibleStairs(): Stairs[] {
-        return this.modelSvc.currentMap.floors.map(floor => floor.stairways)
-                   .reduce((prev, current) => prev.concat(current))
-                   .filter(stairs => stairs.target === null && stairs.floor !== this.floor).concat([null]);
-    }
 
-    connectStairs(event: MatAutocompleteSelectedEvent) {
+    setStairsGroup(event: MatSelectChange) {
         if (this.singleSelectedObject instanceof Stairs) {
-            const stairs: Stairs = event.option.value as Stairs;
-            if (this.singleSelectedObject.target) {
-                this.singleSelectedObject.target.target = null;
+            const group: number = event.value;
+            if (group === undefined) {  // new Group
+                this.singleSelectedObject.group = Math.max(
+                    0, ...this.modelSvc.currentMap.floors
+                              .reduce((stairsList, floor) => stairsList.concat(floor.stairways), [])
+                              .map(stairs => stairs.group)
+                ) + 1;
             }
-            this.singleSelectedObject.target = stairs;
-            if (stairs) {
-                stairs.target = this.singleSelectedObject;
+            else {
+                this.singleSelectedObject.group = group;
             }
         }
+        this.modelSvc.updateConnectibleStairsGroups();
     }
 
     @HostListener('window:resize', ['$event'])

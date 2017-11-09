@@ -1,4 +1,4 @@
-import { FloorGraph } from './../pathlib/floor-graph.class';
+import { FloorGraph } from '../pathlib/floor-graph.class';
 import { Portal } from './portal.class';
 import { Wall } from './wall.class';
 import { Point } from './point.class';
@@ -17,11 +17,10 @@ export class Floor {
 
     constructor(obj: {
         walls: {p1: {x: number, y: number}, p2: {x: number, y: number}}[],
-        portals: {id: number, label: string, p1: {x: number, y: number}, p2: {x: number, y: number}}[],
+        portals: {label: string, p1: {x: number, y: number}, p2: {x: number, y: number}}[],
         stairways: {
-            id: number, label: string, p1: {x: number, y: number}, p2: {x: number, y: number},
-            target: Stairs,
-            canEnter: boolean, canLeave: boolean, length: number
+            label: string, p1: {x: number, y: number}, p2: {x: number, y: number},
+            group: number, canEnter: boolean, canLeave: boolean, length: number
         }[]
         label: string
     }) {
@@ -33,13 +32,13 @@ export class Floor {
         for (const portal_obj of obj.portals) {
             const p1 = this.getExistingOrThisPoint(new Point(portal_obj.p1.x, portal_obj.p1.y));
             const p2 = this.getExistingOrThisPoint(new Point(portal_obj.p2.x, portal_obj.p2.y));
-            this.portals.push(new Portal(portal_obj.id, portal_obj.label, p1, p2));
+            this.portals.push(new Portal(portal_obj.label, p1, p2));
         }
         for (const stairs_obj of obj.stairways) {
             const p1 = this.getExistingOrThisPoint(new Point(stairs_obj.p1.x, stairs_obj.p1.y));
             const p2 = this.getExistingOrThisPoint(new Point(stairs_obj.p2.x, stairs_obj.p2.y));
-            this.stairways.push(new Stairs(this, stairs_obj.id, stairs_obj.label, p1, p2,
-                stairs_obj.target, stairs_obj.canEnter, stairs_obj.canLeave, stairs_obj.length));
+            this.stairways.push(new Stairs(stairs_obj.label, p1, p2,
+                stairs_obj.group, stairs_obj.canEnter, stairs_obj.canLeave, stairs_obj.length));
         }
         this.label = obj.label ? obj.label : '';
         this.floorGraph = new FloorGraph();
@@ -76,30 +75,36 @@ export class Floor {
     }
 
     public joinPoints(master: Point, slave: Point) {
-        const lines = [...this.walls, ...this.portals] as Line[];
-        for (const line of lines) {
-            line.replacePoint(slave, master);
-            if (line.isValid()) {
-                if (
-                    this.walls.find(w => !w.deleted && line !== w && line.equals(w)) ||
-                    this.portals.find(p => !p.deleted && line !== p && line.equals(p))
-                ) {
-                    console.log('Deleting invalid line (duplicate):', JSON.stringify(line));
-                    line.deleted = true;
-                }
-            }
-            else {
-                console.log('Deleting invalid line (start=end):', JSON.stringify(line));
-                line.deleted = true;
-            }
-        }
-        this.applyDelete();
+        this.walls.forEach(line => line.replacePoint(slave, master));
+        this.portals.forEach(line => line.replacePoint(slave, master));
+        this.stairways.forEach(line => line.replacePoint(slave, master));
+
+        this.walls = this.walls.filter(line => this.lineIsValid(line));
+        this.portals = this.portals.filter(line => this.lineIsValid(line));
+        this.stairways = this.stairways.filter(line => this.lineIsValid(line));
     }
 
-    public applyDelete() {
-        this.walls = this.walls.filter(wall => !wall.deleted);
-        this.portals = this.portals.filter(portal => !portal.deleted);
-        this.stairways = this.stairways.filter(stairs => !stairs.deleted);
+    private lineIsValid(line: Line) {
+        if (line.isValid()) {
+            if (
+                this.walls.find((w, i) => line !== w && line.equals(w) &&
+                    (line instanceof Wall ? this.walls.indexOf(line as Wall) < i : true)) ||
+                this.portals.find((p, i) => line !== p && line.equals(p) &&
+                    (line instanceof Portal ? this.portals.indexOf(line as Portal) < i : true)) ||
+                this.stairways.find((s, i) => line !== s && line.equals(s) &&
+                    (line instanceof Stairs ? this.stairways.indexOf(line as Stairs) < i : true))
+            ) {
+                console.log('Deleting invalid line (duplicate):', JSON.stringify(line.forExport()));
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+        else {
+            console.log('Deleting invalid line (start=end):', JSON.stringify(line.forExport()));
+            return false;
+        }
     }
 
     public forExport() {

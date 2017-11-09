@@ -1,11 +1,10 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG, HammerGestureConfig } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { routing } from './app.routing';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { HashLocationStrategy, Location, LocationStrategy } from '@angular/common';
-import { HammerGestureConfig, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 import { SvgEditComponent } from './svg-edit/svg-edit.component';
@@ -25,25 +24,26 @@ import {
     MatGridListModule,
     MatIconModule,
     MatInputModule,
+    MatListModule,
     MatMenuModule,
     MatProgressSpinnerModule,
+    MatRadioModule,
+    MatSelectModule,
+    MatSidenavModule,
     MatSliderModule,
     MatSlideToggleModule,
-    MatListModule,
-    MatSidenavModule,
     MatSnackBarModule,
     MatTableModule,
     MatToolbarModule,
-    MatTooltipModule,
-    MatRadioModule,
+    MatTooltipModule
 } from '@angular/material';
 import { MapListComponent } from './main/map-list.component';
-import {MainComponent} from './main/main.component';
-import { ToolbarComponent} from './svg-edit/toolbar.component';
+import { MainComponent } from './main/main.component';
+import { ToolbarComponent } from './svg-edit/toolbar.component';
 import { TypeNamePipe } from './svg-edit/type-name.pipe';
 import { MapnameDialogComponent } from './svg-edit/dialogs/mapname-dialog.component';
 
-export class MyHammerConfig extends HammerGestureConfig  {
+export class MyHammerConfig extends HammerGestureConfig {
     overrides = <any>{
         'pinch': {enable: true}
     };
@@ -68,12 +68,12 @@ export class MyHammerConfig extends HammerGestureConfig  {
         MatIconModule, MatSliderModule, MatSidenavModule,
         MatSlideToggleModule, MatListModule, MatGridListModule, MatFormFieldModule,
         MatInputModule, MatProgressSpinnerModule, MatTableModule, MatTooltipModule, MatSnackBarModule, MatRadioModule,
-        FlexLayoutModule
+        FlexLayoutModule, MatSelectModule
     ],
     providers: [
         Location, {provide: LocationStrategy, useClass: HashLocationStrategy}, RequestService, ModelService,
         MessageService,
-        { provide: HAMMER_GESTURE_CONFIG, useClass: MyHammerConfig }
+        {provide: HAMMER_GESTURE_CONFIG, useClass: MyHammerConfig}
     ],
     bootstrap: [AppComponent]
 })

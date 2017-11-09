@@ -1,18 +1,16 @@
 import { Point } from './point.class';
 import { Line } from './line.class';
-import { Selectable } from './../model/selectable.interface';
+import { Selectable } from './selectable.interface';
 
 export class Portal extends Line implements Selectable {
-    public id: number;
     public label: string;
 
-    constructor(id: number, label: string, p1: Point, p2: Point) {
+    constructor(label: string, p1: Point, p2: Point) {
         super(p1, p2);
-        this.id = id;
         this.label = label;
     }
 
     public forExport() {
-        return Object.assign(super.forExport(), {id: this.id, label: this.label});
+        return Object.assign(super.forExport(), {label: this.label});
     }
 }

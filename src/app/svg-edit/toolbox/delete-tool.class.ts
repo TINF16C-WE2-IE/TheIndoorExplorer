@@ -15,8 +15,9 @@ export class DeleteTool extends Tool {
 
     public onMouseUp(evt: MouseEvent) {
         const selected = this.getExistingObjectsBelowCursor().obj;
-        selected.deleted = true;
-        this.modelSvc.currentFloor.applyDelete();
+        this.floor.walls = this.floor.walls.filter(line => line !== selected);
+        this.floor.portals = this.floor.portals.filter(line => line !== selected);
+        this.floor.stairways = this.floor.stairways.filter(line => line !== selected);
     }
 
     public onMouseMove(evt: MouseEvent) {

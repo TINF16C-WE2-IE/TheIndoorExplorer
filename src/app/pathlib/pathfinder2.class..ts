@@ -351,7 +351,7 @@ export class Pathfinder2 {
             for (const n1 of nodes) {
                 for (const n2 of nodes) {
 
-                    if (!n1.equals(n2)) {
+                    if (n1 !== n2) {
                         if (chckdN.find(el =>
                                 ((el.p1.x === n1.stairs.center.x && el.p1.y === n1.stairs.center.y)
                                     && (el.p2.x === n2.stairs.center.x && el.p2.y === n2.stairs.center.y))
@@ -385,7 +385,7 @@ export class Pathfinder2 {
         // in the second part, we just link the stairs of individual floors together!
         for (const n1 of totalNodes) {
             for (const n2 of totalNodes) {
-                if (!n1.equals(n2) && n1.floorLevel !== n2.floorLevel) {
+                if ((n1 !== n2) && n1.floorLevel !== n2.floorLevel) {
 
                     if (chckdN.find(el =>
                             ((el.p1.x === n1.stairs.center.x && el.p1.y === n1.stairs.center.y)
@@ -397,7 +397,7 @@ export class Pathfinder2 {
                         ) === undefined) {
 
                         // we need to check, if one stair has the other as target
-                        if (n2.stairs.target === n1.stairs || n1.stairs.target === n2.stairs) {
+                        if (n1.stairs.group === n1.stairs.group) {
 
                             // pythagoras value for this 3d length :D
                             const hDist = Math.sqrt(
@@ -452,14 +452,10 @@ export class Pathfinder2 {
         // create a copy of the stair graph. and add start and end.
         const cpy: StairNode[] = [];
         Object.assign(cpy, currentMap.stairGraph);
-        const stnt = new StairNode(new Stairs(
-            currentMap.floors[floorId1], -1, 'start point', new Point(point1.x + 10, point1.y + 10, false),
-            new Point(point1.x - 10, point1.y - 10, false)
-        ), floorId1);
-        const ndnt = new StairNode(new Stairs(
-            currentMap.floors[floorId2], -2, 'end point', new Point(point2.x + 10, point2.y + 10, false),
-            new Point(point2.x - 10, point2.y - 10, false)
-        ), floorId2);
+        const stnt = new StairNode(new Stairs('start point', new Point(point1.x + 10, point1.y + 10, false),
+            new Point(point1.x - 10, point1.y - 10, false)), floorId1);
+        const ndnt = new StairNode(new Stairs('end point', new Point(point2.x + 10, point2.y + 10, false),
+            new Point(point2.x - 10, point2.y - 10, false)), floorId2);
 
         // connect the start and end with other stairs on the same floor
         for (const st of cpy) {
@@ -599,7 +595,7 @@ export class Pathfinder2 {
             // while the last node in backtracking-path has a valid parent (means: not themselves), go on.
             const resultPath = [];
             resultPath.push(end);
-            while (!parents[nodes.indexOf(resultPath[resultPath.length - 1])].equals(resultPath[resultPath.length - 1])) {
+            while (parents[nodes.indexOf(resultPath[resultPath.length - 1])] !== resultPath[resultPath.length - 1]) {
                 resultPath.push(parents[nodes.indexOf(resultPath[resultPath.length - 1])]);
             }
             resultPath.reverse();
