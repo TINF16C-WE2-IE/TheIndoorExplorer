@@ -13,9 +13,12 @@ import { DeleteTool } from './toolbox/delete-tool.class';
 import { LineTool } from './toolbox/line-tool.class';
 import { DirectionsTool } from './toolbox/directions-tool.class';
 import { Portal } from '../model/portal.class';
-import { MatIconRegistry, MatSelectChange, MatSidenav } from '@angular/material';
+import { MatDialog, MatIconRegistry, MatSelectChange, MatSidenav } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Stairs } from '../model/stairs.class';
+import { MapnameDialogComponent } from './dialogs/mapname-dialog.component';
+import { DeleteMapDialogComponent } from './dialogs/delete-map-dialog.component';
+import { PublishMapDialogComponent } from './dialogs/publish-map-dialog.component';
 
 @Component({
     selector: 'app-svg-edit',

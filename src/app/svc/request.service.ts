@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Http, RequestOptions, Headers } from '@angular/http';
+import { Http, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 @Injectable()
@@ -7,11 +7,14 @@ export class RequestService {
 
 
     public static readonly URL_LOGIN_ENDPOINT = 'https://bin.nubenum.de/ie/auth.php?action=login';
-    private static readonly URL_API = 'https://bin.nubenum.de/ie/api/api.php?';
-    public static readonly LIST_MAPS = 'maplist';
-    public static readonly LIST_MAP_DETAILS = 'jsonmap';
-    public static readonly LIST_MAP_SAVE = 'insertupdatemap';
-    public static readonly INFO_USER = 'userinfo';
+    private static readonly URL_API = 'https://bin.nubenum.de/ie/api/v1/';
+    public static readonly LIST_MAPS = 'map';
+    public static readonly LIST_MAP_DETAILS = 'map/';
+    public static readonly LIST_MAP_SAVE = 'map/';
+    public static readonly INFO_USER = 'user';
+    public static readonly DELETE_MAP = 'map/';
+    public static readonly LOGOUT = 'user/logout';
+    public static readonly PUBLISH = 'map/';
 
     private options: RequestOptions;
 
@@ -30,6 +33,13 @@ export class RequestService {
     public post(endpoint: string, obj: any): Observable<any> {
         return this.http.post(
             encodeURI(RequestService.URL_API + endpoint), obj, this.options
+        ).map(res => this.handleResponse(res));
+    }
+
+    public delete(endpoint: string, paramsObj: any): Observable<any> {
+        return this.http.delete(
+            encodeURI(RequestService.URL_API + endpoint + this.uriEncodeObject(paramsObj)),
+            this.options
         ).map(res => this.handleResponse(res));
     }
 
@@ -60,7 +70,6 @@ export class RequestService {
                 str += '&' + encodeURI(key) + '=' + encodeURIComponent(obj[key]);
             }
         }
-
         return str;
     }
 }

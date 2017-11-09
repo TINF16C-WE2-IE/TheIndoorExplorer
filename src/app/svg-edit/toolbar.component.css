@@ -4,16 +4,17 @@
     top:0;
     left:0;
     z-index: 550;
+    padding-left: 8px;
 }
 
 .example-fill-remaining-space {
     flex: 1 1 auto;
 }
 mat-toolbar button {
-    padding: 0;
+    padding: 0 8px;
 }
 
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 650px) {
     .mat-toolbar .mat-button{
         min-width: 35px;
     }
@@ -44,4 +45,7 @@ mat-toolbar button {
     transition: opacity 0.35s ease-in;
     opacity: 1;
 }
-
+#back{
+    z-index: auto;
+    margin-left: -8px;
+}

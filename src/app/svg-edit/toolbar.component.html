@@ -1,10 +1,34 @@
 <mat-toolbar class="mat-elevation-z6">
-    <div (click)="openDialog()" id="openDialog">
+
+    <button mat-icon-button id="back" [routerLink]="['']">
+        <mat-icon aria-label="Back to home">arrow_back</mat-icon>
+    </button>
+    <div (click)="openNameDialog()" id="openDialog">
         <span>{{modelSvc.currentMap?.name}} </span>
         <mat-icon id='editname'>mode_edit</mat-icon>
     </div>
 
     <span class="example-fill-remaining-space"></span>
+
+    <div >
+        <button mat-button (click)="saveCurrentMap()">
+            <mat-icon >save</mat-icon>
+            <span class="toolbar-text">Save</span>
+        </button>
+    </div>
+    <div >
+        <button mat-button (click)="openPublishDialog()">
+            <mat-icon >share</mat-icon>
+            <span class="toolbar-text">Publish</span>
+        </button>
+    </div>
+
+    <div >
+        <button mat-button (click)="openDeleteDialog()">
+            <mat-icon >delete_forever</mat-icon>
+            <span class="toolbar-text">Delete map</span>
+        </button>
+    </div>
 
     <div *ngIf="!modelSvc.userInfo?.id">
         <button mat-button [matMenuTriggerFor]="appMenu">
@@ -12,18 +36,13 @@
             <span class="toolbar-text">Login</span>
         </button>
     </div>
+
     <div *ngIf="modelSvc.userInfo?.id">
         <button mat-button [matMenuTriggerFor]="appMenu">
             <mat-icon id="toolbarLoggedIn">account_box</mat-icon>
             <span class="toolbar-text">{{modelSvc.userInfo.username}}</span>
         </button>
     </div>
-    <button mat-button [routerLink]="['']">
-        <mat-icon id="home">home</mat-icon>
-        <span class="toolbar-text">Home</span>
-
-    </button>
-</mat-toolbar>
 
 <mat-menu #appMenu="matMenu" [overlapTrigger]="false">
     <div *ngIf="!modelSvc.userInfo?.id;">

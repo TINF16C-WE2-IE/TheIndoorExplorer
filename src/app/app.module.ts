@@ -42,6 +42,8 @@ import { MainComponent } from './main/main.component';
 import { ToolbarComponent } from './svg-edit/toolbar.component';
 import { TypeNamePipe } from './svg-edit/type-name.pipe';
 import { MapnameDialogComponent } from './svg-edit/dialogs/mapname-dialog.component';
+import { DeleteMapDialogComponent } from './svg-edit/dialogs/delete-map-dialog.component';
+import { PublishMapDialogComponent } from './svg-edit/dialogs/publish-map-dialog.component';
 
 export class MyHammerConfig extends HammerGestureConfig {
     overrides = <any>{
@@ -57,10 +59,15 @@ export class MyHammerConfig extends HammerGestureConfig {
         MainComponent,
         ToolbarComponent,
         MapnameDialogComponent,
-        TypeNamePipe
+        DeleteMapDialogComponent,
+        TypeNamePipe,
+        DeleteMapDialogComponent,
+        PublishMapDialogComponent
     ],
     entryComponents: [
-        MapnameDialogComponent
+        DeleteMapDialogComponent,
+        MapnameDialogComponent,
+        PublishMapDialogComponent
     ],
     imports: [
         BrowserModule, FormsModule, HttpModule, routing, BrowserAnimationsModule, MatAutocompleteModule,
