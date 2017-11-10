@@ -44,11 +44,6 @@
                     <mat-icon>add_a_photo</mat-icon>
                     <span>Add image</span>
                 </button>
-                <br>
-                <button mat-button>
-                    <mat-icon>public</mat-icon>
-                    <span>Publish map</span>
-                </button>
             </p>
         </div>
 
@@ -201,7 +196,7 @@
                         {{f.label || '?'}}
                     </mat-button-toggle>
                     <div id="floor-spacer"></div>
-                    <button mat-raised-button color="accent" *ngIf="!editMode && hasWritePermission"
+                    <button mat-raised-button color="primary" *ngIf="!editMode && hasWritePermission"
                             (click)="switchToEditMode()" class="edit-button">
                         <mat-icon aria-label="Edit">edit</mat-icon>
                         <span>Edit mode</span>

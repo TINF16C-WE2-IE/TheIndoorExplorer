@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 /* Angular-Material Theme */
-@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+/*@import '~@angular/material/prebuilt-themes/indigo-pink.css';*/
+
 
 * {
     box-sizing: border-box;
@@ -12,7 +13,7 @@ html{
 
 body {
     margin: 0;
-    background-color: #4ABDAC;
+    background-color: #4DB6AC;
     height:100%;
     position: relative;
 }

@@ -32,7 +32,7 @@ export abstract class Tool {
         return this.floor.getExistingOrThisPoint(new Point(this.mouse.x, this.mouse.y), exclude);
     }
 
-    protected getExistingObjectsBelowCursor(lineAccuracy = 5): { points: Point[], obj: any } {
+    protected getExistingObjectsBelowCursor(lineAccuracy = 10): { points: Point[], obj: any } {
         const point = this.floor.getExistingOrThisPoint(new Point(this.mouse.x, this.mouse.y), [], true);
         if (point) {
             return {points: [point], obj: null};
