@@ -8,7 +8,6 @@ import { Tool } from './tool.class';
 import { Point } from '../../model/point.class';
 import { Selectable } from '../../model/selectable.interface';
 import { Line } from '../../model/line.class';
-import { Pathfinder } from '../../pathlib/pathfinder.class';
 
 export class DirectionsTool extends Tool {
 
@@ -55,14 +54,10 @@ export class DirectionsTool extends Tool {
 
     public selectWaypoint(selected: Selectable | any) {
 
-        console.log('selected:', selected);
-
         // TS has no way of checking for an interface :(
         if (this.isSelectable(selected)) {
             if (this.modelSvc.selectedObjects.length) {
 
-                console.log('generate path from/to:', this.selectedDest1.p,
-                        this.selectedDest1.fid, selected.center, this.modelSvc.currentFloorId, this.modelSvc.currentMap);
                 this.pfinder.generateGlobalPath(this.selectedDest1.p,
                         this.selectedDest1.fid, selected.center, this.modelSvc.currentFloorId, this.modelSvc.currentMap);
                 this.modelSvc.selectedObjects = [];
@@ -110,7 +105,5 @@ export class DirectionsTool extends Tool {
         for (const f of this.modelSvc.currentMap.floors) {
             f.floorGraph.paths = [];
         }
-
-        console.log('got map', this.modelSvc.currentMap);
     }
 }

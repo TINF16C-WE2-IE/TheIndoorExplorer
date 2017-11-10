@@ -507,8 +507,6 @@ export class Pathfinder2 {
         }
         cpy.push(stnt, ndnt);
 
-        console.log('map links', currentMap.stairGraph.map(el => el.links.map(elm => ({c: elm.stairs.center, l: elm.floorLevel}))));
-
         // now search the shortest global path from start to end
         // this is kind of funny ;)
         const stairPath = this.findStairPathFromTo(cpy, stnt, ndnt);
@@ -517,18 +515,14 @@ export class Pathfinder2 {
 
         // now go through the global stairpath and just calculate the paths between the stairs on the same floor.
         // its already ensured, that theese stairs have a connection on the same floor. so just calculate straightforward.
-        console.log('got stairpath', stairPath);
         if (stairPath !== null && stairPath.length > 0) {
             let curFloor = floorId1;
             for (let i = 1; i < stairPath.length; i++) {
 
                 if (stairPath[i].floorLevel === curFloor) {
                     this.generatePath(stairPath[i - 1].stairs.center, stairPath[i].stairs.center, currentMap.floors[curFloor]);
-                    console.log('connect from/to on the same floor',
-                                  stairPath[i - 1].stairs.center, stairPath[i].stairs.center, curFloor);
                 } else {
                     curFloor = stairPath[i].floorLevel;
-                    console.log('current floor is now', curFloor);
                 }
             }
         } else {
