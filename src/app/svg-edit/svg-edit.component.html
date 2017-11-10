@@ -92,7 +92,7 @@
             <button *ngIf="!editMode" type="button" mat-raised-button color="accent" id="search-button"
                     (click)="sidenav.open()">
                 <mat-icon>location_searching</mat-icon>
-                <span>Search</span>
+                <span>Search, {{mouse.x}}/{{mouse.y}}</span>
             </button>
             <div id="canvas-container">
 
@@ -125,7 +125,7 @@
                         </svg:defs>
 
                         <svg:line *ngFor="let wall of floor.walls" stroke="black"
-                                  stroke-width="3" stroke-linecap="round"                        
+                                  stroke-width="3" stroke-linecap="round"
                                   [attr.x1]="wall.p1.x" [attr.y1]="wall.p1.y" [attr.x2]="wall.p2.x"
                                   [attr.y2]="wall.p2.y"
                                   marker-end="url(#circle)" marker-start="url(#circle)"/>
