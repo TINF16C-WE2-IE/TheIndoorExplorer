@@ -210,7 +210,6 @@ export class SvgEditComponent implements OnInit {
         this.selectTool('Move');
         this.sideNavMode = 'side';
         this.sidenav.open();
-
     }
 
     switchToViewMode() {

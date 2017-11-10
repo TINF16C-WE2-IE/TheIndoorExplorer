@@ -15,6 +15,7 @@ import {PublishMapDialogComponent} from './dialogs/publish-map-dialog.component'
 export class ToolbarComponent implements OnInit {
 
     @ViewChild('appMenu') appMenu: ElementRef;
+
     public searchQuery = '';
 
     constructor(private rqstSvc: RequestService,
