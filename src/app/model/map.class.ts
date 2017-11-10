@@ -32,7 +32,7 @@ export class Map {
     public createFloor(cloneFrom: Floor = null) {
         if (!cloneFrom) {
             this.floors.push(new Floor({
-                walls: [], portals: [], stairways: [],
+                walls: [], portals: [], stairways: [], elevators: [],
                 label: String(Math.max(0, ...this.floors.map(floor => Number.parseInt(floor.label, 10))
                                                  .filter(n => !Number.isNaN(n))) + 1)
             }));

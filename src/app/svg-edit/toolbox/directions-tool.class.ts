@@ -1,14 +1,8 @@
-import { StairNode } from './../../pathlib/stair-node.class';
-import { Floor } from './../../model/floor.class';
-import { LinePath } from './../../pathlib/line-path.class';
-import { ModelService } from './../../svc/model.service';
-import { Mouse } from './../mouse.class';
-import { Pathfinder2 } from './../../pathlib/pathfinder2.class.';
+import { ModelService } from '../../svc/model.service';
+import { Mouse } from '../mouse.class';
+import { Pathfinder2 } from '../../pathlib/pathfinder2.class.';
 import { Tool } from './tool.class';
-import { Point } from '../../model/point.class';
-import { Selectable } from '../../model/selectable.interface';
-import { Line } from '../../model/line.class';
-import { Pathfinder } from '../../pathlib/pathfinder.class';
+import { isSelectable, Selectable } from '../../model/selectable.interface';
 
 export class DirectionsTool extends Tool {
 
@@ -53,11 +47,11 @@ export class DirectionsTool extends Tool {
 
     public selectWaypoint(selected: Selectable | any) {
         // TS has no way of checking for an interface :(
-        if (this.isSelectable(selected)) {
+        if (isSelectable(selected)) {
             if (this.modelSvc.selectedObjects.length) {
 
                 this.pfinder.generateGlobalPath(this.modelSvc.selectedObjects[0].center,
-                        this.modelSvc.currentFloorId, selected.center, this.modelSvc.currentFloorId, this.modelSvc.currentMap);
+                    this.modelSvc.currentFloorId, selected.center, this.modelSvc.currentFloorId, this.modelSvc.currentMap);
                 this.modelSvc.selectedObjects = [];
             } else {
                 this.modelSvc.selectedObjects.push(selected);
