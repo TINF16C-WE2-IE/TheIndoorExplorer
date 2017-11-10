@@ -7,6 +7,8 @@ import { isSelectable, Selectable } from '../../model/selectable.interface';
 export class DirectionsTool extends Tool {
 
     public pfinder: Pathfinder2;
+    private selectedDest1: {p: Point, fid: number};
+
     private dragOrigin: {x: number, y: number};
     private panDragOrigin: {x: number, y: number};
 
@@ -46,15 +48,24 @@ export class DirectionsTool extends Tool {
     }
 
     public selectWaypoint(selected: Selectable | any) {
+
         // TS has no way of checking for an interface :(
         if (isSelectable(selected)) {
             if (this.modelSvc.selectedObjects.length) {
 
-                this.pfinder.generateGlobalPath(this.modelSvc.selectedObjects[0].center,
-                    this.modelSvc.currentFloorId, selected.center, this.modelSvc.currentFloorId, this.modelSvc.currentMap);
+                this.pfinder.generateGlobalPath(this.selectedDest1.p,
+                        this.selectedDest1.fid, selected.center, this.modelSvc.currentFloorId, this.modelSvc.currentMap);
                 this.modelSvc.selectedObjects = [];
             } else {
                 this.modelSvc.selectedObjects.push(selected);
+
+                for (const f of this.modelSvc.currentMap.floors) {
+                    for (const p of f.portals.concat(f.stairways)) {
+                        if (p === selected) {
+                            this.selectedDest1 = {p: selected.center, fid: this.modelSvc.currentMap.floors.indexOf(f)};
+                        }
+                    }
+                }
             }
         } else {
             this.modelSvc.selectedObjects = [];
@@ -89,7 +100,5 @@ export class DirectionsTool extends Tool {
         for (const f of this.modelSvc.currentMap.floors) {
             f.floorGraph.paths = [];
         }
-
-        console.log('got map', this.modelSvc.currentMap);
     }
 }
