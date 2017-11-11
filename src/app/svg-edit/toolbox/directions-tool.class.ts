@@ -89,7 +89,7 @@ export class DirectionsTool extends Tool {
 
             // you can set smooth to true. This will result in a bit smoother paths,
             // but also (in the worst case) in twice as much nodes and therefore quadratic more calculation cost!
-            f.floorGraph = this.pfinder.createLinkedFloorGraph([...f.walls], 20, true);
+            f.floorGraph = this.pfinder.createLinkedFloorGraph([...f.walls], 20, false);
 
         }
 

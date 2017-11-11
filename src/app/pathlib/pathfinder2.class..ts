@@ -13,11 +13,8 @@ import { PathNode } from './path-node.class';
 
 export class Pathfinder2 {
 
-    // mainly just for debugging
-    public connections: Line[];
-
     constructor() {
-        this.connections = [];
+
     }
 
     // before calling this, nodes should have been linked together.
@@ -175,32 +172,11 @@ export class Pathfinder2 {
 
                     const midV = new Vector(Math.cos(midAng) * radius, Math.sin(midAng) * radius);
                     nodes.push(new PathNode(p1.x + midV.x, p1.y + midV.y));
-
-                    // again, check if this point is near any line.
-                    /* this is TODO
-                    for (const l of walls) {
-                        if (this.distToLineSegmentSquared(new Point(p1.x + midV.x, p1.y + midV.y), l.p1, l.p2) < radius ) {
-                            nodes.push(new PathNode(p1.x + midV.x, p1.y + midV.y));
-                        } else {
-                            // otherwise you are too fat to pass through this small gap :P
-                            console.log('point is not generated:', new Point(p1.x + midV.x, p1.y + midV.y));
-                        }
-                    }
-                    */
                 }
             }
         }
 
         return nodes;
-    }
-
-    private distToLineSegmentSquared(p: Point, e1: Point, e2: Point) {
-        const l2 = Math.sqrt(e1.x - e2.x ** 2 + e1.y - e2.y ** 2);
-        if (l2 === 0) return Math.sqrt(p.x - p.x ** 2 + p.y - p.y ** 2);
-        let t = ((p.x - e1.x) * (e2.x - e1.x) + (p.y - e1.y) * (e2.y - e1.y)) / l2;
-        t = Math.max(0, Math.min(1, t));
-        const obj = { x: e1.x + t * (e2.x - e1.x), y: e1.y + t * (e2.y - e1.y) };
-        return Math.sqrt(p.x - obj.x ** 2 + p.y - obj.y ** 2);
     }
 
 
@@ -219,7 +195,6 @@ export class Pathfinder2 {
 
         // total nodes list
         const nodes: PathNode[] = [];
-        this.connections = [];      // not needed anymore. DEPRECTAED. only for debug of the last calculatet floorgraph.
 
         // checked-links list, which contains checked links, but theese links were not worth it
         const chckd: Line[] = [];
@@ -265,7 +240,6 @@ export class Pathfinder2 {
                                 nodes.find(el => el.x === n1.x && el.y === n1.y),
                                 nodes.find(el => el.x === n2.x && el.y === n2.y)
                             );
-                            this.connections.push(new Line(p1, p2));
                         } else {
 
                             // just and mark as checked.
