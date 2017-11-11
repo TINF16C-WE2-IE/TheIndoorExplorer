@@ -84,16 +84,9 @@ export class DirectionsTool extends Tool {
             // but also (in the worst case) in twice as much nodes and therefore quadratic more calculation cost!
             f.floorGraph = this.pfinder.createLinkedFloorGraph([...f.walls], 20, true);
 
-            console.log('floor graph:', f.floorGraph);
-
-            // this.pfinder.insertPointsToFloorGraph(f.getAllTeleporters().map(el => el.center), f.floorGraph, f.walls);
         }
 
         this.pfinder.generateTeleporterGraphOnMap(this.modelSvc.currentMap);
-
-
-
-            console.log('got final map graph:', this.modelSvc.currentMap.stairGraph);
 
         for (const f of this.modelSvc.currentMap.floors) {
             f.floorGraph.paths = [];

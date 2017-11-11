@@ -94,7 +94,7 @@
             <button *ngIf="!editMode" type="button" mat-raised-button color="accent" id="search-button"
                     (click)="sidenav.open()">
                 <mat-icon>location_searching</mat-icon>
-                <span>Search, {{mouse.x}}/{{mouse.y}}</span>
+                <span>Search</span>
             </button>
             <div id="canvas-container">
 
@@ -184,13 +184,19 @@
                             </svg:text>
                         </svg:g>
 
-                        <svg:g *ngFor="let paths of movingPaths">
-                            <svg:line *ngFor="let path of paths.path" stroke="red" stroke-width="3"
+                        <svg:g *ngFor="let linepath of movingPaths">
+                            <svg:line *ngFor="let path of linepath.path" stroke="red" stroke-width="3"
                                       stroke-linecap="round" stroke-linejoin="bevel"
-                                      stroke-dasharray="50,10" fill="none"
+                                      stroke-dasharray="35,10" fill="none"
                                       [attr.x1]="path.p1.x" [attr.y1]="path.p1.y"
                                       [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
                                       marker-end="url(#circle)" marker-start="url(#circle)"/>
+
+                              <svg:text *ngIf="linepath.path.length > 0" text-anchor="middle"
+                                [attr.x]="linepath.path[linepath.path.length - 1].p1.x" [attr.y]="linepath.path[linepath.path.length - 1].p1.y - 20"
+                                fill="red">
+                                {{linepath.description}}
+                            </svg:text>
                         </svg:g>
 
 

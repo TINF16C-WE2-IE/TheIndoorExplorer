@@ -308,7 +308,7 @@ export class Pathfinder2 {
         }
     }
 
-    // finds path from start to end on the given floor
+    // adds a path from start to end on the given floor
     public generatePath(start: Point, end: Point, floor: Floor, considerInsertingPoints: boolean = true): void {
 
         // work with a copy of the floorgraph.
@@ -538,13 +538,9 @@ export class Pathfinder2 {
         }
         cpy.push(stnt, ndnt);
 
-        console.log('Zwischenergebnis:', cpy);
-
         // now search the shortest global path from start to end
         // this is kind of funny ;)
         const stairPath = this.findStairPathFromTo(cpy, stnt, ndnt);
-
-        console.log('stairpath: ', stairPath);
 
         this.clearAllFloorGraphs(currentMap);
 
@@ -556,6 +552,15 @@ export class Pathfinder2 {
 
                 if (stairPath[i].floorLevel === curFloor) {
                     this.generatePath(stairPath[i - 1].teleporter.center, stairPath[i].teleporter.center, currentMap.floors[curFloor]);
+                    const curGraph = currentMap.floors[curFloor].floorGraph;
+
+                    // if the next point is on a teleporter to a different floorlevel
+                    if (i < stairPath.length - 1 && stairPath[i + 1].floorLevel !== curFloor) {
+                        const diff = stairPath[i + 1].floorLevel - curFloor;
+                        curGraph.paths[curGraph.paths.length - 1].description = + Math.abs(diff) + ' Layer' + (diff > 1 ? 's' : '')
+                                                                                + (Math.sign(diff) > 0 ? ' Up.' : ' Down.');
+                    }
+
                 } else {
                     curFloor = stairPath[i].floorLevel;
                 }
