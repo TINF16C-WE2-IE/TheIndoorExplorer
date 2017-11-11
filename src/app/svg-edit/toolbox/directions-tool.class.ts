@@ -3,6 +3,7 @@ import { Mouse } from '../mouse.class';
 import { Pathfinder2 } from '../../pathlib/pathfinder2.class.';
 import { Tool } from './tool.class';
 import { isSelectable, Selectable } from '../../model/selectable.interface';
+import { Point } from '../../model/point.class';
 
 export class DirectionsTool extends Tool {
 
@@ -47,20 +48,20 @@ export class DirectionsTool extends Tool {
         }
     }
 
-    public selectWaypoint(selected: Selectable | any) {
+    public selectWaypoint(selected: Selectable) {
 
         // TS has no way of checking for an interface :(
         if (isSelectable(selected)) {
             if (this.modelSvc.selectedObjects.length) {
 
                 this.pfinder.generateGlobalPath(this.selectedDest1.p,
-                        this.selectedDest1.fid, selected.center, this.modelSvc.currentFloorId, this.modelSvc.currentMap);
+                    this.selectedDest1.fid, selected.center, this.modelSvc.currentFloorId, this.modelSvc.currentMap);
                 this.modelSvc.selectedObjects = [];
             } else {
                 this.modelSvc.selectedObjects.push(selected);
 
                 for (const f of this.modelSvc.currentMap.floors) {
-                    for (const p of f.portals.concat(f.stairways)) {
+                    for (const p of this.modelSvc.currentMap.getAllSelectables()) {
                         if (p === selected) {
                             this.selectedDest1 = {p: selected.center, fid: this.modelSvc.currentMap.floors.indexOf(f)};
                         }
@@ -92,10 +93,10 @@ export class DirectionsTool extends Tool {
             // you can set smooth to true. This will result in a bit smoother paths,
             // but also (in the worst case) in twice as much nodes and therefore quadratic more calculation cost!
             f.floorGraph = this.pfinder.createLinkedFloorGraph([...f.walls], 45, false);
-            this.pfinder.insertPointsToFloorGraph(f.stairways.map(el => el.center), f.floorGraph, f.walls);
+            this.pfinder.insertPointsToFloorGraph(f.getAllTeleporters().map(el => el.center), f.floorGraph, f.walls);
         }
 
-        this.pfinder.generateStairGraphOnMap(this.modelSvc.currentMap);
+        this.pfinder.generateTeleporterGraphOnMap(this.modelSvc.currentMap);
 
         for (const f of this.modelSvc.currentMap.floors) {
             f.floorGraph.paths = [];

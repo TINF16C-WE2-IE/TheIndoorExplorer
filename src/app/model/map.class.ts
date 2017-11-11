@@ -1,14 +1,17 @@
-import { StairNode } from '../pathlib/stair-node.class';
+import { TeleporterNode } from '../pathlib/teleporter-node.class';
 import { Floor } from './floor.class';
 import { ModelService } from '../svc/model.service';
 import { Mouse } from '../svg-edit/mouse.class';
+import { Selectable } from './selectable.interface';
+import { Point } from './point.class';
+import { Teleporter } from './teleporter.interface';
 
 
 export class Map {
     public id: number;
     public name: string;
     public floors: Floor[];
-    public stairGraph: StairNode[];
+    public stairGraph: TeleporterNode[];
     public favorite: boolean;
     public permission: number;
     public visibility: number;
@@ -86,8 +89,16 @@ export class Map {
         this.updateCanvasSize(sizeX, 1, dangling);
     }
 
-    private getAllPoints() {
-        return this.floors.map(floor => floor.getAllPoints()).reduce((first, second) => first.concat(second), []);
+    private getAllPoints(): Point[] {
+        return this.floors.reduce((pointList, floor) => pointList.concat(floor.getAllPoints()), []);
+    }
+
+    public getAllSelectables(): Selectable[] {
+        return this.floors.reduce((selectablesList, floor) => selectablesList.concat(floor.getAllSelectables()), []);
+    }
+
+    public getAllTeleporters(): Teleporter[] {
+        return this.floors.reduce((teleportersList, floor) => teleportersList.concat(floor.getAllTeleporters()), []);
     }
 
     public fitToViewport() {

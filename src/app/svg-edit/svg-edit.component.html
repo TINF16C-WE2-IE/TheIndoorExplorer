@@ -74,7 +74,8 @@
                 <input matInput name="objname" [(ngModel)]="singleSelectedObject.label" placeholder="Object Name">
             </mat-form-field>
             <mat-form-field *ngIf="(singleSelectedObject | type:'Stairs') || (singleSelectedObject | type:'Elevator')">
-                <mat-select [placeholder]="'Connect ' + (singleSelectedObject | type)" [value]="singleSelectedObject.group"
+                <mat-select [placeholder]="'Connect ' + (singleSelectedObject | type)"
+                            [value]="singleSelectedObject.group"
                             (change)="setTeleporterGroup(singleSelectedObject, $event.value)">
                     <mat-option [value]="null">None</mat-option>
                     <mat-option [value]="undefined">New group</mat-option>
@@ -164,18 +165,15 @@
 
                         <svg:g *ngFor="let elevator of floor.elevators">
                             <svg:rect
-                                    [attr.stroke]="selectedObjects.indexOf(elevator) !== -1 ? '#b71c1c' : '#afafaf'"
-                                    stroke-width="10" fill-opacity="0.5"
+                                    [attr.stroke]="getSelectableColor(elevator)" stroke-width="10" fill-opacity="0.5"
                                     [attr.x]="elevator.center.x - 30" [attr.y]="elevator.center.y - 30"
                                     width="60" height="60"/>
                             <svg:line
-                                    [attr.stroke]="selectedObjects.indexOf(elevator) !== -1 ? '#b71c1c' : '#afafaf'"
-                                    stroke-width="5"
+                                    [attr.stroke]="getSelectableColor(elevator)" stroke-width="5"
                                     [attr.x1]="elevator.center.x - 30" [attr.y1]="elevator.center.y - 30"
                                     [attr.x2]="elevator.center.x + 30" [attr.y2]="elevator.center.y + 30"/>
                             <svg:line
-                                    [attr.stroke]="selectedObjects.indexOf(elevator) !== -1 ? '#b71c1c' : '#afafaf'"
-                                    stroke-width="5"
+                                    [attr.stroke]="getSelectableColor(elevator)" stroke-width="5"
                                     [attr.x1]="elevator.center.x + 30" [attr.y1]="elevator.center.y - 30"
                                     [attr.x2]="elevator.center.x - 30" [attr.y2]="elevator.center.y + 30"/>
                             <svg:circle [attr.cx]="elevator.center.x" [attr.cy]="elevator.center.y" r="4"

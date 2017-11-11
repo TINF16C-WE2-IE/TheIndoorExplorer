@@ -168,10 +168,6 @@ export class SvgEditComponent implements OnInit {
         this.modelSvc.currentMap.removeFloor(floor);
     }
 
-    saveCurrentMap() {
-        this.modelSvc.saveMap();
-    }
-
     viewBoxString() {
         return (this.modelSvc.panOffset.x || 0) + ' ' + (this.modelSvc.panOffset.y || 0) + ' '
             + (this.modelSvc.canvasSize.x || 0) + ' ' + (this.modelSvc.canvasSize.y || 0);

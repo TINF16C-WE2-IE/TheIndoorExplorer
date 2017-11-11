@@ -6,6 +6,7 @@ import { Line } from './line.class';
 import { Selectable } from './selectable.interface';
 import { Stairs } from './stairs.class';
 import { Elevator } from './elevator.class';
+import { Teleporter } from './teleporter.interface';
 
 export class Floor {
 
@@ -63,6 +64,10 @@ export class Floor {
         return (this.portals as Selectable[])
             .concat(this.stairways as Selectable[])
             .concat(this.elevators as Selectable[]);
+    }
+
+    public getAllTeleporters(): Teleporter[] {
+        return (this.stairways as Teleporter[]).concat(this.elevators as Teleporter[]);
     }
 
     public getExistingOrThisPoint(p: Point, exclude: Point[] = [], nullIfNotFound = false, fromPointList: Point[] = null) {

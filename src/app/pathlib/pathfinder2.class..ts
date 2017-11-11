@@ -1,6 +1,6 @@
 import { Stairs } from '../model/stairs.class';
 import { Map } from '../model/map.class';
-import { StairNode } from './stair-node.class';
+import { TeleporterNode } from './teleporter-node.class';
 import { Floor } from '../model/floor.class';
 import { LinePath } from './line-path.class';
 import { FloorGraph } from './floor-graph.class';
@@ -297,14 +297,12 @@ export class Pathfinder2 {
         if (considerInsertingPoints) {
             // optionally add start and end, if they are not already included
             const additionalPoints = [];
-            if ([...floor.stairways.map(ele => ele.center),
-                    ...floor.portals.map(ele => ele.center)].find(
+            if (floor.getAllSelectables().map(ele => ele.center).find(
                     el => el.x === start.x && el.y === start.y
                 ) === undefined) {
                 additionalPoints.push(start);
             }
-            if ([...floor.stairways.map(ele => ele.center),
-                    ...floor.portals.map(ele => ele.center)].find(
+            if (floor.getAllSelectables().map(ele => ele.center).find(
                     el => el.x === end.x && el.y === end.y
                 ) === undefined) {
                 additionalPoints.push(end);
@@ -332,9 +330,9 @@ export class Pathfinder2 {
 
 
     // ############################## Stair Graph #########################################
-    public generateStairGraphOnMap(map: Map) {
+    public generateTeleporterGraphOnMap(map: Map) {
 
-        const totalNodes: StairNode[] = [];
+        const totalNodes: TeleporterNode[] = [];
         const chckdN: {p1: Point, p2: Point, lvl1: number, lvl2: number}[] = [];
 
         // generate stair-linking for each floor individually
@@ -343,9 +341,9 @@ export class Pathfinder2 {
             // clear the paths on the map!
             f.floorGraph.paths = [];
 
-            const nodes: StairNode[] = [];
+            const nodes: TeleporterNode[] = [];
             for (const s1 of f.stairways) {
-                nodes.push(new StairNode(s1, map.floors.indexOf(f)));
+                nodes.push(new TeleporterNode(s1, map.floors.indexOf(f)));
             }
 
             for (const n1 of nodes) {
@@ -450,11 +448,11 @@ export class Pathfinder2 {
         }
 
         // create a copy of the stair graph. and add start and end.
-        const cpy: StairNode[] = [];
+        const cpy: TeleporterNode[] = [];
         Object.assign(cpy, currentMap.stairGraph);
-        const stnt = new StairNode(new Stairs('start point', new Point(point1.x + 10, point1.y + 10, false),
+        const stnt = new TeleporterNode(new Stairs('start point', new Point(point1.x + 10, point1.y + 10, false),
             new Point(point1.x - 10, point1.y - 10, false)), floorId1);
-        const ndnt = new StairNode(new Stairs('end point', new Point(point2.x + 10, point2.y + 10, false),
+        const ndnt = new TeleporterNode(new Stairs('end point', new Point(point2.x + 10, point2.y + 10, false),
             new Point(point2.x - 10, point2.y - 10, false)), floorId2);
 
         // connect the start and end with other stairs on the same floor
@@ -544,7 +542,7 @@ export class Pathfinder2 {
         }
     }
 
-    public findStairPathFromTo(nodes: StairNode[], from: StairNode, to: StairNode): StairNode[] {
+    public findStairPathFromTo(nodes: TeleporterNode[], from: TeleporterNode, to: TeleporterNode): TeleporterNode[] {
 
         if (from === to || nodes.indexOf(from) === nodes.indexOf(to)) return [from];
 
@@ -566,8 +564,8 @@ export class Pathfinder2 {
     }
 
     // returns null, if this path is not possible
-    private calculateStairPath(nodes: StairNode[], costs: number[], parents: StairNode[],
-                               openList: StairNode[], closedList: StairNode[], end: StairNode): StairNode[] {
+    private calculateStairPath(nodes: TeleporterNode[], costs: number[], parents: TeleporterNode[],
+                               openList: TeleporterNode[], closedList: TeleporterNode[], end: TeleporterNode): TeleporterNode[] {
 
         let min = Number.MAX_VALUE;
         let curCost = min;
