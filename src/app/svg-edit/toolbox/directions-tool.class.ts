@@ -61,8 +61,9 @@ export class DirectionsTool extends Tool {
                 this.modelSvc.selectedObjects.push(selected);
 
                 for (const f of this.modelSvc.currentMap.floors) {
-                    for (const p of this.modelSvc.currentMap.getAllSelectables()) {
+                    for (const p of f.getAllSelectables()) {
                         if (p === selected) {
+
                             this.selectedDest1 = {p: selected.center, fid: this.modelSvc.currentMap.floors.indexOf(f)};
                         }
                     }
@@ -71,32 +72,28 @@ export class DirectionsTool extends Tool {
         } else {
             this.modelSvc.selectedObjects = [];
         }
-
-        // just debug test, selecting points on different floors. Of course only works on maps with a floor above the selected point
-        /*
-        if (this.isSelectable(selected)) {
-                this.pfinder.generateGlobalPath(selected.center,
-                        this.modelSvc.currentFloorId, selected.center, this.modelSvc.currentFloorId + 1, this.modelSvc.currentMap);
-                this.modelSvc.selectedObjects = [];
-
-        } else {
-            this.modelSvc.selectedObjects = [];
-        }
-        */
     }
 
     public onMapLoaded() {
+
 
         // create the basic nodegraph on each floor, and insert the static elevators and stairs
         for (const f of this.modelSvc.currentMap.floors) {
 
             // you can set smooth to true. This will result in a bit smoother paths,
             // but also (in the worst case) in twice as much nodes and therefore quadratic more calculation cost!
-            f.floorGraph = this.pfinder.createLinkedFloorGraph([...f.walls], 20, false);
-            this.pfinder.insertPointsToFloorGraph(f.getAllTeleporters().map(el => el.center), f.floorGraph, f.walls);
+            f.floorGraph = this.pfinder.createLinkedFloorGraph([...f.walls], 20, true);
+
+            console.log('floor graph:', f.floorGraph);
+
+            // this.pfinder.insertPointsToFloorGraph(f.getAllTeleporters().map(el => el.center), f.floorGraph, f.walls);
         }
 
         this.pfinder.generateTeleporterGraphOnMap(this.modelSvc.currentMap);
+
+
+
+            console.log('got final map graph:', this.modelSvc.currentMap.stairGraph);
 
         for (const f of this.modelSvc.currentMap.floors) {
             f.floorGraph.paths = [];

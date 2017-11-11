@@ -1,13 +1,13 @@
-import { Stairs } from '../model/stairs.class';
+import { Teleporter } from './../model/teleporter.interface';
 
 export class TeleporterNode {
-    public stairs: Stairs;
+    public teleporter: Teleporter;
     public links: TeleporterNode[];
     public costs: number[];
     public floorLevel: number;
 
-    constructor(stairs: Stairs = null, floorLevel: number = 0, links: TeleporterNode[] = [], costs: number[] = []) {
-        this.stairs = stairs;
+    constructor(teleporter: Teleporter = null, floorLevel: number = 0, links: TeleporterNode[] = [], costs: number[] = []) {
+        this.teleporter = teleporter;
         this.links = links;
         this.floorLevel = floorLevel;
         this.costs = costs;

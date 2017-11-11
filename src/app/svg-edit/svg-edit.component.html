@@ -193,6 +193,11 @@
                                       marker-end="url(#circle)" marker-start="url(#circle)"/>
                         </svg:g>
 
+
+                        <!-- Pathfinding Debug -->
+                        <svg:circle *ngFor="let node of floor.floorGraph.nodes" [attr.cx]="node.x" [attr.cy]="node.y" r="2" style="stroke: none; fill:green;"/>
+
+
                         <svg:circle *ngIf="mouse.xs !== null && mouse.ys !== null"
                                     [attr.cx]="mouse.xs" [attr.cy]="mouse.ys" r="5" style="stroke:red; fill:none"/>
                     </svg:g>
