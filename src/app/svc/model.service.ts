@@ -1,9 +1,8 @@
-import { Selectable } from './../model/selectable.interface';
-import { Point } from './../model/point.class';
-import { Map } from '../model/map.class';
 import { ElementRef, Injectable } from '@angular/core';
-import { RequestService } from './request.service';
+import { Map } from '../model/map.class';
 import { Stairs } from '../model/stairs.class';
+import { Selectable } from './../model/selectable.interface';
+import { RequestService } from './request.service';
 
 
 @Injectable()
@@ -36,7 +35,8 @@ export class ModelService {
     public get currentFloor() {
         if (this.currentMap && this.currentMap.floors) {
             return this.currentMap.floors[this.currentFloorId];
-        } else {
+        }
+        else {
             return null;
         }
     }
@@ -86,8 +86,7 @@ export class ModelService {
         );
     }
 
-    public loadMap(mapId: number, callback: () => void = () => {
-    }) {
+    public loadMap(mapId: number, callback: Function = null) {
         if (mapId === -1) {
             const newMap = new Map({
                 id: -1,
@@ -100,14 +99,15 @@ export class ModelService {
             newMap.createFloor();
             newMap.fitToViewport();
             this.currentMap = newMap;
-            callback();
-        } else {
+            if (callback) callback();
+        }
+        else {
             this.rqstSvc.get(RequestService.LIST_MAP_DETAILS + mapId, {}).subscribe(
                 resp => {
                     if (resp !== null) {
                         this.currentMap = new Map(resp, this);
                         this.currentMap.fitToViewport();
-                        callback();
+                        if (callback) callback();
                     }
                 }
             );

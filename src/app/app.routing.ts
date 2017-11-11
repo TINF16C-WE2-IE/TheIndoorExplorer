@@ -12,7 +12,11 @@ export const routes: Routes = [
         pathMatch: 'full'
     },
     {
-        path: 'editor/:mapId',
+        path: 'view/:mapId',
+        component: SvgEditComponent
+    },
+    {
+        path: 'edit/:mapId',
         component: SvgEditComponent
     },
     {

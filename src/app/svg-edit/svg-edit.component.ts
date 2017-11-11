@@ -1,24 +1,22 @@
-import { LinePath } from '../pathlib/line-path.class';
-import { Floor } from '../model/floor.class';
-import { Selectable } from '../model/selectable.interface';
-import { Wall } from '../model/wall.class';
-import { ModelService, StairsGroup } from '../svc/model.service';
-import { ActivatedRoute, Router } from '@angular/router';
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { MatIconRegistry, MatSelectChange, MatSidenav } from '@angular/material';
+import { DomSanitizer } from '@angular/platform-browser';
+import { ActivatedRoute, Router } from '@angular/router';
 import 'rxjs/add/operator/switchMap';
+import { Floor } from '../model/floor.class';
+import { Portal } from '../model/portal.class';
+import { Selectable } from '../model/selectable.interface';
+import { Stairs } from '../model/stairs.class';
+import { Wall } from '../model/wall.class';
+import { LinePath } from '../pathlib/line-path.class';
+import { Pathfinder2 } from '../pathlib/pathfinder2.class';
+import { ModelService, StairsGroup } from '../svc/model.service';
 import { Mouse } from './mouse.class';
+import { DeleteTool } from './toolbox/delete-tool.class';
+import { DirectionsTool } from './toolbox/directions-tool.class';
+import { LineTool } from './toolbox/line-tool.class';
 import { MoveTool } from './toolbox/move-tool.class';
 import { SelectTool } from './toolbox/select-tool.class';
-import { DeleteTool } from './toolbox/delete-tool.class';
-import { LineTool } from './toolbox/line-tool.class';
-import { DirectionsTool } from './toolbox/directions-tool.class';
-import { Portal } from '../model/portal.class';
-import { MatDialog, MatIconRegistry, MatSelectChange, MatSidenav } from '@angular/material';
-import { DomSanitizer } from '@angular/platform-browser';
-import { Stairs } from '../model/stairs.class';
-import { MapnameDialogComponent } from './dialogs/mapname-dialog.component';
-import { DeleteMapDialogComponent } from './dialogs/delete-map-dialog.component';
-import { PublishMapDialogComponent } from './dialogs/publish-map-dialog.component';
 
 @Component({
     selector: 'app-svg-edit',
@@ -46,22 +44,28 @@ export class SvgEditComponent implements OnInit {
     public backgroundImageDataURL = null;
     public sideNavMode = 'over';
     public startpoint = true;
+    public urlMapIdString = '';
 
     @ViewChild('sidenav') sidenav: MatSidenav;
     @ViewChild('fileUploadButton') fileUploadButton: ElementRef;
     @ViewChild('editorCanvas') editorCanvas: ElementRef;
 
-    get floor() {
-        return this.modelSvc.currentFloor;
+
+    get currentMap() {
+        return this.modelSvc.currentMap;
     }
 
     get floors() {
-        if (this.modelSvc.currentMap) return this.modelSvc.currentMap.floors;
+        if (this.currentMap) return this.currentMap.floors;
         return null;
     }
 
+    get currentFloor() {
+        return this.modelSvc.currentFloor;
+    }
+
     get movingPaths(): LinePath[] {
-        return (this.modelSvc.currentFloor) ? this.modelSvc.currentFloor.floorGraph.paths : null;
+        return (this.currentFloor) ? this.currentFloor.floorGraph.paths : null;
     }
 
     get singleSelectedObject(): Selectable {
@@ -69,12 +73,6 @@ export class SvgEditComponent implements OnInit {
             return this.modelSvc.selectedObjects[0];
         }
         return null;
-    }
-
-    public getSelectableColor(obj: Selectable) {
-        if (this.modelSvc.selectedObjects.indexOf(obj) !== -1) return '#0d47a1';
-        if (this.modelSvc.currentFloor.searchResults.indexOf(obj) !== -1) return '#b71c1c';
-        return '#afafaf';
     }
 
     get connectibleStairsGroups() {
@@ -104,17 +102,49 @@ export class SvgEditComponent implements OnInit {
         this.selectTool('Directions');
 
         this.modelSvc.editorCanvas = this.editorCanvas;
-        this.route.params.subscribe(
-            params => {
+        this.route.url.subscribe(
+            urlSegments => {
+                const mode = urlSegments[0].path;
+                this.urlMapIdString = urlSegments[1].path;
+
+                console.log(mode, this.urlMapIdString);
+                if (mode === 'edit') {
+                    this.switchToEditMode();
+                }
+                else {
+                    this.switchToViewMode();
+                }
+
                 this.modelSvc.loadMap(
-                    Number.parseInt(params['mapId']),
-                    () => {
-                        (<DirectionsTool>this.mouse.tool).onMapLoaded();
-                    }
+                    this.urlMapIdString === 'new' ? -1 : Number.parseInt(this.urlMapIdString),
+                    () => this.onMapLoaded()
                 );
             }
         );
     }
+
+    private onMapLoaded() {
+        console.log('building route graph...');
+        // initialize connection graphs for pathfinding - function moved from DirectionsTool
+
+        // create the basic nodegraph on each floor, and insert the static elevators and stairs
+        for (const f of this.floors) {
+
+            // you can set smooth to true. This will result in a bit smoother paths,
+            // but also (in the worst case) in twice as much nodes and therefore quadratic more calculation cost!
+            f.floorGraph = Pathfinder2.createLinkedFloorGraph([...f.walls], 45, false);
+            Pathfinder2.insertPointsToFloorGraph(f.stairways.map(el => el.center), f.floorGraph, f.walls);
+        }
+
+        Pathfinder2.generateStairGraphOnMap(this.modelSvc.currentMap);
+
+        for (const f of this.modelSvc.currentMap.floors) {
+            f.floorGraph.paths = [];
+        }
+
+        console.log('done!', this.modelSvc.currentMap);
+    }
+
 
     selectTool($event: any) {
         console.log($event);
@@ -150,22 +180,18 @@ export class SvgEditComponent implements OnInit {
     }
 
     createFloor(cloneFrom: Floor = null) {
-        this.modelSvc.currentMap.createFloor(cloneFrom);
+        this.currentMap.createFloor(cloneFrom);
         this.selectFloor(this.floors.length - 1);
     }
 
     moveFloor(floor: Floor, direction: number) {
-        const newPos = this.modelSvc.currentMap.moveFloor(floor, direction);
+        const newPos = this.currentMap.moveFloor(floor, direction);
         this.selectFloor(newPos);
     }
 
     removeFloor(floor: Floor) {
         this.selectFloor(0);
-        this.modelSvc.currentMap.removeFloor(floor);
-    }
-
-    saveCurrentMap() {
-        this.modelSvc.saveMap();
+        this.currentMap.removeFloor(floor);
     }
 
     viewBoxString() {
@@ -174,11 +200,11 @@ export class SvgEditComponent implements OnInit {
     }
 
     zoom(direction: number) {
-        this.modelSvc.currentMap.zoom(direction);
+        this.currentMap.zoom(direction);
     }
 
     fitToViewport() {
-        this.modelSvc.currentMap.fitToViewport();
+        this.currentMap.fitToViewport();
     }
 
     backgroundImage(event) {
@@ -190,7 +216,7 @@ export class SvgEditComponent implements OnInit {
         const reader = new FileReader();
 
         const myThis = this;
-        reader.addEventListener('load', function() {
+        reader.addEventListener('load', function () {
             myThis.backgroundImageDataURL = reader.result;
         }, false);
 
@@ -199,10 +225,16 @@ export class SvgEditComponent implements OnInit {
         }
     }
 
+    public getSelectableColor(obj: Selectable) {
+        if (this.modelSvc.selectedObjects.indexOf(obj) !== -1) return '#0d47a1';
+        if (this.currentFloor.searchResults.indexOf(obj) !== -1) return '#b71c1c';
+        return '#afafaf';
+    }
+
     search(query: string) {
         console.log('search', query);
-        this.modelSvc.currentMap.search(query);
-        this.modelSvc.currentMap.fitToViewport();
+        this.currentMap.search(query);
+        this.currentMap.fitToViewport();
     }
 
     switchToEditMode() {
@@ -228,8 +260,8 @@ export class SvgEditComponent implements OnInit {
     getStairsGroupDisplayName(stairsGroup: StairsGroup) {
         return 'Group ' + stairsGroup.group + ': ' +
             stairsGroup.stairways.map(stairs => {
-                const floor = this.modelSvc.currentMap.floors.find(fl => fl.stairways.indexOf(stairs) !== -1);
-                const floorIndex = this.modelSvc.currentMap.floors.indexOf(floor);
+                const floor = this.floors.find(fl => fl.stairways.indexOf(stairs) !== -1);
+                const floorIndex = this.floors.indexOf(floor);
                 return {index: floorIndex, floorLabel: (floor.label || '?'), stairsLabel: (stairs.label || '?')};
             }).sort((a, b) => {
                 return (a.index - b.index) || a.stairsLabel.toUpperCase().localeCompare(b.stairsLabel.toUpperCase());
@@ -244,7 +276,7 @@ export class SvgEditComponent implements OnInit {
             const group: number = event.value;
             if (group === undefined) {  // new Group
                 this.singleSelectedObject.group = Math.max(
-                    0, ...this.modelSvc.currentMap.floors
+                    0, ...this.floors
                               .reduce((stairsList, floor) => stairsList.concat(floor.stairways), [])
                               .map(stairs => stairs.group)
                 ) + 1;
@@ -259,7 +291,7 @@ export class SvgEditComponent implements OnInit {
     @HostListener('window:resize', ['$event'])
     onResize(event) {
         console.log('resize');
-        this.modelSvc.currentMap.fitToViewport();
+        this.currentMap.fitToViewport();
     }
 
 }

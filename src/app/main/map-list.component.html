@@ -3,9 +3,9 @@
     <mat-nav-list>
         <div *ngFor="let map of maps">
         <mat-divider></mat-divider>
-        <mat-list-item [routerLink]="['/editor', '' + map.id]">{{map.name}}</mat-list-item>
+        <mat-list-item [routerLink]="['/view', '' + map.id]">{{map.name}}</mat-list-item>
         </div>
-        <button class="fab" mat-fab [routerLink]="['/editor', '-1']" matTooltip="Create a new map" *ngIf="modelSvc.userInfo?.username">
+        <button class="fab" mat-fab [routerLink]="['/edit', 'new']" matTooltip="Create a new map" *ngIf="modelSvc.userInfo?.username">
             <mat-icon>add</mat-icon>
         </button>
     </mat-nav-list>

@@ -1,27 +1,27 @@
-import { Stairs } from '../model/stairs.class';
-import { Map } from '../model/map.class';
-import { StairNode } from './stair-node.class';
 import { Floor } from '../model/floor.class';
-import { LinePath } from './line-path.class';
-import { FloorGraph } from './floor-graph.class';
-import { Vector } from './vector.class';
 import { Line } from '../model/line.class';
+import { Map } from '../model/map.class';
 import { Point } from '../model/point.class';
+import { Stairs } from '../model/stairs.class';
+import { FloorGraph } from './floor-graph.class';
+import { LinePath } from './line-path.class';
 import { PathNode } from './path-node.class';
+import { StairNode } from './stair-node.class';
+import { Vector } from './vector.class';
 
 export class Pathfinder2 {
 
     // mainly just for debugging
-    public connections: Line[];
+    // public connections: Line[];
 
-    constructor() {
-        this.connections = [];
-    }
+    // constructor() {
+    // this.connections = [];
+    // }
 
     // before calling this, nodes should have been linked together.
     // (and a link has to be registered in BOTH nodes!)
     // additionally, "from" and "to" should have the reference to a node in the given nodes list.
-    public findPathFromTo(nodes: PathNode[], from: PathNode, to: PathNode): PathNode[] {
+    public static findPathFromTo(nodes: PathNode[], from: PathNode, to: PathNode): PathNode[] {
 
         if (from === to || nodes.indexOf(from) === nodes.indexOf(to)) return [from];
 
@@ -43,8 +43,8 @@ export class Pathfinder2 {
     }
 
     // returns null, if this path is not possible
-    private calculatePath(nodes: PathNode[], costs: number[], parents: PathNode[],
-                          openList: PathNode[], closedList: PathNode[], end: PathNode): PathNode[] {
+    private static calculatePath(nodes: PathNode[], costs: number[], parents: PathNode[],
+                                 openList: PathNode[], closedList: PathNode[], end: PathNode): PathNode[] {
 
         let min = Number.MAX_VALUE;
         let curCost = min;
@@ -78,7 +78,8 @@ export class Pathfinder2 {
                         minClNode = cl;
                         minLinkIndex = j;
                     }
-                } else {
+                }
+                else {
                     // already in closed list
                 }
             }
@@ -94,7 +95,8 @@ export class Pathfinder2 {
 
         if (openList.length > 0 && closedList.indexOf(end) < 0) {
             return this.calculatePath(nodes, costs, parents, openList, closedList, end);
-        } else {
+        }
+        else {
 
             // got the costs over the nodes. now back-track.
             // start at end node and backtrack over the parent for each node.
@@ -109,8 +111,8 @@ export class Pathfinder2 {
         }
     }
 
-    private checkIntersectionOfLineWithLines(p1x, p1y, p2x, p2y, lines: Line[], endpointTolerance: number,
-                                             debug: boolean = false): boolean {
+    private static checkIntersectionOfLineWithLines(p1x, p1y, p2x, p2y, lines: Line[], endpointTolerance: number,
+                                                    debug: boolean = false): boolean {
 
         let intersects = false;
         for (const w of lines) {
@@ -133,7 +135,7 @@ export class Pathfinder2 {
         return intersects;
     }
 
-    private createNodesForWallEnd(p1: Point, p2: Point, radius: number, walls: Line[], smooth: boolean = false): PathNode[] {
+    private static createNodesForWallEnd(p1: Point, p2: Point, radius: number, walls: Line[], smooth: boolean = false): PathNode[] {
 
         const nodes: PathNode[] = [];
 
@@ -181,7 +183,7 @@ export class Pathfinder2 {
     }
 
 
-    public linkNodes(nn1: PathNode, nn2: PathNode): void {
+    public static linkNodes(nn1: PathNode, nn2: PathNode): void {
         const dist = Math.sqrt((nn1.x - nn2.x) * (nn1.x - nn2.x) + (nn1.y - nn2.y) * (nn1.y - nn2.y));
         nn1.addLinkTo(nn2, dist);
         nn2.addLinkTo(nn1, dist);
@@ -191,14 +193,14 @@ export class Pathfinder2 {
     // ############################## Floor Graph #########################################
 
     // advanced approach: more complex in preparation, but less nodes, so cheaper for path finding.
-    public createLinkedFloorGraph(walls: Line[], radius: number, smooth: boolean = false): FloorGraph {
+    public static createLinkedFloorGraph(walls: Line[], radius: number, smooth: boolean = false): FloorGraph {
 
 
         // total nodes list
         const nodes: PathNode[] = [];
-        this.connections = [];      // not needed anymore. DEPRECTAED. only for debug of the last calculatet floorgraph.
+        // this.connections = [];      // not needed anymore. DEPRECATED. only for debug of the last calculated floorgraph.
 
-        // checked-links list, which contains checked links, but theese links were not worth it
+        // checked-links list, which contains checked links, but these links were not worth it
         const chckd: Line[] = [];
 
         // checked-links list, which contains checked points, which we generated nodes for.
@@ -234,7 +236,7 @@ export class Pathfinder2 {
                         const p1 = new Point(n1.x, n1.y, false);
                         const p2 = new Point(n2.x, n2.y, false);
 
-                        // if this link doesnt intersect any walls
+                        // if this link doesn't intersect any walls
                         if (!this.checkIntersectionOfLineWithLines(
                                 n1.x, n1.y, n2.x, n2.y, walls, -0.00001)
                         ) {
@@ -242,17 +244,20 @@ export class Pathfinder2 {
                                 nodes.find(el => el.x === n1.x && el.y === n1.y),
                                 nodes.find(el => el.x === n2.x && el.y === n2.y)
                             );
-                            this.connections.push(new Line(p1, p2));
-                        } else {
+                            // this.connections.push(new Line(p1, p2));
+                        }
+                        else {
 
                             // just and mark as checked.
                             chckd.push(new Line(p1, p2));
                         }
-                    } else {
+                    }
+                    else {
                         // already checked.
                     }
 
-                } else {
+                }
+                else {
                     // dont check the same node.
                 }
             }
@@ -263,7 +268,7 @@ export class Pathfinder2 {
     }
 
     // inserts start/end/stair points or something to the floor graph.
-    public insertPointsToFloorGraph(points: Point[], floorGraph: FloorGraph, walls: Line[]): void {
+    public static insertPointsToFloorGraph(points: Point[], floorGraph: FloorGraph, walls: Line[]): void {
 
         // connect every point to visible nodes!
         for (const p of points) {
@@ -286,7 +291,7 @@ export class Pathfinder2 {
     }
 
     // finds path from start to end on the given floor
-    public generatePath(start: Point, end: Point, floor: Floor, considerInsertingPoints: boolean = true): void {
+    public static generatePath(start: Point, end: Point, floor: Floor, considerInsertingPoints: boolean = true): void {
 
         // work with a copy of the floorgraph.
         const cpy: FloorGraph = new FloorGraph();
@@ -325,14 +330,15 @@ export class Pathfinder2 {
                     new Point(path[i - 1].x, path[i - 1].y, false)
                 ));
             }
-        } else {
+        }
+        else {
 
         }
     }
 
 
     // ############################## Stair Graph #########################################
-    public generateStairGraphOnMap(map: Map) {
+    public static generateStairGraphOnMap(map: Map) {
 
         const totalNodes: StairNode[] = [];
         const chckdN: {p1: Point, p2: Point, lvl1: number, lvl2: number}[] = [];
@@ -427,8 +433,8 @@ export class Pathfinder2 {
     }
 
     // finds the path globally through the whole building from start (floor1) to end (floor2)
-    public generateGlobalPath(point1: Point, floorId1: number, point2: Point, floorId2: number,
-                              currentMap: Map): void {
+    public static generateGlobalPath(point1: Point, floorId1: number, point2: Point, floorId2: number,
+                                     currentMap: Map): void {
 
 
         // first, clear all paths on the whole map!
@@ -500,11 +506,13 @@ export class Pathfinder2 {
             for (let i = 1; i < stairPath.length; i++) {
                 if (stairPath[i].floorLevel === curFloor) {
                     this.generatePath(stairPath[i - 1].stairs.center, stairPath[i].stairs.center, currentMap.floors[curFloor]);
-                } else {
+                }
+                else {
                     curFloor = stairPath[i].floorLevel;
                 }
             }
-        } else {
+        }
+        else {
 
             console.log('this path is not possible!');
 
@@ -515,7 +523,7 @@ export class Pathfinder2 {
         }
     }
 
-    public findStairPathFromTo(nodes: StairNode[], from: StairNode, to: StairNode): StairNode[] {
+    public static findStairPathFromTo(nodes: StairNode[], from: StairNode, to: StairNode): StairNode[] {
 
         if (from === to || nodes.indexOf(from) === nodes.indexOf(to)) return [from];
 
@@ -537,8 +545,8 @@ export class Pathfinder2 {
     }
 
     // returns null, if this path is not possible
-    private calculateStairPath(nodes: StairNode[], costs: number[], parents: StairNode[],
-                               openList: StairNode[], closedList: StairNode[], end: StairNode): StairNode[] {
+    private static calculateStairPath(nodes: StairNode[], costs: number[], parents: StairNode[],
+                                      openList: StairNode[], closedList: StairNode[], end: StairNode): StairNode[] {
 
         let min = Number.MAX_VALUE;
         let curCost = min;
@@ -572,7 +580,8 @@ export class Pathfinder2 {
                         minClNode = cl;
                         minLinkIndex = j;
                     }
-                } else {
+                }
+                else {
                     // already in closed list
                 }
             }
@@ -588,7 +597,8 @@ export class Pathfinder2 {
 
         if (openList.length > 0 && closedList.indexOf(end) < 0) {
             return this.calculateStairPath(nodes, costs, parents, openList, closedList, end);
-        } else {
+        }
+        else {
 
             // got the costs over the nodes. now back-track.
             // start at end node and backtrack over the parent for each node.
