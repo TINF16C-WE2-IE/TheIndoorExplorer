@@ -21,7 +21,7 @@ export class MainComponent {
     }
 
     public performLogout(): void {
-        this.rqstSvc.get('logout', {}).subscribe(
+        this.rqstSvc.get('user/logout', {}).subscribe(
             resp => {
                 if (resp) {
                     console.log('Logout response:', resp);

@@ -17,7 +17,7 @@ export class MapListComponent implements OnInit {
     public get maps(): Map[] {
         return Object.keys(this.modelSvc.maps).map(key => this.modelSvc.maps[key]);
     }
-    constructor(private msgSvc: MessageService, private rqstSvc: RequestService, private modelSvc: ModelService,
+    constructor(private msgSvc: MessageService, private rqstSvc: RequestService, public modelSvc: ModelService,
                 private changeRef: ChangeDetectorRef) {
     }
 
