@@ -187,7 +187,7 @@
                         <svg:g *ngFor="let linepath of movingPaths">
                             <svg:line *ngFor="let path of linepath.path" stroke="red" stroke-width="3"
                                       stroke-linecap="round" stroke-linejoin="bevel"
-                                      stroke-dasharray="35,10" fill="none"
+                                      stroke-dasharray="5,8" fill="none"
                                       [attr.x1]="path.p1.x" [attr.y1]="path.p1.y"
                                       [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
                                       marker-end="url(#circle)" marker-start="url(#circle)"/>
@@ -198,11 +198,6 @@
                                 {{linepath.description}}
                             </svg:text>
                         </svg:g>
-
-
-                        <!-- Pathfinding Debug -->
-                        <svg:circle *ngFor="let node of floor.floorGraph.nodes" [attr.cx]="node.x" [attr.cy]="node.y" r="2" style="stroke: none; fill:green;"/>
-
 
                         <svg:circle *ngIf="mouse.xs !== null && mouse.ys !== null"
                                     [attr.cx]="mouse.xs" [attr.cy]="mouse.ys" r="5" style="stroke:red; fill:none"/>

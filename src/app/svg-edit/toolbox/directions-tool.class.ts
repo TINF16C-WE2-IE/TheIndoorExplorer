@@ -48,26 +48,33 @@ export class DirectionsTool extends Tool {
         }
     }
 
-    public selectWaypoint(selected: Selectable) {
+    public selectWaypoint(selected: Selectable, floorArrayIndex: number = null) {
+
+        console.log('selected:', selected);
 
         // TS has no way of checking for an interface :(
         if (isSelectable(selected)) {
-            if (this.modelSvc.selectedObjects.length) {
 
-                this.pfinder.generateGlobalPath(this.selectedDest1.p,
-                    this.selectedDest1.fid, selected.center, this.modelSvc.currentFloorId, this.modelSvc.currentMap);
-                this.modelSvc.selectedObjects = [];
-            } else {
-                this.modelSvc.selectedObjects.push(selected);
 
+            // if we dont know the floor index, search for it.
+            if (floorArrayIndex === null || floorArrayIndex === undefined) {
                 for (const f of this.modelSvc.currentMap.floors) {
                     for (const p of f.getAllSelectables()) {
                         if (p === selected) {
-
-                            this.selectedDest1 = {p: selected.center, fid: this.modelSvc.currentMap.floors.indexOf(f)};
+                            floorArrayIndex = this.modelSvc.currentMap.floors.indexOf(f);
                         }
                     }
                 }
+            }
+
+            if (this.modelSvc.selectedObjects.length) {
+
+                this.pfinder.generateGlobalPath(this.selectedDest1.p,
+                    this.selectedDest1.fid, selected.center, floorArrayIndex, this.modelSvc.currentMap);
+                this.modelSvc.selectedObjects = [];
+            } else {
+                this.modelSvc.selectedObjects.push(selected);
+                this.selectedDest1 = { p: selected.center, fid: floorArrayIndex};
             }
         } else {
             this.modelSvc.selectedObjects = [];

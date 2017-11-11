@@ -358,11 +358,10 @@ export class Pathfinder2 {
         const totalNodes: TeleporterNode[] = [];
         const chckdN: {p1: Point, p2: Point, lvl1: number, lvl2: number}[] = [];
 
+        this.clearAllFloorGraphs(map);
+
         // generate teleporter-linking for each floor individually
         for (const f of map.floors) {
-
-            // clear the paths on the map!
-            f.floorGraph.paths = [];
 
             const nodes: TeleporterNode[] = [];
             for (const s1 of f.getAllTeleporters()) {
@@ -460,10 +459,7 @@ export class Pathfinder2 {
                               currentMap: Map): void {
 
 
-        // first, clear all paths on the whole map!
-        for (const f of currentMap.floors) {
-            f.floorGraph.paths = [];
-        }
+        this.clearAllFloorGraphs(currentMap);
 
 
         // pre-check any easy conditions!
@@ -568,11 +564,7 @@ export class Pathfinder2 {
         } else {
 
             console.log('this path is not possible!');
-
-            // Again, clear all paths on the whole map!
-            for (const f of currentMap.floors) {
-                f.floorGraph.paths = [];
-            }
+            this.clearAllFloorGraphs(currentMap);
         }
     }
 
