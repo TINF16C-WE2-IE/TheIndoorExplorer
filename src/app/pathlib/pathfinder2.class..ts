@@ -172,12 +172,29 @@ export class Pathfinder2 {
                     }
 
                     const midV = new Vector(Math.cos(midAng) * radius, Math.sin(midAng) * radius);
-                    nodes.push(new PathNode(p1.x + midV.x, p1.y + midV.y));
+
+                    // again, check if this point is near any line.
+                    for (const l of walls) {
+                        if (this.distToLineSegmentSquared(new Point(p1.x + midV.x, p1.y + midV.y), l.p1, l.p2) < radius ) {
+                            nodes.push(new PathNode(p1.x + midV.x, p1.y + midV.y));
+                        } else {
+                            // otherwise you are too fat to pass through this small gap :P
+                        }
+                    }
                 }
             }
         }
 
         return nodes;
+    }
+
+    private distToLineSegmentSquared(p: Point, e1: Point, e2: Point) {
+        const l2 = Math.sqrt(e1.x - e2.x ** 2 + e1.y - e2.y ** 2);
+        if (l2 === 0) return Math.sqrt(p.x - p.x ** 2 + p.y - p.y ** 2);
+        let t = ((p.x - e1.x) * (e2.x - e1.x) + (p.y - e1.y) * (e2.y - e1.y)) / l2;
+        t = Math.max(0, Math.min(1, t));
+        const obj = { x: e1.x + t * (e2.x - e1.x), y: e1.y + t * (e2.y - e1.y) };
+        return Math.sqrt(p.x - obj.x ** 2 + p.y - obj.y ** 2);
     }
 
 
