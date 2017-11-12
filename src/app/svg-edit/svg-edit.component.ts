@@ -12,8 +12,8 @@ import { TeleporterGroup } from '../model/teleporter-group.interface';
 import { isTeleporter, Teleporter } from '../model/teleporter.interface';
 import { Wall } from '../model/wall.class';
 import { LinePath } from '../pathlib/line-path.class';
-import { Pathfinder2 } from '../pathlib/pathfinder2.class';
 import { ModelService } from '../svc/model.service';
+import { WorkerService } from '../svc/worker.service';
 import { Mouse } from './mouse.class';
 import { DeleteTool } from './toolbox/delete-tool.class';
 import { DirectionsTool } from './toolbox/directions-tool.class';
@@ -90,7 +90,7 @@ export class SvgEditComponent implements OnInit {
 
 
     constructor(private modelSvc: ModelService, private route: ActivatedRoute, private router: Router,
-                iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
+                public workerSvc: WorkerService, iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
 
         iconRegistry.addSvgIcon('move', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/move.svg'));
         iconRegistry.addSvgIcon('wall', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/pencil.svg'));
@@ -121,33 +121,33 @@ export class SvgEditComponent implements OnInit {
 
                 this.modelSvc.loadMap(
                     this.urlMapIdString === 'new' ? -1 : Number.parseInt(this.urlMapIdString),
-                    () => this.onMapLoaded()
+                    () => this.workerSvc.call('Test')
                 );
             }
         );
     }
 
-    private onMapLoaded() {
-        console.log('building route graph...');
-        // initialize connection graphs for pathfinding - function moved from DirectionsTool
-
-        // create the basic nodegraph on each floor, and insert the static elevators and stairs
-        for (const f of this.floors) {
-
-            // you can set smooth to true. This will result in a bit smoother paths,
-            // but also (in the worst case) in twice as much nodes and therefore quadratic more calculation cost!
-            f.floorGraph = Pathfinder2.createLinkedFloorGraph([...f.walls], 45, false);
-            Pathfinder2.insertPointsToFloorGraph(f.stairways.map(el => el.center), f.floorGraph, f.walls);
-        }
-
-        Pathfinder2.generateTeleporterGraphOnMap(this.modelSvc.currentMap);
-
-        for (const f of this.modelSvc.currentMap.floors) {
-            f.floorGraph.paths = [];
-        }
-
-        console.log('done!', this.modelSvc.currentMap);
-    }
+    // private onMapLoaded() {
+    //     console.log('building route graph...');
+    //     // initialize connection graphs for pathfinding - function moved from DirectionsTool
+    //
+    //     // create the basic nodegraph on each floor, and insert the static elevators and stairs
+    //     for (const f of this.floors) {
+    //
+    //         // you can set smooth to true. This will result in a bit smoother paths,
+    //         // but also (in the worst case) in twice as much nodes and therefore quadratic more calculation cost!
+    //         f.floorGraph = Pathfinder2.createLinkedFloorGraph([...f.walls], 45, false);
+    //         Pathfinder2.insertPointsToFloorGraph(f.stairways.map(el => el.center), f.floorGraph, f.walls);
+    //     }
+    //
+    //     Pathfinder2.generateTeleporterGraphOnMap(this.modelSvc.currentMap);
+    //
+    //     for (const f of this.modelSvc.currentMap.floors) {
+    //         f.floorGraph.paths = [];
+    //     }
+    //
+    //     console.log('done!', this.modelSvc.currentMap);
+    // }
 
 
     selectTool($event: any) {

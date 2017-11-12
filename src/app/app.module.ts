@@ -45,6 +45,7 @@ import { PublishMapDialogComponent } from './svg-edit/dialogs/publish-map-dialog
 import { SvgEditComponent } from './svg-edit/svg-edit.component';
 import { ToolbarComponent } from './svg-edit/toolbar.component';
 import { TypeNamePipe } from './svg-edit/type-name.pipe';
+import { WorkerService } from './svc/worker.service';
 
 export class MyHammerConfig extends HammerGestureConfig {
     overrides = <any>{
@@ -83,6 +84,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         RequestService,
         ModelService,
         MessageService,
+        WorkerService,
         {provide: LocationStrategy, useClass: HashLocationStrategy},
         {provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy},
         {provide: HAMMER_GESTURE_CONFIG, useClass: MyHammerConfig}
