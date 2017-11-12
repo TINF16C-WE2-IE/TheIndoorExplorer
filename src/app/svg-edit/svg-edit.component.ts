@@ -1,19 +1,23 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
-import { MatIconRegistry, MatSelectChange, MatSidenav } from '@angular/material';
+import { MatIconRegistry, MatSidenav } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import 'rxjs/add/operator/switchMap';
+import { Elevator } from '../model/elevator.class';
 import { Floor } from '../model/floor.class';
 import { Portal } from '../model/portal.class';
 import { Selectable } from '../model/selectable.interface';
 import { Stairs } from '../model/stairs.class';
+import { TeleporterGroup } from '../model/teleporter-group.interface';
+import { isTeleporter, Teleporter } from '../model/teleporter.interface';
 import { Wall } from '../model/wall.class';
 import { LinePath } from '../pathlib/line-path.class';
 import { Pathfinder2 } from '../pathlib/pathfinder2.class';
-import { ModelService, StairsGroup } from '../svc/model.service';
+import { ModelService } from '../svc/model.service';
 import { Mouse } from './mouse.class';
 import { DeleteTool } from './toolbox/delete-tool.class';
 import { DirectionsTool } from './toolbox/directions-tool.class';
+import { ElevatorTool } from './toolbox/elevator-tool.class';
 import { LineTool } from './toolbox/line-tool.class';
 import { MoveTool } from './toolbox/move-tool.class';
 import { SelectTool } from './toolbox/select-tool.class';
@@ -33,7 +37,7 @@ export class SvgEditComponent implements OnInit {
         {'name': 'Draw Wall', 'icon': 'wall'},
         {'name': 'Draw Portal', 'icon': 'portal'},
         {'name': 'Draw Stairs', 'icon': 'stairs'},
-        {'name': 'Draw Elevator', 'icon': 'elevator'}
+        {'name': 'Place Elevator', 'icon': 'elevator'}
     ];
     public selectedTool = 'Move';
     public editMode = false;
@@ -75,8 +79,8 @@ export class SvgEditComponent implements OnInit {
         return null;
     }
 
-    get connectibleStairsGroups() {
-        return this.modelSvc.connectibleStairsGroups;
+    get connectibleTeleporterGroups() {
+        return this.modelSvc.connectibleTeleporterGroups;
     }
 
     get hasWritePermission(): boolean {
@@ -136,7 +140,7 @@ export class SvgEditComponent implements OnInit {
             Pathfinder2.insertPointsToFloorGraph(f.stairways.map(el => el.center), f.floorGraph, f.walls);
         }
 
-        Pathfinder2.generateStairGraphOnMap(this.modelSvc.currentMap);
+        Pathfinder2.generateTeleporterGraphOnMap(this.modelSvc.currentMap);
 
         for (const f of this.modelSvc.currentMap.floors) {
             f.floorGraph.paths = [];
@@ -168,6 +172,9 @@ export class SvgEditComponent implements OnInit {
                 break;
             case 'Draw Stairs':
                 this.mouse.tool = new LineTool(this.mouse, this.modelSvc, {lineType: Stairs});
+                break;
+            case 'Place Elevator':
+                this.mouse.tool = new ElevatorTool(this.mouse, this.modelSvc);
                 break;
             case 'Directions':
                 this.mouse.tool = new DirectionsTool(this.mouse, this.modelSvc);
@@ -257,40 +264,40 @@ export class SvgEditComponent implements OnInit {
         }
     }
 
-    getStairsGroupDisplayName(stairsGroup: StairsGroup) {
-        return 'Group ' + stairsGroup.group + ': ' +
-            stairsGroup.stairways.map(stairs => {
-                const floor = this.floors.find(fl => fl.stairways.indexOf(stairs) !== -1);
+    getTeleporterGroupDisplayName(teleporterGroup: TeleporterGroup) {
+        return 'Group ' + teleporterGroup.group + ': ' +
+            teleporterGroup.members.map(teleporter => {
+                const floor = this.floors.find(fl => {
+                    return fl.stairways.indexOf(teleporter as Stairs) !== -1
+                        || fl.elevators.indexOf(teleporter as Elevator) !== -1;
+                });
                 const floorIndex = this.floors.indexOf(floor);
-                return {index: floorIndex, floorLabel: (floor.label || '?'), stairsLabel: (stairs.label || '?')};
+                return {index: floorIndex, floorLabel: (floor.label || '?'), stairsLabel: (teleporter.label || '?')};
             }).sort((a, b) => {
                 return (a.index - b.index) || a.stairsLabel.toUpperCase().localeCompare(b.stairsLabel.toUpperCase());
             }).map(obj => {
-                return obj.stairsLabel + '(' + obj.floorLabel + ')';
+                return obj.stairsLabel + ' (' + obj.floorLabel + ')';
             }).join(', ');
     }
 
 
-    setStairsGroup(event: MatSelectChange) {
-        if (this.singleSelectedObject instanceof Stairs) {
-            const group: number = event.value;
+    setTeleporterGroup(teleporter: Teleporter, group: number) {
+        if (isTeleporter(this.singleSelectedObject)) {
             if (group === undefined) {  // new Group
-                this.singleSelectedObject.group = Math.max(
-                    0, ...this.floors
-                              .reduce((stairsList, floor) => stairsList.concat(floor.stairways), [])
-                              .map(stairs => stairs.group)
+                teleporter.group = Math.max(
+                    0, ...this.connectibleTeleporterGroups
+                              .reduce((groupsList, teleporterGroup) => groupsList.concat(teleporterGroup.group), [])
                 ) + 1;
             }
             else {
-                this.singleSelectedObject.group = group;
+                teleporter.group = group;
             }
         }
-        this.modelSvc.updateConnectibleStairsGroups();
+        this.modelSvc.updateConnectibleTeleporterGroups();
     }
 
     @HostListener('window:resize', ['$event'])
-    onResize(event) {
-        console.log('resize');
+    onResize() {
         this.currentMap.fitToViewport();
     }
 

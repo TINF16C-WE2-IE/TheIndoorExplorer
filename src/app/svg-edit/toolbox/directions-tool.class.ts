@@ -1,17 +1,14 @@
-import { Selectable } from '../../model/selectable.interface';
+import { Point } from '../../model/point.class';
+import { isSelectable, Selectable } from '../../model/selectable.interface';
 import { Pathfinder2 } from '../../pathlib/pathfinder2.class';
-import { ModelService } from '../../svc/model.service';
-import { Mouse } from '../mouse.class';
 import { Tool } from './tool.class';
 
 export class DirectionsTool extends Tool {
 
+    private selectedDest1: {p: Point, fid: number};
     private dragOrigin: {x: number, y: number};
     private panDragOrigin: {x: number, y: number};
 
-    constructor(mouse: Mouse, modelSvc: ModelService, public args = {}) {
-        super(mouse, modelSvc, args);
-    }
 
     public get name() {
         return 'Directions';
@@ -42,34 +39,38 @@ export class DirectionsTool extends Tool {
         }
     }
 
-    public selectWaypoint(selected: Selectable | any) {
+    public selectWaypoint(selected: Selectable, floorArrayIndex: number = null) {
+
+        console.log('selected:', selected);
+
         // TS has no way of checking for an interface :(
-        if (this.isSelectable(selected)) {
+        if (isSelectable(selected)) {
+
+
+            // if we dont know the floor index, search for it.
+            if (floorArrayIndex === null || floorArrayIndex === undefined) {
+                for (const f of this.modelSvc.currentMap.floors) {
+                    for (const p of f.getAllSelectables()) {
+                        if (p === selected) {
+                            floorArrayIndex = this.modelSvc.currentMap.floors.indexOf(f);
+                        }
+                    }
+                }
+            }
+
             if (this.modelSvc.selectedObjects.length) {
 
-                Pathfinder2.generateGlobalPath(this.modelSvc.selectedObjects[0].center,
-                    this.modelSvc.currentFloorId, selected.center, this.modelSvc.currentFloorId, this.modelSvc.currentMap);
+                Pathfinder2.generateGlobalPath(this.selectedDest1.p,
+                    this.selectedDest1.fid, selected.center, floorArrayIndex, this.modelSvc.currentMap);
                 this.modelSvc.selectedObjects = [];
             }
             else {
                 this.modelSvc.selectedObjects.push(selected);
+                this.selectedDest1 = {p: selected.center, fid: floorArrayIndex};
             }
         }
         else {
             this.modelSvc.selectedObjects = [];
         }
-
-        // just debug test, selecting points on different floors. Of course only works on maps with a floor above the selected point
-        /*
-        if (this.isSelectable(selected)) {
-                Pathfinder2.generateGlobalPath(selected.center,
-                        this.modelSvc.currentFloorId, selected.center, this.modelSvc.currentFloorId + 1, this.modelSvc.currentMap);
-                this.modelSvc.selectedObjects = [];
-
-        } else {
-            this.modelSvc.selectedObjects = [];
-        }
-        */
     }
-
 }

@@ -2,9 +2,11 @@ import { Line } from './../model/line.class';
 export class LinePath {
 
     public path: Line[];
+    public description: string; // a user info for this path (if needed)
 
-    constructor(path: Line[] = []) {
+    constructor(path: Line[] = [], description = '') {
         this.path = path;
+        this.description = description;
     }
 
     public getLength() {

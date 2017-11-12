@@ -1,8 +1,9 @@
 import { Point } from './point.class';
 import { Portal } from './portal.class';
 import { Selectable } from './selectable.interface';
+import { Teleporter } from './teleporter.interface';
 
-export class Stairs extends Portal implements Selectable {
+export class Stairs extends Portal implements Selectable, Teleporter {
 
     public length: number;
     public canEnter: boolean;

@@ -1,6 +1,9 @@
 import { ElementRef, Injectable } from '@angular/core';
 import { Map } from '../model/map.class';
 import { Stairs } from '../model/stairs.class';
+import { TeleporterGroup } from '../model/teleporter-group.interface';
+import { Elevator } from '../model/elevator.class';
+import { Teleporter } from '../model/teleporter.interface';
 import { Selectable } from './../model/selectable.interface';
 import { RequestService } from './request.service';
 
@@ -14,7 +17,7 @@ export class ModelService {
     public userInfo: {id: number, username: string};
 
     private _selectedObjects: Selectable[] = [];
-    public connectibleStairsGroups: StairsGroup[] = [];
+    public connectibleTeleporterGroups: TeleporterGroup[] = [];
 
     public editorCanvas: ElementRef;
     public viewportSize: {x: number, y: number} = {x: 500, y: 500};
@@ -47,7 +50,7 @@ export class ModelService {
 
     public set selectedObjects(value: Selectable[]) {
         this._selectedObjects = value;
-        this.updateConnectibleStairsGroups();
+        this.updateConnectibleTeleporterGroups();
     }
 
     public setCurrentFloor(id: number) {
@@ -144,26 +147,31 @@ export class ModelService {
             });
     }
 
-    updateConnectibleStairsGroups() {
-        const stairsGroups: StairsGroup[] = [];
-        for (const stairs of this.currentMap.floors
-                                 .reduce((stairsList, floor) => stairsList.concat(floor.stairways), []) as Stairs[]) {
-            if (stairs.group !== null) {
-                const foundGroup = stairsGroups.find(grp => grp.group === stairs.group);
+    updateConnectibleTeleporterGroups() {
+        let teleporters: Teleporter[] = [];
+        if (this.selectedObjects.length === 1) {
+            if (this.selectedObjects[0] instanceof Stairs) {
+                teleporters = this.currentMap.floors.reduce((stairsList, floor) => stairsList.concat(floor.stairways), []);
+            }
+            else if (this.selectedObjects[0] instanceof Elevator) {
+                teleporters = this.currentMap.floors.reduce((elevatorList, floor) => elevatorList.concat(floor.elevators), []);
+            }
+        }
+
+        const teleporterGroups: TeleporterGroup[] = [];
+        for (const teleporter of teleporters) {
+            if (teleporter.group !== null) {
+                const foundGroup = teleporterGroups.find(grp => grp.group === teleporter.group);
                 if (foundGroup) {
-                    foundGroup.stairways.push(stairs);
+                    foundGroup.members.push(teleporter);
                 }
                 else {
-                    stairsGroups.push({group: stairs.group, stairways: [stairs]});
+                    teleporterGroups.push({group: teleporter.group, members: [teleporter]});
                 }
             }
         }
-        this.connectibleStairsGroups = stairsGroups;
+        this.connectibleTeleporterGroups = teleporterGroups;
     }
 }
 
 
-export interface StairsGroup {
-    group: number;
-    stairways: Stairs[];
-}

@@ -1,8 +1,7 @@
-import {Mouse} from '../mouse.class';
-import {Point} from '../../model/point.class';
-import {ModelService} from '../../svc/model.service';
-import {Line} from '../../model/line.class';
-import {Selectable} from '../../model/selectable.interface';
+import { Mouse } from '../mouse.class';
+import { Point } from '../../model/point.class';
+import { ModelService } from '../../svc/model.service';
+import { Line } from '../../model/line.class';
 
 export abstract class Tool {
     public get name() {
@@ -32,26 +31,34 @@ export abstract class Tool {
         return this.floor.getExistingOrThisPoint(new Point(this.mouse.x, this.mouse.y), exclude);
     }
 
-    protected getExistingObjectsBelowCursor(lineAccuracy = 10): { points: Point[], obj: any } {
-        const point = this.floor.getExistingOrThisPoint(new Point(this.mouse.x, this.mouse.y), [], true);
-        if (point) {
-            return {points: [point], obj: null};
+    protected getExistingObjectsBelowCursor(lineAccuracy = 10): {points: Point[], obj: any} {
+        const mousePoint = new Point(this.mouse.x, this.mouse.y);
+        const linePoint = this.floor.getExistingOrThisPoint(mousePoint, [], true);
+        if (linePoint) {
+            return {points: [linePoint], obj: null};
         }
-        else {
-            const lines = ([...this.floor.walls, ...this.floor.portals, ...this.floor.stairways] as Line[])
-                .map(line => {
-                    return {
-                        distance: this.pointDistance(this.mouse.x, this.mouse.y, line.p1.x, line.p1.y, line.p2.x, line.p2.y),
-                        line: line
-                    };
-                });
-            if (lines.length) {
-                const shortest = lines.reduce((prev, current) => prev.distance > current.distance ? current : prev);
-                if (shortest.distance <= lineAccuracy) {
-                    return {points: [shortest.line.p1, shortest.line.p2], obj: shortest.line};
-                }
+
+        const elevatorPoint = this.floor.getExistingOrThisPoint(mousePoint, [], true,
+            this.floor.elevators.map(elevator => elevator.center));
+        if (elevatorPoint) {
+            return {
+                points: [elevatorPoint],
+                obj: this.floor.elevators.find(elevator => elevator.center.equals(elevatorPoint))
+            };
+        }
+
+        const lines = ([...this.floor.walls, ...this.floor.portals, ...this.floor.stairways] as Line[])
+            .map(line => ({
+                distance: this.pointDistance(this.mouse.x, this.mouse.y, line.p1.x, line.p1.y, line.p2.x, line.p2.y),
+                line: line
+            }));
+        if (lines.length) {
+            const shortest = lines.reduce((prev, current) => prev.distance > current.distance ? current : prev);
+            if (shortest.distance <= lineAccuracy) {
+                return {points: [shortest.line.p1, shortest.line.p2], obj: shortest.line};
             }
         }
+
         return {points: [], obj: null};
     }
 
@@ -78,7 +85,4 @@ export abstract class Tool {
         return Math.sqrt((x - xx) ** 2 + (y - yy) ** 2);
     }
 
-    protected isSelectable(obj: Selectable | any): obj is Selectable {
-        return (obj && obj.label !== undefined);
-    }
 }

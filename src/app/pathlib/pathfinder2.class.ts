@@ -1,22 +1,18 @@
-import { Floor } from '../model/floor.class';
-import { Line } from '../model/line.class';
-import { Map } from '../model/map.class';
-import { Point } from '../model/point.class';
+import { Elevator } from './../model/elevator.class';
+import { Teleporter } from './../model/teleporter.interface';
 import { Stairs } from '../model/stairs.class';
-import { FloorGraph } from './floor-graph.class';
+import { Map } from '../model/map.class';
+import { TeleporterNode } from './teleporter-node.class';
+import { Floor } from '../model/floor.class';
 import { LinePath } from './line-path.class';
-import { PathNode } from './path-node.class';
-import { StairNode } from './stair-node.class';
+import { FloorGraph } from './floor-graph.class';
 import { Vector } from './vector.class';
+import { Line } from '../model/line.class';
+import { Point } from '../model/point.class';
+import { PathNode } from './path-node.class';
 
 export class Pathfinder2 {
 
-    // mainly just for debugging
-    // public connections: Line[];
-
-    // constructor() {
-    // this.connections = [];
-    // }
 
     // before calling this, nodes should have been linked together.
     // (and a link has to be registered in BOTH nodes!)
@@ -244,7 +240,6 @@ export class Pathfinder2 {
                                 nodes.find(el => el.x === n1.x && el.y === n1.y),
                                 nodes.find(el => el.x === n2.x && el.y === n2.y)
                             );
-                            // this.connections.push(new Line(p1, p2));
                         }
                         else {
 
@@ -290,7 +285,7 @@ export class Pathfinder2 {
         }
     }
 
-    // finds path from start to end on the given floor
+    // adds a path from start to end on the given floor
     public static generatePath(start: Point, end: Point, floor: Floor, considerInsertingPoints: boolean = true): void {
 
         // work with a copy of the floorgraph.
@@ -302,14 +297,12 @@ export class Pathfinder2 {
         if (considerInsertingPoints) {
             // optionally add start and end, if they are not already included
             const additionalPoints = [];
-            if ([...floor.stairways.map(ele => ele.center),
-                    ...floor.portals.map(ele => ele.center)].find(
+            if (floor.getAllSelectables().map(ele => ele.center).find(
                     el => el.x === start.x && el.y === start.y
                 ) === undefined) {
                 additionalPoints.push(start);
             }
-            if ([...floor.stairways.map(ele => ele.center),
-                    ...floor.portals.map(ele => ele.center)].find(
+            if (floor.getAllSelectables().map(ele => ele.center).find(
                     el => el.x === end.x && el.y === end.y
                 ) === undefined) {
                 additionalPoints.push(end);
@@ -337,21 +330,20 @@ export class Pathfinder2 {
     }
 
 
-    // ############################## Stair Graph #########################################
-    public static generateStairGraphOnMap(map: Map) {
+    // ############################## Teleporter Graph #########################################
+    public static generateTeleporterGraphOnMap(map: Map) {
 
-        const totalNodes: StairNode[] = [];
+        const totalNodes: TeleporterNode[] = [];
         const chckdN: {p1: Point, p2: Point, lvl1: number, lvl2: number}[] = [];
 
-        // generate stair-linking for each floor individually
+        this.clearAllFloorGraphs(map);
+
+        // generate teleporter-linking for each floor individually
         for (const f of map.floors) {
 
-            // clear the paths on the map!
-            f.floorGraph.paths = [];
-
-            const nodes: StairNode[] = [];
-            for (const s1 of f.stairways) {
-                nodes.push(new StairNode(s1, map.floors.indexOf(f)));
+            const nodes: TeleporterNode[] = [];
+            for (const s1 of f.getAllTeleporters()) {
+                nodes.push(new TeleporterNode(s1, map.floors.indexOf(f)));
             }
 
             for (const n1 of nodes) {
@@ -359,24 +351,27 @@ export class Pathfinder2 {
 
                     if (n1 !== n2) {
                         if (chckdN.find(el =>
-                                ((el.p1.x === n1.stairs.center.x && el.p1.y === n1.stairs.center.y)
-                                    && (el.p2.x === n2.stairs.center.x && el.p2.y === n2.stairs.center.y))
-                                || ((el.p1.x === n2.stairs.center.x && el.p1.y === n2.stairs.center.y)
-                                && (el.p2.x === n1.stairs.center.x && el.p2.y === n1.stairs.center.y))
+                                ((el.p1.x === n1.teleporter.center.x && el.p1.y === n1.teleporter.center.y)
+                                    && (el.p2.x === n2.teleporter.center.x && el.p2.y === n2.teleporter.center.y))
+                                || ((el.p1.x === n2.teleporter.center.x && el.p1.y === n2.teleporter.center.y)
+                                && (el.p2.x === n1.teleporter.center.x && el.p2.y === n1.teleporter.center.y))
                             ) === undefined) {
 
+                             // it makes sense just to link those teleporters, which actually have a link to a second one.
+                            if (n1.teleporter.group !== null && n2.teleporter.group !== null) {
 
-                            this.generatePath(n1.stairs.center, n2.stairs.center, f);
-                            if (f.floorGraph.paths[f.floorGraph.paths.length - 1].path.length > 0) {
-                                const length = f.floorGraph.paths[f.floorGraph.paths.length - 1].getLength();
-                                n1.links.push(n2);
-                                n1.costs.push(length);
-                                n2.links.push(n1);
-                                n2.costs.push(length);
+                                this.generatePath(n1.teleporter.center, n2.teleporter.center, f);
+                                if (f.floorGraph.paths[f.floorGraph.paths.length - 1].path.length > 0) {
+                                    const length = f.floorGraph.paths[f.floorGraph.paths.length - 1].getLength();
+                                    n1.links.push(n2);
+                                    n1.costs.push(length);
+                                    n2.links.push(n1);
+                                    n2.costs.push(length);
+                                }
                             }
 
                             chckdN.push({
-                                p1: n1.stairs.center, p2: n2.stairs.center,
+                                p1: n1.teleporter.center, p2: n2.teleporter.center,
                                 lvl1: map.floors.indexOf(f), lvl2: map.floors.indexOf(f)
                             });
                         }
@@ -388,26 +383,31 @@ export class Pathfinder2 {
         }
 
 
-        // in the second part, we just link the stairs of individual floors together!
+        // in the second part, we just link the teleporters of individual floors together!
         for (const n1 of totalNodes) {
             for (const n2 of totalNodes) {
-                if ((n1 !== n2) && n1.floorLevel !== n2.floorLevel) {
+                if ((n1 !== n2) && n1.teleporter.group !== null && n2.teleporter.group !== null && n1.floorLevel !== n2.floorLevel
+                      && ((n1.teleporter instanceof Stairs && n2.teleporter instanceof Stairs)
+                            || (n1.teleporter instanceof Elevator && n2.teleporter instanceof Elevator)
+                          )
+                    ) {
 
                     if (chckdN.find(el =>
-                            ((el.p1.x === n1.stairs.center.x && el.p1.y === n1.stairs.center.y)
-                                && (el.p2.x === n2.stairs.center.x && el.p2.y === n2.stairs.center.y)
+                            ((el.p1.x === n1.teleporter.center.x && el.p1.y === n1.teleporter.center.y)
+                                && (el.p2.x === n2.teleporter.center.x && el.p2.y === n2.teleporter.center.y)
                                 && (el.lvl1 === n1.floorLevel && el.lvl2 === n2.floorLevel))
-                            || ((el.p1.x === n2.stairs.center.x && el.p1.y === n2.stairs.center.y)
-                            && (el.p2.x === n1.stairs.center.x && el.p2.y === n1.stairs.center.y)
+                            || ((el.p1.x === n2.teleporter.center.x && el.p1.y === n2.teleporter.center.y)
+                            && (el.p2.x === n1.teleporter.center.x && el.p2.y === n1.teleporter.center.y)
                             && (el.lvl1 === n2.floorLevel && el.lvl2 === n1.floorLevel))
                         ) === undefined) {
 
                         // we need to check, if one stair has the other as target
-                        if (n1.stairs.group === n1.stairs.group) {
+                        if (n1.teleporter.group === n2.teleporter.group) {
 
                             // pythagoras value for this 3d length :D
                             const hDist = Math.sqrt(
-                                (n2.stairs.center.x - n1.stairs.center.x) ** 2 + (n2.stairs.center.y - n1.stairs.center.y) ** 2
+                                (n2.teleporter.center.x - n1.teleporter.center.x) ** 2
+                                + (n2.teleporter.center.y - n1.teleporter.center.y) ** 2
                             );
                             const vDist = (n2.floorLevel - n1.floorLevel) * 500;  // just some random value.
                             const length = Math.sqrt(hDist ** 2 + vDist ** 2);
@@ -419,8 +419,8 @@ export class Pathfinder2 {
                         }
 
                         chckdN.push({
-                            p1: n1.stairs.center,
-                            p2: n2.stairs.center,
+                            p1: n1.teleporter.center,
+                            p2: n2.teleporter.center,
                             lvl1: n1.floorLevel,
                             lvl2: n2.floorLevel
                         });
@@ -437,10 +437,7 @@ export class Pathfinder2 {
                                      currentMap: Map): void {
 
 
-        // first, clear all paths on the whole map!
-        for (const f of currentMap.floors) {
-            f.floorGraph.paths = [];
-        }
+        this.clearAllFloorGraphs(currentMap);
 
 
         // pre-check any easy conditions!
@@ -456,17 +453,29 @@ export class Pathfinder2 {
         }
 
         // create a copy of the stair graph. and add start and end.
-        const cpy: StairNode[] = [];
+        // nobody cares, if we add (start/end) as stairs or elevators,
+        // because they are just getting connected to other teleporters on the same floor.
+        const cpy: TeleporterNode[] = [];
         Object.assign(cpy, currentMap.stairGraph);
-        const stnt = new StairNode(new Stairs('start point', new Point(point1.x + 10, point1.y + 10, false),
+        const stnt = new TeleporterNode(new Stairs('start point', new Point(point1.x + 10, point1.y + 10, false),
             new Point(point1.x - 10, point1.y - 10, false)), floorId1);
-        const ndnt = new StairNode(new Stairs('end point', new Point(point2.x + 10, point2.y + 10, false),
+        const ndnt = new TeleporterNode(new Stairs('end point', new Point(point2.x + 10, point2.y + 10, false),
             new Point(point2.x - 10, point2.y - 10, false)), floorId2);
 
-        // connect the start and end with other stairs on the same floor
+        // connect the start and end with other teleporters on the same floor
         for (const st of cpy) {
             if (st.floorLevel === floorId1) {
-                this.generatePath(point1, st.stairs.center, currentMap.floors[floorId1]);
+
+                // if start and end equal each other, connect them anyways.
+                if (st.teleporter.center.equals(stnt.teleporter.center)) {
+                    st.links.push(stnt);
+                    st.costs.push(0);
+                    stnt.links.push(st);
+                    stnt.costs.push(0);
+                    continue;
+                }
+
+                this.generatePath(point1, st.teleporter.center, currentMap.floors[floorId1]);
                 if (currentMap.floors[floorId1].floorGraph.paths[currentMap.floors[floorId1].floorGraph.paths.length - 1].path.length > 0) {
                     const length = currentMap.floors[floorId1].floorGraph.paths[
                     currentMap.floors[floorId1].floorGraph.paths.length - 1
@@ -480,10 +489,19 @@ export class Pathfinder2 {
 
             if (st.floorLevel === floorId2) {
 
-                this.generatePath(point2, st.stairs.center, currentMap.floors[floorId2]);
-                if (currentMap.floors[floorId2].floorGraph.paths[currentMap.floors[floorId1].floorGraph.paths.length - 1].path.length > 0) {
-                    const length = currentMap.floors[floorId1].floorGraph.paths[
-                    currentMap.floors[floorId1].floorGraph.paths.length - 1
+                // if start and end equal each other, connect them anyways.
+                if (st.teleporter.center.equals(ndnt.teleporter.center)) {
+                    st.links.push(ndnt);
+                    st.costs.push(0);
+                    ndnt.links.push(st);
+                    ndnt.costs.push(0);
+                    continue;
+                }
+
+                this.generatePath(point2, st.teleporter.center, currentMap.floors[floorId2]);
+                if (currentMap.floors[floorId2].floorGraph.paths[currentMap.floors[floorId2].floorGraph.paths.length - 1].path.length > 0) {
+                    const length = currentMap.floors[floorId2].floorGraph.paths[
+                    currentMap.floors[floorId2].floorGraph.paths.length - 1
                         ].getLength();
                     st.links.push(ndnt);
                     st.costs.push(length);
@@ -494,18 +512,29 @@ export class Pathfinder2 {
         }
         cpy.push(stnt, ndnt);
 
-
         // now search the shortest global path from start to end
         // this is kind of funny ;)
         const stairPath = this.findStairPathFromTo(cpy, stnt, ndnt);
 
-        // now go through the global stairpath and just calculate the paths between the stairs on the same floor.
-        // its already ensured, that theese stairs have a connection on the same floor. so just calculate straightforward.
+        this.clearAllFloorGraphs(currentMap);
+
+        // now go through the global stairpath and just calculate the paths between the teleporters on the same floor.
+        // its already ensured, that theese teleporters have a connection on the same floor. so just calculate straightforward.
         if (stairPath !== null && stairPath.length > 0) {
             let curFloor = floorId1;
             for (let i = 1; i < stairPath.length; i++) {
+
                 if (stairPath[i].floorLevel === curFloor) {
-                    this.generatePath(stairPath[i - 1].stairs.center, stairPath[i].stairs.center, currentMap.floors[curFloor]);
+                    this.generatePath(stairPath[i - 1].teleporter.center, stairPath[i].teleporter.center, currentMap.floors[curFloor]);
+                    const curGraph = currentMap.floors[curFloor].floorGraph;
+
+                    // if the next point is on a teleporter to a different floorlevel
+                    if (i < stairPath.length - 1 && stairPath[i + 1].floorLevel !== curFloor) {
+                        const diff = stairPath[i + 1].floorLevel - curFloor;
+                        curGraph.paths[curGraph.paths.length - 1].description = + Math.abs(diff) + ' Layer' + (diff > 1 ? 's' : '')
+                                                                                + (Math.sign(diff) > 0 ? ' Up.' : ' Down.');
+                    }
+
                 }
                 else {
                     curFloor = stairPath[i].floorLevel;
@@ -515,15 +544,19 @@ export class Pathfinder2 {
         else {
 
             console.log('this path is not possible!');
-
-            // Again, clear all paths on the whole map!
-            for (const f of currentMap.floors) {
-                f.floorGraph.paths = [];
-            }
+            this.clearAllFloorGraphs(currentMap);
         }
     }
 
-    public static findStairPathFromTo(nodes: StairNode[], from: StairNode, to: StairNode): StairNode[] {
+    private static clearAllFloorGraphs(map: Map): void {
+
+        // clear all paths on the whole map!
+        for (const f of map.floors) {
+            f.floorGraph.paths = [];
+        }
+    }
+
+    public static findStairPathFromTo(nodes: TeleporterNode[], from: TeleporterNode, to: TeleporterNode): TeleporterNode[] {
 
         if (from === to || nodes.indexOf(from) === nodes.indexOf(to)) return [from];
 
@@ -541,12 +574,13 @@ export class Pathfinder2 {
         }
         closedList.push(from);
 
-        return this.calculateStairPath(nodes, costs, parents, openList, closedList, to);
+        return this.calculateStairPath(nodes, costs, parents, openList, closedList, to, 0);
     }
 
     // returns null, if this path is not possible
-    private static calculateStairPath(nodes: StairNode[], costs: number[], parents: StairNode[],
-                                      openList: StairNode[], closedList: StairNode[], end: StairNode): StairNode[] {
+    private static calculateStairPath(nodes: TeleporterNode[], costs: number[], parents: TeleporterNode[],
+                               openList: TeleporterNode[], closedList: TeleporterNode[], end: TeleporterNode,
+                               debugCounter: number): TeleporterNode[] {
 
         let min = Number.MAX_VALUE;
         let curCost = min;
@@ -588,15 +622,15 @@ export class Pathfinder2 {
         }
 
         // cant generate path.
-        if (!foundNewNode) {
+        if (openList.length === 0) {
             return null;
         }
 
-        openList = openList.splice(openList.indexOf(minClNode.links[minLinkIndex]), 1);
+        openList.splice(openList.indexOf(minClNode.links[minLinkIndex]), 1);
         closedList.push(minClNode.links[minLinkIndex]);
 
-        if (openList.length > 0 && closedList.indexOf(end) < 0) {
-            return this.calculateStairPath(nodes, costs, parents, openList, closedList, end);
+        if (closedList.indexOf(end) < 0) {
+            return this.calculateStairPath(nodes, costs, parents, openList, closedList, end, debugCounter + 1);
         }
         else {
 

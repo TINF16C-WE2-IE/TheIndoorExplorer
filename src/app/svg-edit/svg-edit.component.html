@@ -44,6 +44,11 @@
                     <mat-icon>add_a_photo</mat-icon>
                     <span>Add image</span>
                 </button>
+                <br>
+                <button mat-button>
+                    <mat-icon>public</mat-icon>
+                    <span>Publish map</span>
+                </button>
             </p>
         </div>
 
@@ -68,13 +73,15 @@
             <mat-form-field *ngIf="singleSelectedObject">
                 <input matInput name="objname" [(ngModel)]="singleSelectedObject.label" placeholder="Object Name">
             </mat-form-field>
-            <mat-form-field *ngIf="singleSelectedObject | type:'Stairs'">
-                <mat-select [value]="singleSelectedObject.group" (change)="setStairsGroup($event)"
-                            placeholder="Connect stairs">
+            <mat-form-field *ngIf="(singleSelectedObject | type:'Stairs') || (singleSelectedObject | type:'Elevator')">
+                <mat-select [placeholder]="'Connect ' + (singleSelectedObject | type)"
+                            [value]="singleSelectedObject.group"
+                            (change)="setTeleporterGroup(singleSelectedObject, $event.value)">
                     <mat-option [value]="null">None</mat-option>
                     <mat-option [value]="undefined">New group</mat-option>
-                    <mat-option *ngFor="let stairsGroup of connectibleStairsGroups" [value]="stairsGroup.group">
-                        {{getStairsGroupDisplayName(stairsGroup)}}
+                    <mat-option *ngFor="let teleporterGroup of connectibleTeleporterGroups"
+                                [value]="teleporterGroup.group">
+                        {{getTeleporterGroupDisplayName(teleporterGroup)}}
                     </mat-option>
                 </mat-select>
             </mat-form-field>
@@ -156,13 +163,40 @@
                             </svg:text>
                         </svg:g>
 
-                        <svg:g *ngFor="let paths of movingPaths">
-                            <svg:line *ngFor="let path of paths.path" stroke="red" stroke-width="3"
+                        <svg:g *ngFor="let elevator of currentFloor.elevators">
+                            <svg:rect
+                                    [attr.stroke]="getSelectableColor(elevator)" stroke-width="10" fill-opacity="0.5"
+                                    [attr.x]="elevator.center.x - 30" [attr.y]="elevator.center.y - 30"
+                                    width="60" height="60"/>
+                            <svg:line
+                                    [attr.stroke]="getSelectableColor(elevator)" stroke-width="5"
+                                    [attr.x1]="elevator.center.x - 30" [attr.y1]="elevator.center.y - 30"
+                                    [attr.x2]="elevator.center.x + 30" [attr.y2]="elevator.center.y + 30"/>
+                            <svg:line
+                                    [attr.stroke]="getSelectableColor(elevator)" stroke-width="5"
+                                    [attr.x1]="elevator.center.x + 30" [attr.y1]="elevator.center.y - 30"
+                                    [attr.x2]="elevator.center.x - 30" [attr.y2]="elevator.center.y + 30"/>
+                            <svg:circle [attr.cx]="elevator.center.x" [attr.cy]="elevator.center.y" r="4"
+                                        style="stroke: none; fill:#000000;"/>
+                            <svg:text *ngIf="showLabels" text-anchor="middle"
+                                      [attr.x]="elevator.center.x" [attr.y]="elevator.center.y + 20">
+                                {{elevator.label}}
+                            </svg:text>
+                        </svg:g>
+
+                        <svg:g *ngFor="let linepath of movingPaths">
+                            <svg:line *ngFor="let path of linepath.path" stroke="red" stroke-width="3"
                                       stroke-linecap="round" stroke-linejoin="bevel"
-                                      stroke-dasharray="50,10" fill="none"
+                                      stroke-dasharray="5,8" fill="none"
                                       [attr.x1]="path.p1.x" [attr.y1]="path.p1.y"
                                       [attr.x2]="path.p2.x" [attr.y2]="path.p2.y"
                                       marker-end="url(#circle)" marker-start="url(#circle)"/>
+
+                              <svg:text *ngIf="linepath.path.length > 0" text-anchor="middle"
+                                [attr.x]="linepath.path[linepath.path.length - 1].p1.x" [attr.y]="linepath.path[linepath.path.length - 1].p1.y - 20"
+                                fill="red">
+                                {{linepath.description}}
+                            </svg:text>
                         </svg:g>
 
                         <svg:circle *ngIf="mouse.xs !== null && mouse.ys !== null"
