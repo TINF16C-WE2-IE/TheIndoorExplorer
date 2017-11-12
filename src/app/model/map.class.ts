@@ -77,12 +77,8 @@ export class Map {
     public zoom(scale: number, mouse: Mouse = null, x: number = null, y: number = null, dangling = false) {
         // default canvas width: 2000
         const startCanvasWidth = 2000 / this.modelSvc.zoom;
-        let sizeX = startCanvasWidth / scale;
-        if (sizeX < 200 || sizeX > 10000) {
-            // zoom bounds reached, reset to respective zoom bound
-            sizeX = Math.min(Math.max(sizeX, 200), 10000);
-            scale = startCanvasWidth / sizeX;
-        }
+        const sizeX = this.boundZoom(startCanvasWidth / scale);
+        scale = startCanvasWidth / sizeX;
         // mouse centered zoom (relative to zoom start)
         if (mouse && x && y) {
             const ratio = startCanvasWidth / this.modelSvc.viewportSize.x;
@@ -91,6 +87,14 @@ export class Map {
             this.modelSvc.panOffset.y = mouse.y - (y - this.modelSvc.bodyOffset.y) * ratio / scale;
         }
         this.updateCanvasSize(sizeX, 1, dangling);
+    }
+
+    private boundZoom(sizeX: number) {
+        if (sizeX < 200 || sizeX > 10000) {
+            // zoom bounds reached, reset to respective zoom bound
+            return Math.min(Math.max(sizeX, 200), 10000);
+        }
+        return sizeX;
     }
 
     private getAllPoints(): Point[] {
@@ -133,6 +137,7 @@ export class Map {
 
     public updateCanvasSize(width: number, height: number, dangling = false) {
         // fit required canvas section into viewport (as aspect ratio won't match)
+        width = this.boundZoom(width);
         if (width / height < this.modelSvc.viewportSize.x / this.modelSvc.viewportSize.y) {
             this.modelSvc.canvasSize.x = height * this.modelSvc.viewportSize.x / this.modelSvc.viewportSize.y;
             this.modelSvc.canvasSize.y = height;
