@@ -90,6 +90,9 @@ export class Map {
     }
 
     private boundZoom(sizeX: number) {
+        if (Number.isNaN(sizeX)) {
+            return this.modelSvc.canvasSize.x;
+        }
         if (sizeX < 200 || sizeX > 10000) {
             // zoom bounds reached, reset to respective zoom bound
             return Math.min(Math.max(sizeX, 200), 10000);
@@ -146,7 +149,10 @@ export class Map {
             this.modelSvc.canvasSize.y = width * this.modelSvc.viewportSize.y / this.modelSvc.viewportSize.x;
         }
         // update zoom var if we're not in continuous zoom mode (i.e. pinch to zoom)
-        if (!dangling) this.modelSvc.zoom = 2000 / this.modelSvc.canvasSize.x;
+        if (!dangling) {
+            const zoom = 2000 / this.modelSvc.canvasSize.x;
+            if (zoom) this.modelSvc.zoom = zoom;
+        }
     }
 
     public getMapDimensions() {
