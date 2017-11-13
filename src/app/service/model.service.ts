@@ -74,14 +74,14 @@ export class ModelService {
     public loadMapList() {
         this.rqstSvc.get(RequestService.LIST_MAPS, {}).subscribe(
             resp => {
+                console.log(resp);
                 if (resp.status >= 200 && resp.status <= 299 && resp.data) {
                     for (const mapInfo of resp.data as [
                         {id: number, name: string, favorite: boolean, permission: number, visibility: number}
                         ]) {
                         this.maps[mapInfo.id] = new Map(mapInfo, this);
                     }
-                }
-                else {
+                } else {
                     console.log('Received invalid map list response:', resp);
                 }
             }

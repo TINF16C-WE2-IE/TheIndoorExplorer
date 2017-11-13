@@ -531,7 +531,7 @@ export class Pathfinder2 {
         }
     }
 
-    private static clearAllFloorGraphs(map: Map): void {
+    public static clearAllFloorGraphs(map: Map): void {
 
         // clear all paths on the whole map!
         for (const f of map.floors) {

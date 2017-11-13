@@ -1,9 +1,9 @@
+import { Pathfinder2 } from './../pathlib/pathfinder2.class';
 import { MessageService } from './../service/message.service';
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { MatIconRegistry, MatSidenav } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Pathfinder2 } from '../pathlib/pathfinder2.class';
 import { ModelService } from '../service/model.service';
 import { ToolService } from '../service/tool.service';
 
@@ -106,6 +106,9 @@ export class MapPageComponent implements OnInit {
 
     switchToEditMode() {
         this.editMode = true;
+        if (this.modelSvc.currentMap) {
+            Pathfinder2.clearAllFloorGraphs(this.modelSvc.currentMap);
+        }
         this.toolSvc.selectTool('Move');
         this.sideNavMode = 'side';
         this.sidenav.open();
