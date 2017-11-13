@@ -1,3 +1,4 @@
+import { MessageService } from './message.service';
 import { Injectable } from '@angular/core';
 import { ModelService } from './model.service';
 import { RequestService } from './request.service';
@@ -21,7 +22,8 @@ export class UserService {
     }
 
 
-    constructor(private modelSvc: ModelService, private requestSvc: RequestService) {
+    constructor(private modelSvc: ModelService, private msgSvc: MessageService,
+                  private requestSvc: RequestService) {
     }
 
 
@@ -32,13 +34,13 @@ export class UserService {
                     const userInfo = resp.data as UserInfoResponse;
                     this._userId = userInfo.id;
                     this._userName = userInfo.username;
-                }
-                else if (resp.status >= 400 && resp.status <= 499) {
+                } else if (resp.status >= 400 && resp.status <= 499) {
                     // user not logged in
-                }
-                else {
+                } else {
                     console.log('Received invalid user info response:', resp);
                 }
+            }, error => {
+                this.msgSvc.notify('You are not logged in!', 'Warning');
             }
         );
     }

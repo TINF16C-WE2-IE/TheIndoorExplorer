@@ -1,3 +1,4 @@
+import { MessageService } from './message.service';
 import { Injectable } from '@angular/core';
 import { Http, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
@@ -18,7 +19,7 @@ export class RequestService {
 
     private options: RequestOptions;
 
-    constructor(private http: Http) {
+    constructor(private http: Http, private msgSvc: MessageService) {
         this.options = new RequestOptions();
         this.options.withCredentials = true;
     }
@@ -49,19 +50,18 @@ export class RequestService {
             try {
                 const jsonObj = res.json();
                 if (jsonObj.error !== undefined && jsonObj !== null) {
-                    console.log(jsonObj.error);
-                }
-                else {
+                    this.msgSvc.notify(jsonObj.error, 'Error');
+                } else {
                     data = jsonObj;
                 }
             } catch (e) {
                 console.log('Non-JSON response', res.body);
                 data = res.body;
             }
+        } else {
+            data = null;
         }
-        else {
-            data = res.body;
-        }
+
         return {status: res.status, data: data};
     }
 

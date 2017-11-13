@@ -1,3 +1,4 @@
+import { MessageService } from './message.service';
 import { ElementRef, Injectable } from '@angular/core';
 import { Elevator } from '../model/elevator.class';
 import { Map } from '../model/map.class';
@@ -63,7 +64,7 @@ export class ModelService {
         this.currentFloorId = id;
     }
 
-    constructor(private rqstSvc: RequestService) {
+    constructor(private rqstSvc: RequestService, private msgSvc: MessageService) {
         this.maps = {};
         this.currentMapId = 0;
         this.currentFloorId = 0;
@@ -120,13 +121,21 @@ export class ModelService {
 
     public saveMap(callback: (newMapId: number) => void) {
         this.rqstSvc.post(RequestService.LIST_MAP_SAVE + this.currentMapId, this.currentMap.forExport())
-            .subscribe(resp => {
-                console.log('got response map-save:', resp);
-                if (resp.status >= 200 && resp.status <= 299 && resp.data && resp.data.mapId) {
-                    this.currentMap.id = resp.data.mapId;
-                    callback(resp.data.mapId);
+            .subscribe(
+                resp => {
+                    if (resp.status >= 200 && resp.status <= 299 && resp.data && resp.data.mapId) {
+                        this.msgSvc.notify('Map was successfully saved', 'Success');
+                        this.currentMap.id = resp.data.mapId;
+                        callback(resp.data.mapId);
+                    }
+                }, error => {
+                    if (error.status === 401) {
+                        this.msgSvc.notify('You are not allowed to save, you foool!', 'Error');
+                    } else {
+                        this.msgSvc.notify('Couldn\'t save map :(', 'Error');
+                    }
                 }
-            });
+            );
     }
 
     public deleteMap(callback: () => void) {

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Component } from '@angular/core';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material';
 
 @Injectable()
@@ -8,10 +8,14 @@ export class MessageService {
 
     constructor(public snackBar: MatSnackBar) {
         this.snackConfig = new MatSnackBarConfig();
-        this.snackConfig.duration = 2000;
+        this.snackConfig.duration = 3500;
     }
 
-    public notify(msg: string) {
-        this.snackBar.open(msg, '', this.snackConfig);
+    public notify(msg: string, action: string = '') {
+        this.snackBar.open(msg, action, this.snackConfig);
+    }
+
+    public setDuration(duration: number): void {
+        this.snackConfig.duration = duration;
     }
 }

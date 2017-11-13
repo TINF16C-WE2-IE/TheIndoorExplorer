@@ -1,3 +1,4 @@
+import { MessageService } from './../service/message.service';
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { MatIconRegistry, MatSidenav } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -41,7 +42,8 @@ export class MapPageComponent implements OnInit {
     }
 
 
-    constructor(private modelSvc: ModelService, private toolSvc: ToolService, private route: ActivatedRoute,
+    constructor(private modelSvc: ModelService, private msgSvc: MessageService,
+                private toolSvc: ToolService, private route: ActivatedRoute,
                 private router: Router, iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
 
         iconRegistry.addSvgIcon('move', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/move.svg'));
@@ -77,8 +79,6 @@ export class MapPageComponent implements OnInit {
     }
 
     private onMapLoaded() {
-        console.log('building route graph...');
-        // initialize connection graphs for pathfinding - function moved from DirectionsTool
 
         // create the basic nodegraph on each floor, and insert the static elevators and stairs
         for (const f of this.floors) {
@@ -93,8 +93,6 @@ export class MapPageComponent implements OnInit {
         for (const f of this.modelSvc.currentMap.floors) {
             f.floorGraph.paths = [];
         }
-
-        console.log('done!', this.modelSvc.currentMap);
     }
 
 
