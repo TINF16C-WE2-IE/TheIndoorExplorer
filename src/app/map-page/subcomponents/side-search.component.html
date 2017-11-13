@@ -16,7 +16,7 @@
            placeholder="Endpoint... " disabled >
 </mat-form-field>
 
-<button mat-raised-button *ngIf="selectedObjects.length" (click)="onCancelClick()" ><mat-icon>cancel</mat-icon> Cancel</button>
+<button mat-raised-button *ngIf="selectedObjects.length" (click)="onCancelClick()" ><mat-icon>cancel</mat-icon> Clear</button>
 
 
 <mat-nav-list>
@@ -26,11 +26,3 @@
                    (click)="selectWaypoint(result)">{{result.label}}</mat-list-item>
     </span>
 </mat-nav-list>
-
-<p *ngIf="singleSelectedObject">
-    Starting point: {{singleSelectedObject.label}}<br>
-    <b>Select a destination</b>
-</p>
-
-<p *ngIf="!singleSelectedObject"><b class="mat-body-1">Select two portals to get directions</b></p>
-
