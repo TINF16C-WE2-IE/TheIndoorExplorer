@@ -213,19 +213,13 @@ export class Pathfinder2 {
 
         // connect the nodes
         for (const n1 of nodes) {
-            for (const n2 of nodes) {
-
-                if (n1 !== n2) {
+            for (const n2 of nodes.filter(el => el !== n1)) {
                     // check for any link between the nodes
-
 
                     // move onto the next, in case we already checked this link.
                     if (chckd.find(el =>
                             (el.p1.x === n1.x && el.p1.y === n1.y && el.p2.x === n2.x && el.p2.y === n2.y)
                             || (el.p1.x === n2.x && el.p1.y === n2.y && el.p2.x === n1.x && el.p2.y === n1.y)) === undefined) {
-
-                        const p1 = new Point(n1.x, n1.y, false);
-                        const p2 = new Point(n2.x, n2.y, false);
 
                         // if this link doesn't intersect any walls
                         if (!this.checkIntersectionOfLineWithLines(
@@ -239,17 +233,12 @@ export class Pathfinder2 {
                         else {
 
                             // just and mark as checked.
-                            chckd.push(new Line(p1, p2));
+                            chckd.push(new Line(new Point(n1.x, n1.y, false), new Point(n2.x, n2.y, false)));
                         }
                     }
                     else {
                         // already checked.
                     }
-
-                }
-                else {
-                    // dont check the same node.
-                }
             }
         }
 
@@ -318,8 +307,7 @@ export class Pathfinder2 {
                     new Point(path[i - 1].x, path[i - 1].y, false)
                 ));
             }
-        }
-        else {
+        } else {
 
         }
     }
