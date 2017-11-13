@@ -7,6 +7,8 @@ import { Stairs } from '../model/stairs.class';
 import { TeleporterGroup } from '../model/teleporter-group.interface';
 import { Teleporter } from '../model/teleporter.interface';
 import { RequestService } from './request.service';
+import { Observable } from 'rxjs/Observable';
+import { Observer } from 'rxjs/Observer';
 
 
 @Injectable()
@@ -88,7 +90,7 @@ export class ModelService {
         );
     }
 
-    public loadMap(mapId: number, callback: Function = null) {
+    public loadMap(mapId: number): Observable<boolean> {
         if (mapId === -1) {
             const newMap = new Map({
                 id: -1,
@@ -101,21 +103,32 @@ export class ModelService {
             newMap.createFloor();
             newMap.fitToViewport();
             this.currentMap = newMap;
-            if (callback) callback();
+            return Observable.of(true);
         }
         else {
-            this.rqstSvc.get(RequestService.LIST_MAP_DETAILS + mapId, {}).subscribe(
-                resp => {
-                    if (resp.status >= 200 && resp.status <= 299 && resp.data) {
-                        this.currentMap = new Map(resp.data, this);
-                        this.currentMap.fitToViewport();
-                        if (callback) callback();
+            return Observable.create((observer: Observer<boolean>) => {
+
+                this.rqstSvc.get(RequestService.LIST_MAP_DETAILS + mapId, {}).subscribe(
+                    resp => {
+                        if (resp.status >= 200 && resp.status <= 299 && resp.data) {
+                            this.currentMap = new Map(resp.data, this);
+                            this.currentMap.fitToViewport();
+                            observer.next(true);
+                        }
+                        else {
+                            console.log('Received invalid map response:', resp);
+                            observer.next(false);
+                        }
+                        observer.complete();
+                    },
+                    error => {
+                        console.log('Received error map response:', error.status, error.statusText, error.url);
+                        observer.next(false);
+                        observer.complete();
                     }
-                    else {
-                        console.log('Received invalid map response:', resp);
-                    }
-                }
-            );
+                );
+
+            });
         }
     }
 

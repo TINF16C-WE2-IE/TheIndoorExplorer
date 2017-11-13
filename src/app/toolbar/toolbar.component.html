@@ -4,7 +4,8 @@
         <mat-icon aria-label="Back to home">arrow_back</mat-icon>
     </button>
 
-    <div *ngIf="hasMap" id="openDialog" (click)="editMode && openNameDialog()">
+    <div *ngIf="hasMap" id="openDialog" (click)="editMode && openNameDialog()"
+         >
         <span>{{modelSvc.currentMap?.name}}</span>
         <mat-icon *ngIf="editMode" id='editname'>mode_edit</mat-icon>
     </div>

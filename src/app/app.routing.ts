@@ -1,6 +1,8 @@
 import { RouterModule, Routes } from '@angular/router';
 import { MainPageComponent } from './main-page/main-page.component';
 import { MapPageComponent } from './map-page/map-page.component';
+import { MapPageGuardService } from './map-page/map-page-guard.service';
+import { MapPageResolverService } from './map-page/map-page-resolver.service';
 
 export const routes: Routes = [
 
@@ -15,12 +17,17 @@ export const routes: Routes = [
             {
                 path: '',
                 component: MapPageComponent,
-                pathMatch: 'full'
+                pathMatch: 'full',
+                canActivate: [MapPageGuardService],
+                resolve: {resolved: MapPageResolverService}
             },
             {
                 path: 'edit',
                 component: MapPageComponent,
-                pathMatch: 'full'
+                pathMatch: 'full',
+                canActivate: [MapPageGuardService],
+                resolve: {resolved: MapPageResolverService},
+                data: {requireLogin: true, requireWritePerm: true}
             },
             {
                 path: '**',
