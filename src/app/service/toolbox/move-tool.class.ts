@@ -29,6 +29,9 @@ export class MoveTool extends Tool {
             this.dragOrigin = {x: evt.x, y: evt.y};
             this.panDragOrigin = {x: this.modelSvc.panOffset.x, y: this.modelSvc.panOffset.y};
         }
+        else {
+            this.markDirty();
+        }
     }
 
     public onMouseUp(evt: MouseEvent) {

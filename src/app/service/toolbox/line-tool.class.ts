@@ -20,6 +20,7 @@ export abstract class LineTool extends Tool {
         const start = this.getFloorPointBelowCursor();
         this.point = start.clone();
         this.createLine(start, this.point);
+        this.markDirty();
     }
 
     public onMouseUp(evt: MouseEvent) {

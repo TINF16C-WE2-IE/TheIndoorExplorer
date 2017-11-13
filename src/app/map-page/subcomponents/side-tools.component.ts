@@ -11,7 +11,7 @@ import { Tool } from '../../service/toolbox/tool.class';
 export class SideToolsComponent implements OnInit {
 
     public get tools(): Tool[] {
-        return this.toolSvc.toolbox;
+        return this.toolSvc.toolbox.filter(tool => tool.icon);
     }
 
     public get selectedTool(): Tool {

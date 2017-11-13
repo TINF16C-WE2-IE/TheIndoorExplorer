@@ -1,19 +1,20 @@
-import { Pathfinder2 } from './../pathlib/pathfinder2.class';
-import { MessageService } from './../service/message.service';
+import { Pathfinder2 } from '../pathlib/pathfinder2.class';
+import { MessageService } from '../service/message.service';
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { MatIconRegistry, MatSidenav } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModelService } from '../service/model.service';
 import { ToolService } from '../service/tool.service';
+import { CanDeactivateComponent } from './map-page-guard.service';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
     selector: 'app-map-page',
     templateUrl: './map-page.component.html',
     styleUrls: ['./map-page.component.css']
 })
-export class MapPageComponent implements OnInit {
-
+export class MapPageComponent implements OnInit, CanDeactivateComponent {
 
     public editMode = false;
     public showLabels = true;
@@ -29,16 +30,6 @@ export class MapPageComponent implements OnInit {
     get floors() {
         if (this.currentMap) return this.currentMap.floors;
         return null;
-    }
-
-    get currentFloor() {
-        return this.modelSvc.currentFloor;
-    }
-
-
-    get hasWritePermission(): boolean {
-        return true;
-        // return this.modelSvc.currentMap.permission === 1;
     }
 
 
@@ -83,6 +74,7 @@ export class MapPageComponent implements OnInit {
     switchToEditMode() {
         this.editMode = true;
         if (this.modelSvc.currentMap) {
+            console.log('clear graph');
             Pathfinder2.clearAllFloorGraphs(this.modelSvc.currentMap);
         }
         this.toolSvc.selectTool('Move');
@@ -97,6 +89,16 @@ export class MapPageComponent implements OnInit {
         this.sidenav.close();
     }
 
+    canDeactivateComponent(): Observable<boolean> {
+        if (this.editMode) {
+            if (this.modelSvc.currentMap.dirty) {
+                this.msgSvc.notify('You have unsaved changes. Please save or discard them.', 'Warning');
+                return Observable.of(false);
+            }
+        }
+        this.modelSvc.currentMapId = null;
+        return Observable.of(true);
+    }
 
     @HostListener('window:resize', ['$event'])
     onResize() {

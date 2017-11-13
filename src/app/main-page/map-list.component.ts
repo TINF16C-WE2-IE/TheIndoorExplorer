@@ -25,7 +25,7 @@ export class MapListComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.modelSvc.loadMapList();
+        this.modelSvc.loadMapList().subscribe();
     }
 
 }

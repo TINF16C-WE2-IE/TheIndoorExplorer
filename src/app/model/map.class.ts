@@ -16,12 +16,14 @@ export class Map {
     public permission: number;
     public visibility: number;
 
+    public dirty: boolean;
+    private shadow: {name: string, floors?: any[]};
 
     constructor(obj: {
                     id: number, name: string, floors?: any[],
                     favorite: boolean, permission: number, visibility: number
                 },
-                private modelSvc: ModelService) {
+                private modelSvc: ModelService, isShadow = false) {
         this.id = obj.id;
         this.name = obj.name;
         this.floors = obj.floors ? obj.floors.map(floor_obj => new Floor(floor_obj)) : null;
@@ -29,6 +31,7 @@ export class Map {
         this.permission = obj.permission;
         this.visibility = obj.visibility;
         this.stairGraph = [];
+        if (!isShadow) this.storeClean();
     }
 
 
@@ -43,6 +46,7 @@ export class Map {
         else {
             this.floors.push(new Floor(cloneFrom.forExport()));
         }
+        this.dirty = true;
     }
 
     moveFloor(floor: Floor, direction: number): number {
@@ -54,6 +58,7 @@ export class Map {
             this.floors[newFloorId] = tmpFloor;
             return newFloorId;
         }
+        this.dirty = true;
         return floorId;
     }
 
@@ -62,6 +67,7 @@ export class Map {
         if (this.floors.length > 1 && floorId !== -1) {
             this.floors.splice(floorId, 1);
         }
+        this.dirty = true;
     }
 
     public forExport() {
@@ -181,5 +187,16 @@ export class Map {
         for (const floor of this.floors) {
             floor.search(query);
         }
+    }
+
+    public storeClean() {
+        this.shadow = {name: this.name, floors: this.floors && this.floors.map(floor => floor.forExport())};
+        this.dirty = false;
+    }
+
+    public resetClean() {
+        this.name = this.shadow.name;
+        this.floors = this.shadow.floors && this.shadow.floors.map(floor_obj => new Floor(floor_obj));
+        this.dirty = false;
     }
 }

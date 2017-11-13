@@ -66,6 +66,10 @@ export abstract class Tool {
         return {points: [], obj: null};
     }
 
+    protected markDirty() {
+        this.modelSvc.currentMap.dirty = true;
+    }
+
     private pointDistance(x: number, y: number, x1: number, y1: number, x2: number, y2: number) {
         // calculates distance between point (x, y) and line segment (x1, y1)---(x2, y2)
         // adapted from: https://stackoverflow.com/a/6853926/4464570

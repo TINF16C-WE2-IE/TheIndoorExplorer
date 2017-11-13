@@ -67,6 +67,11 @@ export class SidePropertiesComponent implements OnInit {
             }
         }
         this.modelSvc.updateConnectibleTeleporterGroups();
+        this.markDirty();
+    }
+
+    markDirty() {
+        this.modelSvc.currentMap.dirty = true;
     }
 
 }

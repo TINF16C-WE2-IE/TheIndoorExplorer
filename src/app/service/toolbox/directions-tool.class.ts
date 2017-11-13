@@ -14,6 +14,10 @@ export class DirectionsTool extends Tool {
         return 'Directions';
     }
 
+    public get icon(): string {
+        return null;
+    }
+
     public get cursorShape() {
         return 'pointer';
     }

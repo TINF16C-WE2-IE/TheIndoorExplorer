@@ -14,15 +14,15 @@
     <span class="fill-remaining-space"></span>
 
 
-    <button mat-button *ngIf="hasMap && canEdit && !editMode" [routerLink]="['/map', mapIdString, 'edit']">
+    <button mat-button *ngIf="hasMap && canEdit && !editMode" [routerLink]="['/map', mapId, 'edit']">
         <mat-icon>edit_mode</mat-icon>
         <span class="toolbar-text">Edit map</span>
     </button>
 
 
-    <button mat-button *ngIf="hasMap && editMode" [routerLink]="['/map', mapIdString]">
+    <button mat-button *ngIf="hasMap && editMode" (click)="discardOrExit()">
         <mat-icon>cancel</mat-icon>
-        <span class="toolbar-text">Exit</span>
+        <span class="toolbar-text">{{dirty ? 'Discard' : 'Exit'}}</span>
     </button>
 
     <button mat-button *ngIf="hasMap && editMode" (click)="saveCurrentMap()">

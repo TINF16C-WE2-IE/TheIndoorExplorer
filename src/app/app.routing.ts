@@ -19,6 +19,7 @@ export const routes: Routes = [
                 component: MapPageComponent,
                 pathMatch: 'full',
                 canActivate: [MapPageGuardService],
+                canDeactivate: [MapPageGuardService],
                 resolve: {resolved: MapPageResolverService}
             },
             {
@@ -26,6 +27,7 @@ export const routes: Routes = [
                 component: MapPageComponent,
                 pathMatch: 'full',
                 canActivate: [MapPageGuardService],
+                canDeactivate: [MapPageGuardService],
                 resolve: {resolved: MapPageResolverService},
                 data: {requireLogin: true, requireWritePerm: true}
             },

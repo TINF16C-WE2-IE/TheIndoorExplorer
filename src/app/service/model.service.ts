@@ -9,6 +9,7 @@ import { Teleporter } from '../model/teleporter.interface';
 import { RequestService } from './request.service';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
+import { UserService } from './user.service';
 
 
 @Injectable()
@@ -66,28 +67,35 @@ export class ModelService {
         this.currentFloorId = id;
     }
 
-    constructor(private rqstSvc: RequestService, private msgSvc: MessageService) {
+    constructor(private rqstSvc: RequestService, private msgSvc: MessageService, private userSvc: UserService) {
         this.maps = {};
         this.currentMapId = 0;
         this.currentFloorId = 0;
     }
 
 
-    public loadMapList() {
-        this.rqstSvc.get(RequestService.LIST_MAPS, {}).subscribe(
-            resp => {
-                console.log(resp);
-                if (resp.status >= 200 && resp.status <= 299 && resp.data) {
-                    for (const mapInfo of resp.data as [
-                        {id: number, name: string, favorite: boolean, permission: number, visibility: number}
-                        ]) {
-                        this.maps[mapInfo.id] = new Map(mapInfo, this);
+    public loadMapList(): Observable<boolean> {
+        return Observable.create((observer: Observer<boolean>) => {
+            this.userSvc.refreshUserInfo().subscribe(() => {
+                this.rqstSvc.get(RequestService.LIST_MAPS, {}).subscribe(
+                    resp => {
+                        if (resp.status >= 200 && resp.status <= 299 && resp.data) {
+                            for (const mapInfo of resp.data as [
+                                {id: number, name: string, favorite: boolean, permission: number, visibility: number}
+                                ]) {
+                                this.maps[mapInfo.id] = new Map(mapInfo, this);
+                            }
+                            observer.next(true);
+                        }
+                        else {
+                            console.log('Received invalid map list response:', resp);
+                            observer.next(false);
+                        }
+                        observer.complete();
                     }
-                } else {
-                    console.log('Received invalid map list response:', resp);
-                }
-            }
-        );
+                );
+            });
+        });
     }
 
     public loadMap(mapId: number): Observable<boolean> {
@@ -132,16 +140,20 @@ export class ModelService {
         }
     }
 
-    public saveMap(callback: (newMapId: number) => void) {
+    public saveMap(callback: (newMapId?: number) => void) {
         this.rqstSvc.post(RequestService.LIST_MAP_SAVE + this.currentMapId, this.currentMap.forExport())
             .subscribe(
                 resp => {
                     if (resp.status >= 200 && resp.status <= 299) {
                         this.msgSvc.notify('Map was successfully saved', 'Success');
                         if (resp.data && resp.data.mapId) {
+                            const oldId = this.currentMap.id;
                             this.currentMap.id = resp.data.mapId;
-                            callback(resp.data.mapId);
+                            this.maps[resp.data.mapId] = this.currentMap;
+                            this.currentMapId = resp.data.mapId;
+                            this.maps[oldId] = undefined;
                         }
+                        callback(this.currentMap.id);
                     }
                 },
                 error => {

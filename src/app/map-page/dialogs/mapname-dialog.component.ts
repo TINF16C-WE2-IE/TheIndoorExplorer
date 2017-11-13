@@ -22,6 +22,7 @@ export class MapnameDialogComponent implements OnInit {
     onSubmitClick(): void {
 
         this.modelSvc.currentMap.name = this.mapname;
+        this.modelSvc.currentMap.dirty = true;
         this.dialogRef.close();
 
     }

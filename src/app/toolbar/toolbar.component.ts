@@ -5,7 +5,8 @@ import { MapnameDialogComponent } from '../map-page/dialogs/mapname-dialog.compo
 import { PublishMapDialogComponent } from '../map-page/dialogs/publish-map-dialog.component';
 import { ModelService } from '../service/model.service';
 import { UserService } from '../service/user.service';
-import { Router } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, ActivatedRoute } from '@angular/router';
+import { MapPageResolverService } from '../map-page/map-page-resolver.service';
 
 
 @Component({
@@ -22,23 +23,22 @@ export class ToolbarComponent implements OnInit {
         return this.modelSvc.currentMap !== null;
     }
 
-    public get canEdit() {
+    public get canEdit(): boolean {
         return this.modelSvc.currentMap.permission === 1;
     }
 
-    public get mapIdString(): string {
-        if (this.hasMap) {
-            const id = this.modelSvc.currentMap.id;
-            return '' + (id === -1 ? 'new' : id);
-        }
-        else {
-            return null;
-        }
+    public get mapId(): number {
+        return this.modelSvc.currentMap && this.modelSvc.currentMap.id || null;
+    }
+
+    public get dirty(): boolean {
+        return this.modelSvc.currentMap.dirty;
     }
 
     @ViewChild('appMenu') appMenu: ElementRef;
 
-    constructor(public modelSvc: ModelService, public userSvc: UserService, public router: Router,
+    constructor(public modelSvc: ModelService, public userSvc: UserService,
+                private router: Router, private route: ActivatedRoute, private mapResolver: MapPageResolverService,
                 public nameDialog: MatDialog, public deleteDialog: MatDialog, public publishDialog: MatDialog) {
     }
 
@@ -67,7 +67,25 @@ export class ToolbarComponent implements OnInit {
     }
 
     saveCurrentMap() {
-        this.modelSvc.saveMap(newMapId => this.router.navigate(['/map', newMapId, 'edit']));
+        this.modelSvc.saveMap(newMapId => {
+            this.modelSvc.currentMap.storeClean();
+            this.router.navigate(['/map', newMapId, 'edit']);
+        });
+    }
+
+    discardOrExit() {
+        if (this.dirty) {
+            this.modelSvc.currentMap.resetClean();
+        }
+        else {
+            if (this.mapId === null || this.mapId === -1) {
+                this.router.navigate(['']);
+
+            }
+            else {
+                this.router.navigate(['/map', this.mapId]);
+            }
+        }
     }
 
 }

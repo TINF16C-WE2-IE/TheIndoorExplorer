@@ -9,7 +9,7 @@ import { MessageService } from '../service/message.service';
 @Injectable()
 export class MapPageResolverService implements Resolve<void> {
 
-    constructor(private modelSvc: ModelService, private router: Router, private msgSvc: MessageService) {
+    constructor(private modelSvc: ModelService, private router: Router, private messageSvc: MessageService) {
     }
 
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<void> {
@@ -24,7 +24,7 @@ export class MapPageResolverService implements Resolve<void> {
                     }
                     else {
                         this.router.navigate(['']);
-                        this.msgSvc.notify('Map not existing or access denied. Are you logged in?', 'Error');
+                        this.messageSvc.notify('Map not existing or access denied. Are you logged in?');
                     }
                     observer.next(null);
                     observer.complete();
@@ -45,6 +45,7 @@ export class MapPageResolverService implements Resolve<void> {
             // you can set smooth to true. This will result in a bit smoother paths,
             // but also (in the worst case) in twice as much nodes and therefore quadratic more calculation cost!
             f.floorGraph = Pathfinder2.createLinkedFloorGraph([...f.walls], 45, false);
+            Pathfinder2.insertPointsToFloorGraph(f.stairways.map(el => el.center), f.floorGraph, f.walls);
         }
 
         Pathfinder2.generateTeleporterGraphOnMap(this.modelSvc.currentMap);

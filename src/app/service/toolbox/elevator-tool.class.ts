@@ -17,7 +17,7 @@ export class ElevatorTool extends Tool {
         const start = this.getFloorPointBelowCursor();
         this.point = start.clone();
         this.floor.elevators.push(new Elevator('New Elevator', this.point));
-        return true;
+        this.markDirty();
     }
 
     public onMouseUp(evt: MouseEvent) {
@@ -30,6 +30,5 @@ export class ElevatorTool extends Tool {
         if (this.point) {
             this.point.setCoords(this.mouse.x, this.mouse.y);
         }
-        return true;
     }
 }
