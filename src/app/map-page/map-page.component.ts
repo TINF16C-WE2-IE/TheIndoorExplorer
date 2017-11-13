@@ -14,12 +14,14 @@ import { Observable } from 'rxjs/Observable';
     templateUrl: './map-page.component.html',
     styleUrls: ['./map-page.component.css']
 })
-export class MapPageComponent implements OnInit, CanDeactivateComponent {
+export class MapPageComponent implements OnInit , CanDeactivateComponent {
 
     public editMode = false;
     public showLabels = true;
     public sideNavMode = 'over';
+    public onMobile = false;
     public urlMapIdString = '';
+
 
     @ViewChild('sidenav') sidenav: MatSidenav;
 
@@ -80,6 +82,11 @@ export class MapPageComponent implements OnInit, CanDeactivateComponent {
         this.toolSvc.selectTool('Move');
         this.sideNavMode = 'side';
         this.sidenav.open();
+        if (window.innerWidth <= 650) {
+            this.onMobile = true;
+            this.sidenav.close();
+            this.sideNavMode = 'over';
+        }
     }
 
     switchToViewMode() {
@@ -103,5 +110,9 @@ export class MapPageComponent implements OnInit, CanDeactivateComponent {
     @HostListener('window:resize', ['$event'])
     onResize() {
         this.currentMap.fitToViewport();
+    }
+
+    closeSidenav($event: any) {
+        this.sidenav.close();
     }
 }

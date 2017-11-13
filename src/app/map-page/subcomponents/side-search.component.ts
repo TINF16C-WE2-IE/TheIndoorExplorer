@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import { Floor } from '../../model/floor.class';
 import { Selectable } from '../../model/selectable.interface';
 import { ModelService } from '../../service/model.service';
 import { ToolService } from '../../service/tool.service';
 import { DirectionsTool } from '../../service/toolbox/directions-tool.class';
+import {Pathfinder2} from '../../pathlib/pathfinder2.class';
+
 
 @Component({
     selector: 'app-side-search',
@@ -12,13 +14,14 @@ import { DirectionsTool } from '../../service/toolbox/directions-tool.class';
 })
 export class SideSearchComponent implements OnInit {
 
+    @Output() close: EventEmitter<any> = new EventEmitter();
     public searchQuery = '';
-    public startQuery = '';
-    public endQuery = '';
-    public startpoint = true;
 
     public get currentMap() {
         return this.modelSvc.currentMap;
+    }
+    public get selectedObjects(): Selectable[] {
+        return this.modelSvc.selectedObjects;
     }
 
     public get floors(): Floor[] {
@@ -39,6 +42,13 @@ export class SideSearchComponent implements OnInit {
     selectWaypoint(selected: Selectable) {
         if (this.toolSvc.selectedTool instanceof DirectionsTool) {
             this.toolSvc.selectedTool.selectWaypoint(selected);
+            this.searchQuery = '';
+            this.search('');
+        }
+        if (this.selectedObjects.length === 2) {
+            this.search('');
+            this.close.emit('event');
+            console.log('two selected');
         }
     }
 
@@ -46,6 +56,12 @@ export class SideSearchComponent implements OnInit {
         console.log('search', query);
         this.currentMap.search(query);
         this.currentMap.fitToViewport();
+
     }
 
+    onCancelClick() {
+        this.modelSvc.selectedObjects = [];
+        this.searchQuery = '';
+        Pathfinder2.clearAllFloorGraphs(this.modelSvc.currentMap);
+    }
 }

@@ -49,7 +49,7 @@ app-side-search, app-side-tools, app-side-properties {
     flex-direction: column;
 }
 
-#search-button {
+.sidenav-button {
     position: absolute;
     top: 25px;
     left: 25px;
