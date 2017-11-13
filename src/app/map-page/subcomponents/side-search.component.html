@@ -19,7 +19,7 @@
 <br>
 
 <mat-form-field>
-    <input matInput type="search" incremental name="search" [(ngModel)]="endQuery" (keyup)="search()"
+    <input matInput type="search" incremental name="search" [(ngModel)]="endQuery" (keyup)="search(endQuery)"
            placeholder="Endpoint..." (focus)="startpoint = false">
 </mat-form-field>
 
