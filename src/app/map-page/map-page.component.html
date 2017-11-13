@@ -2,9 +2,9 @@
 
 <mat-sidenav-container class="example-container">
 
-    <mat-sidenav #sidenav mode="{{sideNavMode}}" [disableClose]="editMode" class="left-sidenav">
+    <mat-sidenav #sidenav mode="{{sideNavMode}}" [disableClose]="editMode"  class="left-sidenav">
+        <app-side-search *ngIf="!editMode" (close)="closeSidenav($event)"></app-side-search>
 
-        <app-side-search *ngIf="!editMode"></app-side-search>
         <app-side-tools *ngIf="editMode"></app-side-tools>
         <app-side-properties *ngIf="editMode"></app-side-properties>
 

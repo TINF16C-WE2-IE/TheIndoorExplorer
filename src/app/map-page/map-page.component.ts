@@ -13,11 +13,11 @@ import { ToolService } from '../service/tool.service';
 })
 export class MapPageComponent implements OnInit {
 
-
     public editMode = false;
     public showLabels = true;
     public sideNavMode = 'over';
     public urlMapIdString = '';
+
 
     @ViewChild('sidenav') sidenav: MatSidenav;
 
@@ -125,5 +125,9 @@ export class MapPageComponent implements OnInit {
     @HostListener('window:resize', ['$event'])
     onResize() {
         this.currentMap.fitToViewport();
+    }
+
+    closeSidenav($event: any) {
+        this.sidenav.close();
     }
 }

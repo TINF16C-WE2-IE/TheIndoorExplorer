@@ -1,27 +1,23 @@
-<mat-form-field id='search-field'>
-    <input matInput type="search" incremental name="search" [(ngModel)]="searchQuery"
+<mat-form-field id='search-field' *ngIf="selectedObjects.length < 2">
+    <input matInput type="text"  [(ngModel)]="searchQuery"
            (keyup)="search(searchQuery)"
-           placeholder="Search...">
+           [placeholder]="selectedObjects.length ? 'Startpoint...': 'Search...'">
 </mat-form-field>
 
 <br>
 
-<mat-form-field>
-    <input matInput type="search" incremental name="search" [(ngModel)]="startQuery"
-           (keyup)="search(startQuery)"
-           placeholder="Startpoint..." (focus)="startpoint = true">
+<mat-form-field *ngIf="selectedObjects.length === 2">
+    <input matInput type="search" incremental name="search" [ngModel]="selectedObjects[1].label"
+           placeholder="Startpoint... " disabled >
 </mat-form-field>
 
-<br>
-
-<mat-icon>more_vert</mat-icon>
-
-<br>
-
-<mat-form-field>
-    <input matInput type="search" incremental name="search" [(ngModel)]="endQuery" (keyup)="search(endQuery)"
-           placeholder="Endpoint..." (focus)="startpoint = false">
+<mat-form-field *ngIf="selectedObjects.length">
+    <input matInput type="search" incremental name="search" [ngModel]="selectedObjects[0].label"
+           placeholder="Endpoint... " disabled >
 </mat-form-field>
+
+<button mat-raised-button *ngIf="selectedObjects.length" (click)="onCancelClick()" ><mat-icon>cancel</mat-icon> Cancel</button>
+
 
 <mat-nav-list>
     <span *ngFor="let f of floors; let i = index">
@@ -36,5 +32,5 @@
     <b>Select a destination</b>
 </p>
 
-<p *ngIf="!singleSelectedObject"><b>Select two portals to get directions</b></p>
+<p *ngIf="!singleSelectedObject"><b class="mat-body-1">Select two portals to get directions</b></p>
 

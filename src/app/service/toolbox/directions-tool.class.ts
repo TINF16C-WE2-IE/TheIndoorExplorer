@@ -60,14 +60,13 @@ export class DirectionsTool extends Tool {
 
             if (this.modelSvc.selectedObjects.length) {
 
-                Pathfinder2.generateGlobalPath(this.selectedDest1.p,
-                    this.selectedDest1.fid, selected.center, floorArrayIndex, this.modelSvc.currentMap);
-                this.modelSvc.selectedObjects = [];
+                Pathfinder2.generateGlobalPath(selected.center, floorArrayIndex, this.selectedDest1.p,
+                    this.selectedDest1.fid, this.modelSvc.currentMap);
             }
             else {
-                this.modelSvc.selectedObjects.push(selected);
                 this.selectedDest1 = {p: selected.center, fid: floorArrayIndex};
             }
+            this.modelSvc.selectedObjects.push(selected);
         }
         else {
             this.modelSvc.selectedObjects = [];
