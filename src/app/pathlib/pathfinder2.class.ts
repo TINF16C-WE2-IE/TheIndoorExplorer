@@ -43,7 +43,6 @@ export class Pathfinder2 {
 
         let min = Number.MAX_VALUE;
         let curCost = min;
-        let foundNewNode = false;
         let minClNode = null;
         let minLinkIndex = -1;
         for (const cl of closedList) {
@@ -62,8 +61,6 @@ export class Pathfinder2 {
 
                     // add node to openlist, if necessary
                     if (openList.indexOf(cl.links[j]) < 0) {
-
-                        foundNewNode = true;
                         openList.push(cl.links[j]);
                     }
 
@@ -81,17 +78,16 @@ export class Pathfinder2 {
         }
 
         // cant generate path.
-        if (!foundNewNode) {
+        if (openList.length === 0) {
             return null;
         }
 
-        openList = openList.splice(openList.indexOf(minClNode.links[minLinkIndex]), 1);
+        openList.splice(openList.indexOf(minClNode.links[minLinkIndex]), 1);
         closedList.push(minClNode.links[minLinkIndex]);
 
-        if (openList.length > 0 && closedList.indexOf(end) < 0) {
+        if (closedList.indexOf(end) < 0) {
             return this.calculatePath(nodes, costs, parents, openList, closedList, end);
-        }
-        else {
+        } else {
 
             // got the costs over the nodes. now back-track.
             // start at end node and backtrack over the parent for each node.
@@ -583,7 +579,6 @@ export class Pathfinder2 {
 
         let min = Number.MAX_VALUE;
         let curCost = min;
-        let foundNewNode = false;
         let minClNode = null;
         let minLinkIndex = -1;
         for (const cl of closedList) {
@@ -602,8 +597,6 @@ export class Pathfinder2 {
 
                     // add node to openlist, if necessary
                     if (openList.indexOf(cl.links[j]) < 0) {
-
-                        foundNewNode = true;
                         openList.push(cl.links[j]);
                     }
 
@@ -630,8 +623,7 @@ export class Pathfinder2 {
 
         if (closedList.indexOf(end) < 0) {
             return this.calculateStairPath(nodes, costs, parents, openList, closedList, end, debugCounter + 1);
-        }
-        else {
+        } else {
 
             // got the costs over the nodes. now back-track.
             // start at end node and backtrack over the parent for each node.
