@@ -1,8 +1,9 @@
+import { Pathfinder2 } from './../pathlib/pathfinder2.class';
+import { MessageService } from './../service/message.service';
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { MatIconRegistry, MatSidenav } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Pathfinder2 } from '../pathlib/pathfinder2.class';
 import { ModelService } from '../service/model.service';
 import { ToolService } from '../service/tool.service';
 
@@ -41,7 +42,8 @@ export class MapPageComponent implements OnInit {
     }
 
 
-    constructor(private modelSvc: ModelService, private toolSvc: ToolService, private route: ActivatedRoute,
+    constructor(private modelSvc: ModelService, private msgSvc: MessageService,
+                private toolSvc: ToolService, private route: ActivatedRoute,
                 private router: Router, iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
 
         iconRegistry.addSvgIcon('move', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/move.svg'));
@@ -54,48 +56,19 @@ export class MapPageComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.toolSvc.selectTool('Directions');
         this.route.url.subscribe(
             () => {
                 const snap = this.route.snapshot;
                 this.urlMapIdString = snap.params.mapId;
                 const mode = snap.routeConfig.path;
-
                 if (mode === 'edit') {
                     this.switchToEditMode();
                 }
                 else {
                     this.switchToViewMode();
                 }
-
-                this.modelSvc.loadMap(
-                    this.urlMapIdString === 'new' ? -1 : Number.parseInt(this.urlMapIdString),
-                    () => this.onMapLoaded()
-                );
             }
         );
-    }
-
-    private onMapLoaded() {
-        console.log('building route graph...');
-        // initialize connection graphs for pathfinding - function moved from DirectionsTool
-
-        // create the basic nodegraph on each floor, and insert the static elevators and stairs
-        for (const f of this.floors) {
-
-            // you can set smooth to true. This will result in a bit smoother paths,
-            // but also (in the worst case) in twice as much nodes and therefore quadratic more calculation cost!
-            f.floorGraph = Pathfinder2.createLinkedFloorGraph([...f.walls], 45, false);
-            Pathfinder2.insertPointsToFloorGraph(f.stairways.map(el => el.center), f.floorGraph, f.walls);
-        }
-
-        Pathfinder2.generateTeleporterGraphOnMap(this.modelSvc.currentMap);
-
-        for (const f of this.modelSvc.currentMap.floors) {
-            f.floorGraph.paths = [];
-        }
-
-        console.log('done!', this.modelSvc.currentMap);
     }
 
 
@@ -109,6 +82,9 @@ export class MapPageComponent implements OnInit {
 
     switchToEditMode() {
         this.editMode = true;
+        if (this.modelSvc.currentMap) {
+            Pathfinder2.clearAllFloorGraphs(this.modelSvc.currentMap);
+        }
         this.toolSvc.selectTool('Move');
         this.sideNavMode = 'side';
         this.sidenav.open();

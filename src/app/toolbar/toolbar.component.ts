@@ -22,6 +22,10 @@ export class ToolbarComponent implements OnInit {
         return this.modelSvc.currentMap !== null;
     }
 
+    public get canEdit() {
+        return this.modelSvc.currentMap.permission === 1;
+    }
+
     public get mapIdString(): string {
         if (this.hasMap) {
             const id = this.modelSvc.currentMap.id;

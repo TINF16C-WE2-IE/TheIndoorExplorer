@@ -50,6 +50,8 @@ import { RequestService } from './service/request.service';
 import { ToolService } from './service/tool.service';
 import { UserService } from './service/user.service';
 import { ToolbarComponent } from './toolbar/toolbar.component';
+import { MapPageGuardService } from './map-page/map-page-guard.service';
+import { MapPageResolverService } from './map-page/map-page-resolver.service';
 
 export class MyHammerConfig extends HammerGestureConfig {
     overrides = <any>{
@@ -101,6 +103,8 @@ export class MyHammerConfig extends HammerGestureConfig {
         MessageService,
         UserService,
         ToolService,
+        MapPageGuardService,
+        MapPageResolverService,
         {provide: LocationStrategy, useClass: HashLocationStrategy},
         // {provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy},
         {provide: HAMMER_GESTURE_CONFIG, useClass: MyHammerConfig}

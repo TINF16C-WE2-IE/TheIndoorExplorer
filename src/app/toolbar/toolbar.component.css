@@ -46,10 +46,6 @@
     left: 5px;
 }
 
-#openDialog {
-    cursor: pointer;
-}
-
 #openDialog .mat-icon {
     opacity: 0;
 }
