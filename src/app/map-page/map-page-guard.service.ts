@@ -13,7 +13,9 @@ export class MapPageGuardService implements CanActivate, CanDeactivate<CanDeacti
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
         if (route.data.requireLogin) {
             if (route.data.requireWritePerm) {
-                if (route.params.mapId === 'new') return true;
+                if (route.params.mapId === 'new') {
+                    return this.userSvc.isLoggedIn;
+                }
                 const mapId = Number.parseInt(route.params.mapId);
                 if (!this.userSvc.loaded) {
                     this.router.navigate(['/map', route.params.mapId]);

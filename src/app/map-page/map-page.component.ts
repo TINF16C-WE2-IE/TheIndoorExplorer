@@ -60,6 +60,7 @@ export class MapPageComponent implements OnInit , CanDeactivateComponent {
                 else {
                     this.switchToViewMode();
                 }
+                this.fitToViewport();
             }
         );
     }
