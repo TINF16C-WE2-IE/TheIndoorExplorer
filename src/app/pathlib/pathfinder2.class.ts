@@ -514,7 +514,7 @@ export class Pathfinder2 {
                     // if the next point is on a teleporter to a different floorlevel
                     if (i < stairPath.length - 1 && stairPath[i + 1].floorLevel !== curFloor) {
                         const diff = stairPath[i + 1].floorLevel - curFloor;
-                        curGraph.paths[curGraph.paths.length - 1].description = +Math.abs(diff) + ' Layer' + (diff > 1 ? 's' : '')
+                        curGraph.paths[curGraph.paths.length - 1].description = +Math.abs(diff) + ' Floor' + (diff > 1 ? 's' : '')
                             + (Math.sign(diff) > 0 ? ' Up.' : ' Down.');
                     }
 

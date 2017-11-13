@@ -60,7 +60,9 @@ export class MapPageComponent implements OnInit , CanDeactivateComponent {
                 else {
                     this.switchToViewMode();
                 }
-                this.fitToViewport();
+                setTimeout(() => {
+                    this.fitToViewport();
+                }, 0);
             }
         );
     }
@@ -99,7 +101,7 @@ export class MapPageComponent implements OnInit , CanDeactivateComponent {
 
     canDeactivateComponent(): Observable<boolean> {
         if (this.editMode) {
-            if (this.modelSvc.currentMap.dirty) {
+            if (this.modelSvc.currentMap && this.modelSvc.currentMap.dirty) {
                 this.msgSvc.notify('You have unsaved changes. Please save or discard them.', 'Warning');
                 return Observable.of(false);
             }

@@ -69,13 +69,12 @@ export class ToolbarComponent implements OnInit {
     saveCurrentMap() {
         this.modelSvc.saveMap(newMapId => {
             this.modelSvc.currentMap.storeClean();
-            this.router.navigate(['/map', newMapId, 'edit']);
         });
     }
 
     discardOrExit() {
         if (this.dirty) {
-            this.modelSvc.currentMap.resetClean();
+            this.modelSvc.loadMap(this.modelSvc.currentMapId).subscribe();
         }
         else {
             if (this.mapId === null || this.mapId === -1) {
