@@ -1,3 +1,4 @@
+import { MessageService } from './message.service';
 import { ElementRef, Injectable } from '@angular/core';
 import { Elevator } from '../model/elevator.class';
 import { Map } from '../model/map.class';
@@ -6,6 +7,8 @@ import { Stairs } from '../model/stairs.class';
 import { TeleporterGroup } from '../model/teleporter-group.interface';
 import { Teleporter } from '../model/teleporter.interface';
 import { RequestService } from './request.service';
+import { Observable } from 'rxjs/Observable';
+import { Observer } from 'rxjs/Observer';
 
 
 @Injectable()
@@ -63,7 +66,7 @@ export class ModelService {
         this.currentFloorId = id;
     }
 
-    constructor(private rqstSvc: RequestService) {
+    constructor(private rqstSvc: RequestService, private msgSvc: MessageService) {
         this.maps = {};
         this.currentMapId = 0;
         this.currentFloorId = 0;
@@ -73,21 +76,21 @@ export class ModelService {
     public loadMapList() {
         this.rqstSvc.get(RequestService.LIST_MAPS, {}).subscribe(
             resp => {
+                console.log(resp);
                 if (resp.status >= 200 && resp.status <= 299 && resp.data) {
                     for (const mapInfo of resp.data as [
                         {id: number, name: string, favorite: boolean, permission: number, visibility: number}
                         ]) {
                         this.maps[mapInfo.id] = new Map(mapInfo, this);
                     }
-                }
-                else {
+                } else {
                     console.log('Received invalid map list response:', resp);
                 }
             }
         );
     }
 
-    public loadMap(mapId: number, callback: Function = null) {
+    public loadMap(mapId: number): Observable<boolean> {
         if (mapId === -1) {
             const newMap = new Map({
                 id: -1,
@@ -100,33 +103,51 @@ export class ModelService {
             newMap.createFloor();
             newMap.fitToViewport();
             this.currentMap = newMap;
-            if (callback) callback();
+            return Observable.of(true);
         }
         else {
-            this.rqstSvc.get(RequestService.LIST_MAP_DETAILS + mapId, {}).subscribe(
-                resp => {
-                    if (resp.status >= 200 && resp.status <= 299 && resp.data) {
-                        this.currentMap = new Map(resp.data, this);
-                        this.currentMap.fitToViewport();
-                        if (callback) callback();
+            return Observable.create((observer: Observer<boolean>) => {
+
+                this.rqstSvc.get(RequestService.LIST_MAP_DETAILS + mapId, {}).subscribe(
+                    resp => {
+                        if (resp.status >= 200 && resp.status <= 299 && resp.data) {
+                            this.currentMap = new Map(resp.data, this);
+                            this.currentMap.fitToViewport();
+                            observer.next(true);
+                        }
+                        else {
+                            console.log('Received invalid map response:', resp);
+                            observer.next(false);
+                        }
+                        observer.complete();
+                    },
+                    error => {
+                        console.log('Received error map response:', error.status, error.statusText, error.url);
+                        observer.next(false);
+                        observer.complete();
                     }
-                    else {
-                        console.log('Received invalid map response:', resp);
-                    }
-                }
-            );
+                );
+
+            });
         }
     }
 
     public saveMap(callback: (newMapId: number) => void) {
         this.rqstSvc.post(RequestService.LIST_MAP_SAVE + this.currentMapId, this.currentMap.forExport())
-            .subscribe(resp => {
-                console.log('got response map-save:', resp);
-                if (resp.status >= 200 && resp.status <= 299 && resp.data && resp.data.mapId) {
-                    this.currentMap.id = resp.data.mapId;
-                    callback(resp.data.mapId);
+            .subscribe(
+                resp => {
+                    if (resp.status >= 200 && resp.status <= 299) {
+                        this.msgSvc.notify('Map was successfully saved', 'Success');
+                        if (resp.data && resp.data.mapId) {
+                            this.currentMap.id = resp.data.mapId;
+                            callback(resp.data.mapId);
+                        }
+                    }
+                },
+                error => {
+                    this.msgSvc.notify('Could not save map :(', 'Error');
                 }
-            });
+            );
     }
 
     public deleteMap(callback: () => void) {

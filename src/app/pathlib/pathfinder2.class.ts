@@ -43,7 +43,6 @@ export class Pathfinder2 {
 
         let min = Number.MAX_VALUE;
         let curCost = min;
-        let foundNewNode = false;
         let minClNode = null;
         let minLinkIndex = -1;
         for (const cl of closedList) {
@@ -62,8 +61,6 @@ export class Pathfinder2 {
 
                     // add node to openlist, if necessary
                     if (openList.indexOf(cl.links[j]) < 0) {
-
-                        foundNewNode = true;
                         openList.push(cl.links[j]);
                     }
 
@@ -81,17 +78,16 @@ export class Pathfinder2 {
         }
 
         // cant generate path.
-        if (!foundNewNode) {
+        if (openList.length === 0) {
             return null;
         }
 
-        openList = openList.splice(openList.indexOf(minClNode.links[minLinkIndex]), 1);
+        openList.splice(openList.indexOf(minClNode.links[minLinkIndex]), 1);
         closedList.push(minClNode.links[minLinkIndex]);
 
-        if (openList.length > 0 && closedList.indexOf(end) < 0) {
+        if (closedList.indexOf(end) < 0) {
             return this.calculatePath(nodes, costs, parents, openList, closedList, end);
-        }
-        else {
+        } else {
 
             // got the costs over the nodes. now back-track.
             // start at end node and backtrack over the parent for each node.
@@ -217,19 +213,13 @@ export class Pathfinder2 {
 
         // connect the nodes
         for (const n1 of nodes) {
-            for (const n2 of nodes) {
-
-                if (n1 !== n2) {
+            for (const n2 of nodes.filter(el => el !== n1)) {
                     // check for any link between the nodes
-
 
                     // move onto the next, in case we already checked this link.
                     if (chckd.find(el =>
                             (el.p1.x === n1.x && el.p1.y === n1.y && el.p2.x === n2.x && el.p2.y === n2.y)
                             || (el.p1.x === n2.x && el.p1.y === n2.y && el.p2.x === n1.x && el.p2.y === n1.y)) === undefined) {
-
-                        const p1 = new Point(n1.x, n1.y, false);
-                        const p2 = new Point(n2.x, n2.y, false);
 
                         // if this link doesn't intersect any walls
                         if (!this.checkIntersectionOfLineWithLines(
@@ -243,17 +233,12 @@ export class Pathfinder2 {
                         else {
 
                             // just and mark as checked.
-                            chckd.push(new Line(p1, p2));
+                            chckd.push(new Line(new Point(n1.x, n1.y, false), new Point(n2.x, n2.y, false)));
                         }
                     }
                     else {
                         // already checked.
                     }
-
-                }
-                else {
-                    // dont check the same node.
-                }
             }
         }
 
@@ -322,8 +307,7 @@ export class Pathfinder2 {
                     new Point(path[i - 1].x, path[i - 1].y, false)
                 ));
             }
-        }
-        else {
+        } else {
 
         }
     }
@@ -547,7 +531,7 @@ export class Pathfinder2 {
         }
     }
 
-    private static clearAllFloorGraphs(map: Map): void {
+    public static clearAllFloorGraphs(map: Map): void {
 
         // clear all paths on the whole map!
         for (const f of map.floors) {
@@ -583,7 +567,6 @@ export class Pathfinder2 {
 
         let min = Number.MAX_VALUE;
         let curCost = min;
-        let foundNewNode = false;
         let minClNode = null;
         let minLinkIndex = -1;
         for (const cl of closedList) {
@@ -602,8 +585,6 @@ export class Pathfinder2 {
 
                     // add node to openlist, if necessary
                     if (openList.indexOf(cl.links[j]) < 0) {
-
-                        foundNewNode = true;
                         openList.push(cl.links[j]);
                     }
 
@@ -630,8 +611,7 @@ export class Pathfinder2 {
 
         if (closedList.indexOf(end) < 0) {
             return this.calculateStairPath(nodes, costs, parents, openList, closedList, end, debugCounter + 1);
-        }
-        else {
+        } else {
 
             // got the costs over the nodes. now back-track.
             // start at end node and backtrack over the parent for each node.
