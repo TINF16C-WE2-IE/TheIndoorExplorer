@@ -4,6 +4,7 @@ import { Selectable } from '../../model/selectable.interface';
 import { ModelService } from '../../service/model.service';
 import { ToolService } from '../../service/tool.service';
 import { DirectionsTool } from '../../service/toolbox/directions-tool.class';
+import {Pathfinder2} from '../../pathlib/pathfinder2.class';
 
 
 @Component({
@@ -40,7 +41,7 @@ export class SideSearchComponent implements OnInit {
 
     selectWaypoint(selected: Selectable) {
         if (this.toolSvc.selectedTool instanceof DirectionsTool) {
-            this.toolSvc.selectedTool.selectWaypoint(selected, this.modelSvc.currentFloorId);
+            this.toolSvc.selectedTool.selectWaypoint(selected);
             this.searchQuery = '';
             this.search('');
         }
@@ -61,8 +62,7 @@ export class SideSearchComponent implements OnInit {
     onCancelClick() {
         this.modelSvc.selectedObjects = [];
         this.searchQuery = '';
-
-
+        Pathfinder2.clearAllFloorGraphs(this.modelSvc.currentMap);
     }
 
 }

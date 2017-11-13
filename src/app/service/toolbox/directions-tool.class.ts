@@ -59,6 +59,7 @@ export class DirectionsTool extends Tool {
             }
             if (this.modelSvc.selectedObjects.length === 2) {
                 this.modelSvc.selectedObjects = [];
+                Pathfinder2.clearAllFloorGraphs(this.modelSvc.currentMap);
             }
 
             if (this.modelSvc.selectedObjects.length) {
