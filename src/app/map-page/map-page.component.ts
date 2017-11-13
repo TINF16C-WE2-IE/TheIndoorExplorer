@@ -79,7 +79,7 @@ export class MapPageComponent implements OnInit , CanDeactivateComponent {
     switchToEditMode() {
         this.editMode = true;
         if (this.modelSvc.currentMap) {
-            console.log('clear graph');
+            // console.log('clear graph');
             Pathfinder2.clearAllFloorGraphs(this.modelSvc.currentMap);
         }
         this.toolSvc.selectTool('Move');

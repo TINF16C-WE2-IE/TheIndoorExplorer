@@ -45,7 +45,7 @@ export class DirectionsTool extends Tool {
 
     public selectWaypoint(selected: Selectable, floorArrayIndex: number = null) {
 
-        console.log('selected:', selected);
+        // console.log('selected:', selected);
 
         // TS has no way of checking for an interface :(
         if (isSelectable(selected)) {

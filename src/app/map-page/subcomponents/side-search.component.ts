@@ -48,12 +48,12 @@ export class SideSearchComponent implements OnInit {
         if (this.selectedObjects.length === 2) {
             this.search('');
             this.close.emit('event');
-            console.log('two selected');
+            // console.log('two selected');
         }
     }
 
     search(query: string) {
-        console.log('search', query);
+        // console.log('search', query);
         this.currentMap.search(query);
         this.currentMap.fitToViewport();
 

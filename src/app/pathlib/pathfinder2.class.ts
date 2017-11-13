@@ -526,7 +526,7 @@ export class Pathfinder2 {
         }
         else {
 
-            console.log('this path is not possible!');
+            // console.log('this path is not possible!');
             this.clearAllFloorGraphs(currentMap);
         }
     }

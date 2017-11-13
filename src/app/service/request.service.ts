@@ -55,7 +55,7 @@ export class RequestService {
                     data = jsonObj;
                 }
             } catch (e) {
-                console.log('Non-JSON response', res.body);
+                // console.log('Non-JSON response', res.body);
                 data = res.body;
             }
         } else {

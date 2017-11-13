@@ -1,14 +1,14 @@
-import { MessageService } from './message.service';
 import { ElementRef, Injectable } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { Observer } from 'rxjs/Observer';
 import { Elevator } from '../model/elevator.class';
 import { Map } from '../model/map.class';
 import { Selectable } from '../model/selectable.interface';
 import { Stairs } from '../model/stairs.class';
 import { TeleporterGroup } from '../model/teleporter-group.interface';
 import { Teleporter } from '../model/teleporter.interface';
+import { MessageService } from './message.service';
 import { RequestService } from './request.service';
-import { Observable } from 'rxjs/Observable';
-import { Observer } from 'rxjs/Observer';
 import { UserService } from './user.service';
 
 
@@ -88,7 +88,7 @@ export class ModelService {
                         observer.next(true);
                     }
                     else {
-                        console.log('Received invalid map list response:', resp);
+                        // console.log('Received invalid map list response:', resp);
                         observer.next(false);
                     }
                     observer.complete();
@@ -122,18 +122,18 @@ export class ModelService {
                     resp => {
                         if (resp.status >= 200 && resp.status <= 299 && resp.data) {
                             this.currentMap = new Map(resp.data, this);
-                            console.log('loaded');
+                            // console.log('loaded');
                             this.currentMap.fitToViewport();
                             observer.next(true);
                         }
                         else {
-                            console.log('Received invalid map response:', resp);
+                            // console.log('Received invalid map response:', resp);
                             observer.next(false);
                         }
                         observer.complete();
                     },
                     error => {
-                        console.log('Received error map response:', error.status, error.statusText, error.url);
+                        // console.log('Received error map response:', error.status, error.statusText, error.url);
                         observer.next(false);
                         observer.complete();
                     }
@@ -167,7 +167,7 @@ export class ModelService {
     public deleteMap(callback: () => void) {
         this.rqstSvc.delete(RequestService.DELETE_MAP + this.currentMapId, {})
             .subscribe(resp => {
-                console.log('got response map-delete:', resp);
+                // console.log('got response map-delete:', resp);
                 if (resp.status >= 200 && resp.status <= 299) {
                     delete this.maps[this.currentMapId];
                     callback();
@@ -178,7 +178,7 @@ export class ModelService {
     public publishMap() {
         this.rqstSvc.post(RequestService.PUBLISH + this.currentMapId + '/publish', {})
             .subscribe(resp => {
-                console.log('got response map-save: ', resp);
+                // console.log('got response map-save: ', resp);
                 if (resp !== null) {
                     // TODO
                 }

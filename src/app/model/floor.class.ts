@@ -75,7 +75,7 @@ export class Floor {
             point => point !== p && point.equals(p) && exclude.indexOf(point) === -1
         );
         if (points.length > 1) {
-            console.log('WARNING! Twin points found!', JSON.stringify(points));
+            // console.log('WARNING! Twin points found!', JSON.stringify(points));
         }
 
         if (points.length > 0) {
@@ -106,7 +106,7 @@ export class Floor {
                 this.stairways.find((s, i) => line !== s && line.equals(s) &&
                     (line instanceof Stairs ? this.stairways.indexOf(line as Stairs) < i : true))
             ) {
-                console.log('Deleting invalid line (duplicate):', JSON.stringify(line.forExport()));
+                // console.log('Deleting invalid line (duplicate):', JSON.stringify(line.forExport()));
                 return false;
             }
             else {
@@ -114,7 +114,7 @@ export class Floor {
             }
         }
         else {
-            console.log('Deleting invalid line (start=end):', JSON.stringify(line.forExport()));
+            // console.log('Deleting invalid line (start=end):', JSON.stringify(line.forExport()));
             return false;
         }
     }

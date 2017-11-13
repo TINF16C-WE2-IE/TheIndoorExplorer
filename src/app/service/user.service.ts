@@ -40,7 +40,7 @@ export class UserService {
                         // user not logged in
                         observer.next(false);
                     } else {
-                        console.log('Received invalid user info response:', resp);
+                        // console.log('Received invalid user info response:', resp);
                         observer.next(false);
                     }
                     this.loaded = true;
@@ -60,10 +60,10 @@ export class UserService {
         this.requestSvc.get(RequestService.LOGOUT, {}).subscribe(
             resp => {
                 if (resp.status >= 200 && resp.status <= 299) {
-                    console.log('Logout response:', resp);
+                    // console.log('Logout response:', resp);
                 }
                 else {
-                    console.log('Received invalid logout response:', resp);
+                    // console.log('Received invalid logout response:', resp);
                 }
                 location.reload();
             }

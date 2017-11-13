@@ -21,7 +21,7 @@ export class DeleteMapDialogComponent implements OnInit {
     public deleteMap() {
         this.dialogRef.close();
         this.modelSvc.deleteMap(() => {
-            console.log('GOTO /');
+            // console.log('GOTO /');
             this.router.navigate(['root']);
         });
     }

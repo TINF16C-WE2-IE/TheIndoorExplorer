@@ -36,7 +36,7 @@ export class MapPageResolverService implements Resolve<void> {
 
 
     private onMapLoaded() {
-        console.log('building route graph...');
+        // console.log('building route graph...');
         // initialize connection graphs for pathfinding - function moved from DirectionsTool
 
         // create the basic nodegraph on each floor, and insert the static elevators and stairs
@@ -54,6 +54,6 @@ export class MapPageResolverService implements Resolve<void> {
             f.floorGraph.paths = [];
         }
 
-        console.log('done!', this.modelSvc.currentMap);
+        // console.log('done!', this.modelSvc.currentMap);
     }
 }
