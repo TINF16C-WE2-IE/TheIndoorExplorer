@@ -1,0 +1,10 @@
+#editorCanvas {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: white;
+    user-select: none;
+    user-drag: none;
+    -webkit-user-drag: none;
+    box-sizing: content-box;
+}

@@ -1,15 +1,14 @@
-import { Elevator } from './../model/elevator.class';
-import { Teleporter } from './../model/teleporter.interface';
-import { Stairs } from '../model/stairs.class';
-import { Map } from '../model/map.class';
-import { TeleporterNode } from './teleporter-node.class';
+import { Elevator } from '../model/elevator.class';
 import { Floor } from '../model/floor.class';
-import { LinePath } from './line-path.class';
-import { FloorGraph } from './floor-graph.class';
-import { Vector } from './vector.class';
 import { Line } from '../model/line.class';
+import { Map } from '../model/map.class';
 import { Point } from '../model/point.class';
+import { Stairs } from '../model/stairs.class';
+import { FloorGraph } from './floor-graph.class';
+import { LinePath } from './line-path.class';
 import { PathNode } from './path-node.class';
+import { TeleporterNode } from './teleporter-node.class';
+import { Vector } from './vector.class';
 
 export class Pathfinder2 {
 
@@ -22,8 +21,8 @@ export class Pathfinder2 {
         if (from === to || nodes.indexOf(from) === nodes.indexOf(to)) return [from];
 
         // open/closed nodes for pathfinding
-        const openList = [];
-        const closedList = [];
+        const openList: PathNode[] = [];
+        const closedList: PathNode[] = [];
 
 
         // assign initial costs for nodes, and create their parents for backtracking the best path.
@@ -107,8 +106,8 @@ export class Pathfinder2 {
         }
     }
 
-    private static checkIntersectionOfLineWithLines(p1x, p1y, p2x, p2y, lines: Line[], endpointTolerance: number,
-                                                    debug: boolean = false): boolean {
+    private static checkIntersectionOfLineWithLines(p1x: number, p1y: number, p2x: number, p2y: number,
+                                                    lines: Line[], endpointTolerance: number, debug: boolean = false): boolean {
 
         let intersects = false;
         for (const w of lines) {
@@ -357,7 +356,7 @@ export class Pathfinder2 {
                                 && (el.p2.x === n1.teleporter.center.x && el.p2.y === n1.teleporter.center.y))
                             ) === undefined) {
 
-                             // it makes sense just to link those teleporters, which actually have a link to a second one.
+                            // it makes sense just to link those teleporters, which actually have a link to a second one.
                             if (n1.teleporter.group !== null && n2.teleporter.group !== null) {
 
                                 this.generatePath(n1.teleporter.center, n2.teleporter.center, f);
@@ -387,10 +386,10 @@ export class Pathfinder2 {
         for (const n1 of totalNodes) {
             for (const n2 of totalNodes) {
                 if ((n1 !== n2) && n1.teleporter.group !== null && n2.teleporter.group !== null && n1.floorLevel !== n2.floorLevel
-                      && ((n1.teleporter instanceof Stairs && n2.teleporter instanceof Stairs)
-                            || (n1.teleporter instanceof Elevator && n2.teleporter instanceof Elevator)
-                          )
-                    ) {
+                    && ((n1.teleporter instanceof Stairs && n2.teleporter instanceof Stairs)
+                        || (n1.teleporter instanceof Elevator && n2.teleporter instanceof Elevator)
+                    )
+                ) {
 
                     if (chckdN.find(el =>
                             ((el.p1.x === n1.teleporter.center.x && el.p1.y === n1.teleporter.center.y)
@@ -531,8 +530,8 @@ export class Pathfinder2 {
                     // if the next point is on a teleporter to a different floorlevel
                     if (i < stairPath.length - 1 && stairPath[i + 1].floorLevel !== curFloor) {
                         const diff = stairPath[i + 1].floorLevel - curFloor;
-                        curGraph.paths[curGraph.paths.length - 1].description = + Math.abs(diff) + ' Layer' + (diff > 1 ? 's' : '')
-                                                                                + (Math.sign(diff) > 0 ? ' Up.' : ' Down.');
+                        curGraph.paths[curGraph.paths.length - 1].description = +Math.abs(diff) + ' Layer' + (diff > 1 ? 's' : '')
+                            + (Math.sign(diff) > 0 ? ' Up.' : ' Down.');
                     }
 
                 }
@@ -561,8 +560,8 @@ export class Pathfinder2 {
         if (from === to || nodes.indexOf(from) === nodes.indexOf(to)) return [from];
 
         // open/closed nodes for pathfinding
-        const openList = [];
-        const closedList = [];
+        const openList: TeleporterNode[] = [];
+        const closedList: TeleporterNode[] = [];
 
 
         // assign initial costs for nodes, and create their parents for backtracking the best path.
@@ -579,8 +578,8 @@ export class Pathfinder2 {
 
     // returns null, if this path is not possible
     private static calculateStairPath(nodes: TeleporterNode[], costs: number[], parents: TeleporterNode[],
-                               openList: TeleporterNode[], closedList: TeleporterNode[], end: TeleporterNode,
-                               debugCounter: number): TeleporterNode[] {
+                                      openList: TeleporterNode[], closedList: TeleporterNode[], end: TeleporterNode,
+                                      debugCounter: number): TeleporterNode[] {
 
         let min = Number.MAX_VALUE;
         let curCost = min;

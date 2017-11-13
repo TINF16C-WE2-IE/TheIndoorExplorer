@@ -28,23 +28,28 @@ import {
 } from '@angular/material';
 import { BrowserModule, HAMMER_GESTURE_CONFIG, HammerGestureConfig } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { RouteReuseStrategy } from '@angular/router';
 
 import { AppComponent } from './app.component';
 import { routing } from './app.routing';
-import { CustomRouteReuseStrategy } from './custom-route-reuse-strategy';
-import { MainComponent } from './main/main.component';
-import { MapListComponent } from './main/map-list.component';
-import { MessageService } from './svc/message.service';
-import { ModelService } from './svc/model.service';
+import { MainPageComponent } from './main-page/main-page.component';
+import { MapListComponent } from './main-page/map-list.component';
+import { DeleteMapDialogComponent } from './map-page/dialogs/delete-map-dialog.component';
+import { MapnameDialogComponent } from './map-page/dialogs/mapname-dialog.component';
+import { PublishMapDialogComponent } from './map-page/dialogs/publish-map-dialog.component';
+import { MapPageComponent } from './map-page/map-page.component';
+import { FloorControlsComponent } from './map-page/subcomponents/floor-controls.component';
+import { SidePropertiesComponent } from './map-page/subcomponents/side-properties.component';
+import { SideSearchComponent } from './map-page/subcomponents/side-search.component';
+import { SideToolsComponent } from './map-page/subcomponents/side-tools.component';
+import { SvgComponent } from './map-page/subcomponents/svg.component';
+import { TypeNamePipe } from './map-page/subcomponents/type-name.pipe';
+import { MessageService } from './service/message.service';
+import { ModelService } from './service/model.service';
 
-import { RequestService } from './svc/request.service';
-import { DeleteMapDialogComponent } from './svg-edit/dialogs/delete-map-dialog.component';
-import { MapnameDialogComponent } from './svg-edit/dialogs/mapname-dialog.component';
-import { PublishMapDialogComponent } from './svg-edit/dialogs/publish-map-dialog.component';
-import { SvgEditComponent } from './svg-edit/svg-edit.component';
-import { ToolbarComponent } from './svg-edit/toolbar.component';
-import { TypeNamePipe } from './svg-edit/type-name.pipe';
+import { RequestService } from './service/request.service';
+import { ToolService } from './service/tool.service';
+import { UserService } from './service/user.service';
+import { ToolbarComponent } from './toolbar/toolbar.component';
 
 export class MyHammerConfig extends HammerGestureConfig {
     overrides = <any>{
@@ -55,15 +60,26 @@ export class MyHammerConfig extends HammerGestureConfig {
 @NgModule({
     declarations: [
         AppComponent,
-        SvgEditComponent,
+
+        MainPageComponent,
         MapListComponent,
-        MainComponent,
-        ToolbarComponent,
+
+        MapPageComponent,
+
         MapnameDialogComponent,
         DeleteMapDialogComponent,
-        TypeNamePipe,
         DeleteMapDialogComponent,
-        PublishMapDialogComponent
+        PublishMapDialogComponent,
+
+        FloorControlsComponent,
+        SvgComponent,
+        SideSearchComponent,
+        SideToolsComponent,
+        SidePropertiesComponent,
+
+        ToolbarComponent,
+
+        TypeNamePipe
     ],
     entryComponents: [
         DeleteMapDialogComponent,
@@ -83,8 +99,10 @@ export class MyHammerConfig extends HammerGestureConfig {
         RequestService,
         ModelService,
         MessageService,
+        UserService,
+        ToolService,
         {provide: LocationStrategy, useClass: HashLocationStrategy},
-        {provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy},
+        // {provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy},
         {provide: HAMMER_GESTURE_CONFIG, useClass: MyHammerConfig}
     ],
     bootstrap: [AppComponent]

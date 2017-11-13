@@ -1,23 +1,32 @@
-import {RouterModule, Routes} from '@angular/router';
-
-
-import {SvgEditComponent} from './svg-edit/svg-edit.component';
-import {MainComponent} from './main/main.component';
+import { RouterModule, Routes } from '@angular/router';
+import { MainPageComponent } from './main-page/main-page.component';
+import { MapPageComponent } from './map-page/map-page.component';
 
 export const routes: Routes = [
 
     {
         path: '',
-        component: MainComponent,
+        component: MainPageComponent,
         pathMatch: 'full'
     },
     {
-        path: 'view/:mapId',
-        component: SvgEditComponent
-    },
-    {
-        path: 'edit/:mapId',
-        component: SvgEditComponent
+        path: 'map/:mapId',
+        children: [
+            {
+                path: '',
+                component: MapPageComponent,
+                pathMatch: 'full'
+            },
+            {
+                path: 'edit',
+                component: MapPageComponent,
+                pathMatch: 'full'
+            },
+            {
+                path: '**',
+                redirectTo: ''
+            }
+        ]
     },
     {
         path: '**',

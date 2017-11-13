@@ -1,0 +1,65 @@
+:host {
+    background-color: transparent;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 550;
+}
+
+.mat-toolbar {
+    width: 100%;
+    height: 100%;
+    background: none;
+    transition: box-shadow 0.4s ease-in;
+}
+
+.mat-toolbar.mat-elevation-z6 {
+    transition: box-shadow 0.2s ease-out;
+}
+
+.mat-toolbar button {
+    padding: 0 8px;
+}
+
+@media only screen and (max-width: 650px) {
+    .mat-toolbar .mat-button {
+        min-width: 35px;
+    }
+
+    .toolbar-text {
+        display: none;
+    }
+}
+
+.fill-remaining-space {
+    flex: 1 1 auto;
+}
+
+.mat-form-field {
+    font-size: 0.5em;
+}
+
+#editname {
+    position: relative;
+    top: 5px;
+    left: 5px;
+}
+
+#openDialog {
+    cursor: pointer;
+}
+
+#openDialog .mat-icon {
+    opacity: 0;
+}
+
+#openDialog span:hover + .mat-icon {
+    transition: opacity 0.35s ease-in;
+    opacity: 1;
+}
+
+#back {
+    z-index: auto;
+    margin-left: -8px;
+}

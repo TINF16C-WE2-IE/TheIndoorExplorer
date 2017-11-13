@@ -1,0 +1,32 @@
+<mat-button-toggle-group #group="matButtonToggleGroup" value="floors[0]">
+    <mat-button-toggle *ngFor="let f of floors; let i = index"
+                       [class.mat-raised-button]="currentFloor == f"
+                       [class.search-result-floor]="f.searchResults.length"
+                       (click)="selectFloor(i)">
+        {{f.label || '?'}}
+    </mat-button-toggle>
+</mat-button-toggle-group>
+
+
+<div *ngIf="editMode" class="floor-buttons">
+    <button mat-button (click)="createFloor()">
+        <mat-icon>add_circle_outline</mat-icon>
+        New floor
+    </button>
+    <button mat-button (click)="createFloor(currentFloor)">
+        <mat-icon>control_point_duplicate</mat-icon>
+        Clone floor
+    </button>
+    <button mat-button (click)="removeFloor(currentFloor)">
+        <mat-icon>remove_circle_outline</mat-icon>
+        Remove floor
+    </button>
+    <button mat-button (click)="moveFloor(currentFloor, 1)">
+        <mat-icon>vertical_align_top</mat-icon>
+        Move up
+    </button>
+    <button mat-button (click)="moveFloor(currentFloor, -1)">
+        <mat-icon>vertical_align_bottom</mat-icon>
+        Move down
+    </button>
+</div>

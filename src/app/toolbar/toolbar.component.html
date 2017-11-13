@@ -1,0 +1,61 @@
+<mat-toolbar [class.mat-elevation-z6]="elevated">
+
+    <button mat-icon-button *ngIf="hasMap" id="back" [routerLink]="['']">
+        <mat-icon aria-label="Back to home">arrow_back</mat-icon>
+    </button>
+
+    <div *ngIf="hasMap" id="openDialog" (click)="editMode && openNameDialog()">
+        <span>{{modelSvc.currentMap?.name}}</span>
+        <mat-icon *ngIf="editMode" id='editname'>mode_edit</mat-icon>
+    </div>
+
+
+    <span class="fill-remaining-space"></span>
+
+
+    <button mat-button *ngIf="hasMap && !editMode" [routerLink]="['/map', mapIdString, 'edit']">
+        <mat-icon>edit_mode</mat-icon>
+        <span class="toolbar-text">Edit map</span>
+    </button>
+
+
+    <button mat-button *ngIf="hasMap && editMode" [routerLink]="['/map', mapIdString]">
+        <mat-icon>cancel</mat-icon>
+        <span class="toolbar-text">Exit</span>
+    </button>
+
+    <button mat-button *ngIf="hasMap && editMode" (click)="saveCurrentMap()">
+        <mat-icon>save</mat-icon>
+        <span class="toolbar-text">Save</span>
+    </button>
+
+    <button mat-button *ngIf="hasMap && editMode" (click)="openPublishDialog()">
+        <mat-icon>share</mat-icon>
+        <span class="toolbar-text">Publish</span>
+    </button>
+
+    <button mat-button *ngIf="hasMap && editMode" (click)="openDeleteDialog()">
+        <mat-icon>delete_forever</mat-icon>
+        <span class="toolbar-text">Delete map</span>
+    </button>
+
+
+    <button mat-button [matMenuTriggerFor]="appMenu">
+        <mat-icon>account_box</mat-icon>
+        <span class="toolbar-text">{{userSvc.userName}}</span>
+    </button>
+
+</mat-toolbar>
+
+<mat-menu #appMenu="matMenu" [overlapTrigger]="false">
+
+    <div *ngIf="!userSvc.isLoggedIn">
+        <button mat-menu-item (click)="userSvc.login('nubenum')">Nubenum</button>
+        <button mat-menu-item (click)="userSvc.login('github')">Github</button>
+    </div>
+
+    <div *ngIf="userSvc.isLoggedIn">
+        <button mat-menu-item (click)="userSvc.logout()">Logout</button>
+    </div>
+
+</mat-menu>

@@ -1,0 +1,28 @@
+:host {
+    flex-basis: content;
+    margin: 1%;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+#floor-button-container .mat-button-toggle-group {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    background-color: white;
+}
+
+#floor-button-container .mat-button-toggle-checked {
+    background-color: white;
+}
+
+#floor-spacer {
+    flex-grow: 1;
+}
+
+.floor-button {
+    margin: 3px;
+}
+
+.search-result-floor {
+    color: #B71C1C;
+}

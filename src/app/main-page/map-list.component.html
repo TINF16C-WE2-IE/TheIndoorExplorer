@@ -1,0 +1,14 @@
+<mat-card id="card">
+    <mat-card-title>Maps</mat-card-title>
+    <mat-nav-list>
+        <div *ngFor="let map of maps">
+            <mat-divider></mat-divider>
+            <mat-list-item [routerLink]="['/map', '' + map.id]">{{map.name}}</mat-list-item>
+        </div>
+        <button mat-fab class="fab" *ngIf="isLoggedIn"
+                [routerLink]="['/map', 'new', 'edit']" matTooltip="Create a new map">
+            <mat-icon>add</mat-icon>
+        </button>
+    </mat-nav-list>
+</mat-card>
+

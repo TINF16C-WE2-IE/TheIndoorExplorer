@@ -1,7 +1,7 @@
 import { TeleporterNode } from '../pathlib/teleporter-node.class';
 import { Floor } from './floor.class';
-import { ModelService } from '../svc/model.service';
-import { Mouse } from '../svg-edit/mouse.class';
+import { ModelService } from '../service/model.service';
+import { Mouse } from '../service/toolbox/mouse.class';
 import { Selectable } from './selectable.interface';
 import { Point } from './point.class';
 import { Teleporter } from './teleporter.interface';

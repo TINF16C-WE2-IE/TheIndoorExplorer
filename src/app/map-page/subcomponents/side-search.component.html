@@ -1,0 +1,40 @@
+<mat-form-field id='search-field'>
+    <input matInput type="search" incremental name="search" [(ngModel)]="searchQuery"
+           (keyup)="search(searchQuery)"
+           placeholder="Search...">
+</mat-form-field>
+
+<br>
+
+<mat-form-field>
+    <input matInput type="search" incremental name="search" [(ngModel)]="startQuery"
+           (keyup)="search(startQuery)"
+           placeholder="Startpoint..." (focus)="startpoint = true">
+</mat-form-field>
+
+<br>
+
+<mat-icon>more_vert</mat-icon>
+
+<br>
+
+<mat-form-field>
+    <input matInput type="search" incremental name="search" [(ngModel)]="endQuery" (keyup)="search()"
+           placeholder="Endpoint..." (focus)="startpoint = false">
+</mat-form-field>
+
+<mat-nav-list>
+    <span *ngFor="let f of floors; let i = index">
+    <h3 *ngIf="f.searchResults.length" mat-subheader>{{f.label.length ? f.label : i+1}}</h3>
+    <mat-list-item *ngFor="let result of f.searchResults"
+                   (click)="selectWaypoint(result)">{{result.label}}</mat-list-item>
+    </span>
+</mat-nav-list>
+
+<p *ngIf="singleSelectedObject">
+    Starting point: {{singleSelectedObject.label}}<br>
+    <b>Select a destination</b>
+</p>
+
+<p *ngIf="!singleSelectedObject"><b>Select two portals to get directions</b></p>
+

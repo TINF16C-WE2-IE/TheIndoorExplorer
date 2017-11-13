@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModelService } from './svc/model.service';
+import { UserService } from './service/user.service';
 
 @Component({
     selector: 'app-root',
@@ -9,7 +9,7 @@ import { ModelService } from './svc/model.service';
 export class AppComponent implements OnInit {
     title = 'app works!';
 
-    constructor(private modelSvc: ModelService) {
+    constructor(private userSvc: UserService) {
     }
 
     scrollTop() {
@@ -17,6 +17,6 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.modelSvc.loadUserInfo();
+        this.userSvc.refreshUserInfo();
     }
 }

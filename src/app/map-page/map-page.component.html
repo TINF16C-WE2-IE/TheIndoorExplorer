@@ -1,0 +1,44 @@
+<app-toolbar [editMode]="editMode"></app-toolbar>
+
+<mat-sidenav-container class="example-container">
+
+    <mat-sidenav #sidenav mode="{{sideNavMode}}" [disableClose]="editMode" class="left-sidenav">
+
+        <app-side-search *ngIf="!editMode"></app-side-search>
+        <app-side-tools *ngIf="editMode"></app-side-tools>
+        <app-side-properties *ngIf="editMode"></app-side-properties>
+
+    </mat-sidenav>
+
+
+    <div id="viewer-container">
+
+        <button *ngIf="!editMode" type="button" mat-raised-button color="accent" id="search-button"
+                (click)="sidenav.open()">
+            <mat-icon>location_searching</mat-icon>
+            <span>Search</span>
+        </button>
+
+        <div id="canvas-container">
+
+            <app-svg [editMode]="editMode" [showLabels]="showLabels"></app-svg>
+
+            <div id="zoom-button-container">
+                <button class="zoom-button" mat-raised-button (click)="zoom(1.1)">
+                    <mat-icon aria-label="Zoom +">zoom_in</mat-icon>
+                </button>
+                <button class="zoom-button" mat-raised-button (click)="zoom(0.9)">
+                    <mat-icon aria-label="Zoom -">zoom_out</mat-icon>
+                </button>
+                <button class="zoom-button" mat-raised-button (click)="fitToViewport()">
+                    <mat-icon aria-label="Zoom -">zoom_out_map</mat-icon>
+                </button>
+            </div>
+
+        </div>
+
+        <app-floor-controls [editMode]="editMode"></app-floor-controls>
+
+    </div>
+
+</mat-sidenav-container>

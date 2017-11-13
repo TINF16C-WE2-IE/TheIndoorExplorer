@@ -1,0 +1,86 @@
+:host {
+    position: absolute;
+    top: 65px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    align-items: flex-start;
+    align-content: space-around;
+}
+
+.mat-sidenav-container {
+    height: 100%;
+    width: 100%;
+    background-color: transparent;
+    z-index: 0;
+}
+
+.left-sidenav {
+    width: 250px;
+    flex: initial;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 12px 12px;
+}
+
+app-side-search, app-side-tools, app-side-properties {
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #EEEEEE;
+    display: flex;
+    flex-direction: column;
+}
+
+.left-sidenav .mat-form-field .mat-icon {
+    position: relative;
+    /* Adjust these values accordingly */
+    top: 5px;
+    left: 5px;
+}
+
+#viewer-container {
+    flex: 1 1 300px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#search-button {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    z-index: 550;
+}
+
+#canvas-container {
+    position: relative;
+    flex: auto;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    margin: 1% 1% 0;
+}
+
+#zoom-button-container {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+}
+
+.zoom-button {
+    min-width: unset;
+    line-height: unset;
+    padding: 2px;
+    display: block;
+    margin: 2px;
+}
+
+.panel {
+    /* what is this? TODO */
+    flex: 1 1 auto;
+    margin: 0 2em;
+}
+
+

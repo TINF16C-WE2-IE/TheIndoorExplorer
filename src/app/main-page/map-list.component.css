@@ -1,0 +1,19 @@
+#card {
+    box-sizing: border-box;
+    margin: 5% auto;
+    max-width: 400px;
+    width: 90%;
+}
+
+.mat-list-item {
+    transition: background-color 0.3s ease-in;
+}
+
+.mat-list-item:hover{
+    background-color: #e0e0e0;
+}
+
+.fab{
+    float:right;
+    background-color: #FF6D00!important;
+}

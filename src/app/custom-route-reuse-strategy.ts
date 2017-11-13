@@ -1,20 +1,20 @@
-import { ActivatedRouteSnapshot, RouteReuseStrategy } from '@angular/router';
+import { ActivatedRouteSnapshot, DetachedRouteHandle, RouteReuseStrategy } from '@angular/router';
 
 export class CustomRouteReuseStrategy implements RouteReuseStrategy {
     // defaults copied from @angular/router/@angular/router.js : class DefaultRouteReuseStrategy
 
-    shouldDetach(route) {
+    shouldDetach(route: ActivatedRouteSnapshot): boolean {
         return false;
     }
 
-    store(route, detachedTree) {
+    store(route: ActivatedRouteSnapshot, detachedTree: DetachedRouteHandle): void {
     }
 
-    shouldAttach(route) {
+    shouldAttach(route: ActivatedRouteSnapshot): boolean {
         return false;
     }
 
-    retrieve(route) {
+    retrieve(route: ActivatedRouteSnapshot): DetachedRouteHandle {
         return null;
     }
 

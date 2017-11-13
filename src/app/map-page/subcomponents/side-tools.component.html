@@ -1,0 +1,18 @@
+<h2 class="mat-h2">Toolbox</h2>
+<p class="tool-buttons">
+    <button mat-button *ngFor="let tool of tools"
+            class="tool-button" [class.mat-raised-button]="tool === selectedTool"
+            (click)="selectTool(tool.name)">
+        <mat-icon [svgIcon]="tool.icon"></mat-icon>
+        {{tool.name}}
+    </button>
+</p>
+
+<p>
+    <input #fileUploadButton style="display: none" type="file" name="bgimg" id="img-upload" accept="image/*"
+           (change)="changeBackgroundImage(fileUploadButton.files.item(0))">
+    <button mat-button (click)="fileUploadButton.click();">
+        <mat-icon>add_a_photo</mat-icon>
+        <span>Add image</span>
+    </button>
+</p>
