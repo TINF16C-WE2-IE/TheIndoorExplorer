@@ -1,9 +1,9 @@
 import { TeleporterNode } from '../pathlib/teleporter-node.class';
-import { Floor } from './floor.class';
 import { ModelService } from '../service/model.service';
 import { Mouse } from '../service/toolbox/mouse.class';
-import { Selectable } from './selectable.interface';
+import { Floor } from './floor.class';
 import { Point } from './point.class';
+import { Selectable } from './selectable.interface';
 import { Teleporter } from './teleporter.interface';
 
 
@@ -39,7 +39,8 @@ export class Map {
                 label: String(Math.max(0, ...this.floors.map(floor => Number.parseInt(floor.label, 10))
                                                  .filter(n => !Number.isNaN(n))) + 1)
             }));
-        } else {
+        }
+        else {
             this.floors.push(new Floor(cloneFrom.forExport()));
         }
     }
@@ -131,7 +132,8 @@ export class Map {
             const width = bottomRight.x - topLeft.x + 2 * margin;
             const height = bottomRight.y - topLeft.y + 2 * margin;
             this.updateCanvasSize(width, height);
-        } else {
+        }
+        else {
             this.modelSvc.panOffset.x = 0;
             this.modelSvc.panOffset.y = 0;
             this.updateCanvasSize(2000, 1);
@@ -144,7 +146,8 @@ export class Map {
         if (width / height < this.modelSvc.viewportSize.x / this.modelSvc.viewportSize.y) {
             this.modelSvc.canvasSize.x = height * this.modelSvc.viewportSize.x / this.modelSvc.viewportSize.y;
             this.modelSvc.canvasSize.y = height;
-        } else {
+        }
+        else {
             this.modelSvc.canvasSize.x = width;
             this.modelSvc.canvasSize.y = width * this.modelSvc.viewportSize.y / this.modelSvc.viewportSize.x;
         }
@@ -156,18 +159,20 @@ export class Map {
     }
 
     public getMapDimensions() {
-        const domElement = this.modelSvc.editorCanvas.nativeElement.getBoundingClientRect();
-        if (
-            this.modelSvc.viewportSize.x !== domElement.width ||
-            this.modelSvc.viewportSize.y !== domElement.height ||
-            this.modelSvc.bodyOffset.x !== domElement.left ||
-            this.modelSvc.bodyOffset.y !== domElement.top
-        ) {
-            this.modelSvc.viewportSize.x = domElement.width;
-            this.modelSvc.viewportSize.y = domElement.height;
-            this.modelSvc.bodyOffset.x = domElement.left;
-            this.modelSvc.bodyOffset.y = domElement.top;
-            this.updateCanvasSize(this.modelSvc.canvasSize.x, 1);
+        if (this.modelSvc.editorCanvas) {
+            const domElement = this.modelSvc.editorCanvas.nativeElement.getBoundingClientRect();
+            if (
+                this.modelSvc.viewportSize.x !== domElement.width ||
+                this.modelSvc.viewportSize.y !== domElement.height ||
+                this.modelSvc.bodyOffset.x !== domElement.left ||
+                this.modelSvc.bodyOffset.y !== domElement.top
+            ) {
+                this.modelSvc.viewportSize.x = domElement.width;
+                this.modelSvc.viewportSize.y = domElement.height;
+                this.modelSvc.bodyOffset.x = domElement.left;
+                this.modelSvc.bodyOffset.y = domElement.top;
+                this.updateCanvasSize(this.modelSvc.canvasSize.x, 1);
+            }
         }
     }
 

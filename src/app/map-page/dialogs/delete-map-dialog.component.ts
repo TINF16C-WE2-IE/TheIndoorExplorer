@@ -11,14 +11,17 @@ import {MatDialogRef} from '@angular/material';
 })
 export class DeleteMapDialogComponent implements OnInit {
 
-    constructor(private modelSvc: ModelService, private router: Router, public dialogRef: MatDialogRef<DeleteMapDialogComponent>) {
+    constructor(private modelSvc: ModelService, private router: Router,
+                public dialogRef: MatDialogRef<DeleteMapDialogComponent>) {
     }
 
     ngOnInit() {
     }
 
     public deleteMap() {
-        this.modelSvc.deleteMap();
-        location.href = '/';
+        this.modelSvc.deleteMap(() => {
+            console.log('GOTO /');
+            this.router.navigate(['']);
+        });
     }
 }

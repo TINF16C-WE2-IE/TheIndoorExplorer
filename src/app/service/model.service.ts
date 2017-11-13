@@ -73,12 +73,15 @@ export class ModelService {
     public loadMapList() {
         this.rqstSvc.get(RequestService.LIST_MAPS, {}).subscribe(
             resp => {
-                if (resp) {
-                    for (const mapInfo of resp as [
+                if (resp.status >= 200 && resp.status <= 299 && resp.data) {
+                    for (const mapInfo of resp.data as [
                         {id: number, name: string, favorite: boolean, permission: number, visibility: number}
                         ]) {
                         this.maps[mapInfo.id] = new Map(mapInfo, this);
                     }
+                }
+                else {
+                    console.log('Received invalid map list response:', resp);
                 }
             }
         );
@@ -102,32 +105,37 @@ export class ModelService {
         else {
             this.rqstSvc.get(RequestService.LIST_MAP_DETAILS + mapId, {}).subscribe(
                 resp => {
-                    if (resp !== null) {
-                        this.currentMap = new Map(resp, this);
+                    if (resp.status >= 200 && resp.status <= 299 && resp.data) {
+                        this.currentMap = new Map(resp.data, this);
                         this.currentMap.fitToViewport();
                         if (callback) callback();
+                    }
+                    else {
+                        console.log('Received invalid map response:', resp);
                     }
                 }
             );
         }
     }
 
-    public saveMap() {
+    public saveMap(callback: (newMapId: number) => void) {
         this.rqstSvc.post(RequestService.LIST_MAP_SAVE + this.currentMapId, this.currentMap.forExport())
             .subscribe(resp => {
-                console.log('got response map-save: ', resp);
-                if (resp !== null) {
-                    // TODO
+                console.log('got response map-save:', resp);
+                if (resp.status >= 200 && resp.status <= 299 && resp.data && resp.data.mapId) {
+                    this.currentMap.id = resp.data.mapId;
+                    callback(resp.data.mapId);
                 }
             });
     }
 
-    public deleteMap() {
+    public deleteMap(callback: () => void) {
         this.rqstSvc.delete(RequestService.DELETE_MAP + this.currentMapId, {})
             .subscribe(resp => {
-                console.log('got response map-save: ', resp);
-                if (resp !== null) {
-                    // TODO
+                console.log('got response map-delete:', resp);
+                if (resp.status >= 200 && resp.status <= 299 && resp.data && resp.data.mapId) {
+                    delete this.maps[this.currentMapId];
+                    callback();
                 }
             });
     }

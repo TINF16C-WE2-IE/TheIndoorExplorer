@@ -23,44 +23,46 @@ export class RequestService {
         this.options.withCredentials = true;
     }
 
-    public get(endpoint: string, paramsObj: any): Observable<any> {
+    public get(endpoint: string, paramsObj: any): Observable<{status: number, data: any}> {
         return this.http.get(
             encodeURI(RequestService.URL_API + endpoint + this.uriEncodeObject(paramsObj)),
             this.options
         ).map(res => this.handleResponse(res));
     }
 
-    public post(endpoint: string, obj: any): Observable<any> {
+    public post(endpoint: string, obj: any): Observable<{status: number, data: any}> {
         return this.http.post(
             encodeURI(RequestService.URL_API + endpoint), obj, this.options
         ).map(res => this.handleResponse(res));
     }
 
-    public delete(endpoint: string, paramsObj: any): Observable<any> {
+    public delete(endpoint: string, paramsObj: any): Observable<{status: number, data: any}> {
         return this.http.delete(
             encodeURI(RequestService.URL_API + endpoint + this.uriEncodeObject(paramsObj)),
             this.options
         ).map(res => this.handleResponse(res));
     }
 
-    private handleResponse(res: any): any {
+    private handleResponse(res: any): {status: number, data: any} {
+        let data = null;
         if (res.ok === true && res.status === 200) {
             try {
                 const jsonObj = res.json();
                 if (jsonObj.error !== undefined && jsonObj !== null) {
                     console.log(jsonObj.error);
-                    return null;
-                } else {
-                    return jsonObj;
+                }
+                else {
+                    data = jsonObj;
                 }
             } catch (e) {
                 console.log('Non-JSON response', res.body);
-                return null;
+                data = res.body;
             }
-        } else {
-            console.log('Server is not responding correctly! Maybe down?', res);
-            return null;
         }
+        else {
+            data = res.body;
+        }
+        return {status: res.status, data: data};
     }
 
     public uriEncodeObject(obj: any): string {

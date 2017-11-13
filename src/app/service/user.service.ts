@@ -28,11 +28,16 @@ export class UserService {
     public refreshUserInfo() {
         this.requestSvc.get(RequestService.INFO_USER, {}).subscribe(
             resp => {
-                if (resp) {
-                    console.log('got user info:', resp);
-                    const userInfo = resp as UserInfoResponse;
+                if (resp.status >= 200 && resp.status <= 299 && resp.data) {
+                    const userInfo = resp.data as UserInfoResponse;
                     this._userId = userInfo.id;
                     this._userName = userInfo.username;
+                }
+                else if (resp.status >= 400 && resp.status <= 499) {
+                    // user not logged in
+                }
+                else {
+                    console.log('Received invalid user info response:', resp);
                 }
             }
         );
@@ -47,12 +52,15 @@ export class UserService {
     public logout(): void {
         this.requestSvc.get(RequestService.LOGOUT, {}).subscribe(
             resp => {
-                if (resp) {
+                if (resp.status >= 200 && resp.status <= 299) {
                     console.log('Logout response:', resp);
                 }
+                else {
+                    console.log('Received invalid logout response:', resp);
+                }
+                location.reload();
             }
         );
-        location.reload();
     }
 }
 

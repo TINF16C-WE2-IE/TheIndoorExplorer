@@ -5,6 +5,7 @@ import { MapnameDialogComponent } from '../map-page/dialogs/mapname-dialog.compo
 import { PublishMapDialogComponent } from '../map-page/dialogs/publish-map-dialog.component';
 import { ModelService } from '../service/model.service';
 import { UserService } from '../service/user.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -33,11 +34,8 @@ export class ToolbarComponent implements OnInit {
 
     @ViewChild('appMenu') appMenu: ElementRef;
 
-    constructor(public modelSvc: ModelService,
-                public userSvc: UserService,
-                public nameDialog: MatDialog,
-                public deleteDialog: MatDialog,
-                public publishDialog: MatDialog) {
+    constructor(public modelSvc: ModelService, public userSvc: UserService, public router: Router,
+                public nameDialog: MatDialog, public deleteDialog: MatDialog, public publishDialog: MatDialog) {
     }
 
 
@@ -65,7 +63,7 @@ export class ToolbarComponent implements OnInit {
     }
 
     saveCurrentMap() {
-        this.modelSvc.saveMap();
+        this.modelSvc.saveMap(newMapId => this.router.navigate(['/map', newMapId, 'edit']));
     }
 
 }
