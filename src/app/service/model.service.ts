@@ -137,15 +137,15 @@ export class ModelService {
             .subscribe(
                 resp => {
                     if (resp.status >= 200 && resp.status <= 299) {
-                        this.msgSvc.notify('Map was successfully saved', 'Success');
-                        if (resp.data && resp.data.mapId) {
-                            this.currentMap.id = resp.data.mapId;
-                            callback(resp.data.mapId);
+                        this.msgSvc.notify('Map was successfully saved', 'Close');
+                        if (resp.data && resp.data.id) {
+                            this.currentMap.id = resp.data.id;
+                            callback(resp.data.id);
                         }
                     }
                 },
                 error => {
-                    this.msgSvc.notify('Could not save map :(', 'Error');
+                    this.msgSvc.notify('Could not save map :(', 'Close');
                 }
             );
     }
