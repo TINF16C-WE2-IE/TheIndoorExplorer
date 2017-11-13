@@ -30,10 +30,11 @@ export class Mouse {
 
     public onMouseDown(evt: any) {
         const mEvt: MouseEvent = this.convertTouchEvent(evt);
-        this.mapToCanvas(mEvt);
-
-        if (this.tool && mEvt) {
-            this.tool.onMouseDown(mEvt);
+        if (mEvt) {
+            this.mapToCanvas(mEvt);
+            if (this.tool) {
+                this.tool.onMouseDown(mEvt);
+            }
         }
         return false; // disallow browser from dragging the svg image
     }
@@ -47,10 +48,11 @@ export class Mouse {
 
     public onMouseMove(evt: any) {
         const mEvt: MouseEvent = this.convertTouchEvent(evt);
-        this.mapToCanvas(mEvt);
-
-        if (this.tool && mEvt) {
-            this.tool.onMouseMove(mEvt);
+        if (mEvt) {
+            this.mapToCanvas(mEvt);
+            if (this.tool) {
+                this.tool.onMouseMove(mEvt);
+            }
         }
     }
 
@@ -64,9 +66,10 @@ export class Mouse {
             if (evt.touches.length === 1) {
                 return new MouseEvent(evt.type, {clientX: evt.touches[0].clientX, clientY: evt.touches[0].clientY});
             }
+            // if we are on touch and have multiple touch points, ignore: it is probably pinch to zoom
             return null;
         }
-        return evt;
+        return evt; // just a normal mouse event
     }
 
     public onWheel(evt: WheelEvent) {
@@ -76,11 +79,13 @@ export class Mouse {
     }
 
     public onPinch(evt: any) {
+        // use pinch center as current mouse position
         this.onMouseMove(new MouseEvent(evt.type, {clientX: evt.center.x, clientY: evt.center.y}));
         this.modelSvc.currentMap.zoom(evt.scale, this, evt.center.x, evt.center.y, true);
     }
 
     public onPinchEnd(evt: any) {
+        // apply dangling zoom
         this.modelSvc.currentMap.updateCanvasSize(this.modelSvc.canvasSize.x, 1);
     }
 
@@ -90,8 +95,13 @@ export class Mouse {
         }
         if (evt) {
             const ratio = this.modelSvc.canvasSize.x / this.modelSvc.viewportSize.x;
-            this._x = Math.round((evt.x - this.modelSvc.bodyOffset.x) * ratio + this.modelSvc.panOffset.x);
-            this._y = Math.round((evt.y - this.modelSvc.bodyOffset.y) * ratio + this.modelSvc.panOffset.y);
+            // get offset to top left viewport corner, convert to actual canvas pixels, add panOffset
+            const x = Math.round((evt.x - this.modelSvc.bodyOffset.x) * ratio + this.modelSvc.panOffset.x);
+            const y = Math.round((evt.y - this.modelSvc.bodyOffset.y) * ratio + this.modelSvc.panOffset.y);
+            if (!Number.isNaN(x) && !Number.isNaN(y)) {
+                this._x = x;
+                this._y = y;
+            }
         }
     }
 }
