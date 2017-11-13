@@ -22,6 +22,7 @@ export class DeleteTool extends Tool {
         this.floor.walls = this.floor.walls.filter(line => line !== selected);
         this.floor.portals = this.floor.portals.filter(line => line !== selected);
         this.floor.stairways = this.floor.stairways.filter(line => line !== selected);
+        this.floor.elevators = this.floor.elevators.filter(line => line !== selected);
         this.modelSvc.selectedObjects = [];
     }
 

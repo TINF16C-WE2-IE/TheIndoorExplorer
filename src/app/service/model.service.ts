@@ -137,15 +137,18 @@ export class ModelService {
             .subscribe(
                 resp => {
                     if (resp.status >= 200 && resp.status <= 299) {
-                        this.msgSvc.notify('Map was successfully saved', 'Success');
-                        if (resp.data && resp.data.mapId) {
-                            this.currentMap.id = resp.data.mapId;
-                            callback(resp.data.mapId);
+                        this.msgSvc.notify('Map was successfully saved', 'Close');
+                        if (resp.data && resp.data.id && this.currentMap.id === -1) {
+                            this.currentMap.id = resp.data.id;
+                            this.maps[resp.data.id] = this.maps[-1];
+                            this.currentMapId = resp.data.id;
+                            delete this.maps[-1];
+                            callback(resp.data.id);
                         }
                     }
                 },
                 error => {
-                    this.msgSvc.notify('Could not save map :(', 'Error');
+                    this.msgSvc.notify('Could not save map :(', 'Close');
                 }
             );
     }
@@ -154,7 +157,7 @@ export class ModelService {
         this.rqstSvc.delete(RequestService.DELETE_MAP + this.currentMapId, {})
             .subscribe(resp => {
                 console.log('got response map-delete:', resp);
-                if (resp.status >= 200 && resp.status <= 299 && resp.data && resp.data.mapId) {
+                if (resp.status >= 200 && resp.status <= 299) {
                     delete this.maps[this.currentMapId];
                     callback();
                 }
