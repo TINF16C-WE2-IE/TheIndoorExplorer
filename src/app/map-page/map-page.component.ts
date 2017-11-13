@@ -17,6 +17,7 @@ export class MapPageComponent implements OnInit {
     public editMode = false;
     public showLabels = true;
     public sideNavMode = 'over';
+    public onMobile = false;
     public urlMapIdString = '';
 
 
@@ -88,6 +89,11 @@ export class MapPageComponent implements OnInit {
         this.toolSvc.selectTool('Move');
         this.sideNavMode = 'side';
         this.sidenav.open();
+        if (window.innerWidth <= 650) {
+            this.onMobile = true;
+            this.sidenav.close();
+            this.sideNavMode = 'over';
+        }
     }
 
     switchToViewMode() {

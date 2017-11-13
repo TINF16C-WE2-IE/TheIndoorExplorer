@@ -64,5 +64,4 @@ export class SideSearchComponent implements OnInit {
         this.searchQuery = '';
         Pathfinder2.clearAllFloorGraphs(this.modelSvc.currentMap);
     }
-
 }

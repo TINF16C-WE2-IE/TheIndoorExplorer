@@ -2,7 +2,7 @@
 
 <mat-sidenav-container class="example-container">
 
-    <mat-sidenav #sidenav mode="{{sideNavMode}}" [disableClose]="editMode"  class="left-sidenav">
+    <mat-sidenav #sidenav mode="{{sideNavMode}}" [disableClose]="editMode && !onMobile"  class="left-sidenav">
         <app-side-search *ngIf="!editMode" (close)="closeSidenav($event)"></app-side-search>
 
         <app-side-tools *ngIf="editMode"></app-side-tools>
@@ -13,10 +13,15 @@
 
     <div id="viewer-container">
 
-        <button *ngIf="!editMode" type="button" mat-raised-button color="accent" id="search-button"
+        <button *ngIf="!editMode" type="button" mat-raised-button color="accent" class="sidenav-button"
                 (click)="sidenav.open()">
             <mat-icon>location_searching</mat-icon>
             <span>Search</span>
+        </button>
+        <button *ngIf="editMode && onMobile" type="button" mat-raised-button color="accent" class="sidenav-button"
+                (click)="sidenav.open()">
+            <mat-icon>mode_edit</mat-icon>
+            <span>Edit map</span>
         </button>
 
         <div id="canvas-container">
