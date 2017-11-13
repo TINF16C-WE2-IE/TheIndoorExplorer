@@ -65,7 +65,6 @@ export class ToolbarComponent implements OnInit {
     saveCurrentMap() {
         this.modelSvc.saveMap(newMapId => this.router.navigate(['/map', newMapId, 'edit']));
     }
-
 }
 
 

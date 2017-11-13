@@ -2,6 +2,7 @@
     flex-basis: content;
     margin: 1%;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    background-color: white;
 }
 
 #floor-button-container .mat-button-toggle-group {
@@ -11,8 +12,12 @@
     background-color: white;
 }
 
-#floor-button-container .mat-button-toggle-checked {
-    background-color: white;
+.mat-button-toggle-checked {
+
+}
+
+.mat-raised-button{
+    background-color: #FF9100;
 }
 
 #floor-spacer {
