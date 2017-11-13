@@ -39,8 +39,6 @@ export class UserService {
                 } else {
                     console.log('Received invalid user info response:', resp);
                 }
-            }, error => {
-                this.msgSvc.notify('You are not logged in!', 'Warning');
             }
         );
     }

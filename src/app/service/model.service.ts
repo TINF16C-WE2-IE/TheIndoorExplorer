@@ -136,17 +136,16 @@ export class ModelService {
         this.rqstSvc.post(RequestService.LIST_MAP_SAVE + this.currentMapId, this.currentMap.forExport())
             .subscribe(
                 resp => {
-                    if (resp.status >= 200 && resp.status <= 299 && resp.data && resp.data.mapId) {
+                    if (resp.status >= 200 && resp.status <= 299) {
                         this.msgSvc.notify('Map was successfully saved', 'Success');
-                        this.currentMap.id = resp.data.mapId;
-                        callback(resp.data.mapId);
+                        if (resp.data && resp.data.mapId) {
+                            this.currentMap.id = resp.data.mapId;
+                            callback(resp.data.mapId);
+                        }
                     }
-                }, error => {
-                    if (error.status === 401) {
-                        this.msgSvc.notify('You are not allowed to save, you foool!', 'Error');
-                    } else {
-                        this.msgSvc.notify('Couldn\'t save map :(', 'Error');
-                    }
+                },
+                error => {
+                    this.msgSvc.notify('Could not save map :(', 'Error');
                 }
             );
     }

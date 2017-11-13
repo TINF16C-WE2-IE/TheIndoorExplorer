@@ -50,7 +50,7 @@ export class RequestService {
             try {
                 const jsonObj = res.json();
                 if (jsonObj.error !== undefined && jsonObj !== null) {
-                    this.msgSvc.notify(jsonObj.error, 'Error');
+                    // this.msgSvc.notify(jsonObj.error, 'Error');
                 } else {
                     data = jsonObj;
                 }

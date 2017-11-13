@@ -9,7 +9,7 @@ import { MessageService } from '../service/message.service';
 @Injectable()
 export class MapPageResolverService implements Resolve<void> {
 
-    constructor(private modelSvc: ModelService, private router: Router, private messageSvc: MessageService) {
+    constructor(private modelSvc: ModelService, private router: Router, private msgSvc: MessageService) {
     }
 
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<void> {
@@ -24,7 +24,7 @@ export class MapPageResolverService implements Resolve<void> {
                     }
                     else {
                         this.router.navigate(['']);
-                        this.messageSvc.notify('Map not existing or access denied. Are you logged in?');
+                        this.msgSvc.notify('Map not existing or access denied. Are you logged in?', 'Error');
                     }
                     observer.next(null);
                     observer.complete();

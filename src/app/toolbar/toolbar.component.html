@@ -14,7 +14,7 @@
     <span class="fill-remaining-space"></span>
 
 
-    <button mat-button *ngIf="hasMap && !editMode" [routerLink]="['/map', mapIdString, 'edit']">
+    <button mat-button *ngIf="hasMap && canEdit && !editMode" [routerLink]="['/map', mapIdString, 'edit']">
         <mat-icon>edit_mode</mat-icon>
         <span class="toolbar-text">Edit map</span>
     </button>

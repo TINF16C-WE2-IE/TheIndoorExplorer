@@ -55,13 +55,11 @@ export class MapPageComponent implements OnInit {
     }
 
     ngOnInit() {
-        console.log('mappageinit');
         this.route.url.subscribe(
             () => {
                 const snap = this.route.snapshot;
                 this.urlMapIdString = snap.params.mapId;
                 const mode = snap.routeConfig.path;
-                console.log('mode:', mode);
                 if (mode === 'edit') {
                     this.switchToEditMode();
                 }
