@@ -1,4 +1,4 @@
-<h2 class="mat-h2">{{(singleSelectedObject | type) || 'Floor'}} Properties</h2>
+<h2 class="mat-h2">{{(singleSelectedObject?.type) || 'Floor'}} Properties</h2>
 
 <mat-form-field *ngIf="currentFloor && !singleSelectedObject">
     <input matInput name="floorname" [(ngModel)]="currentFloor.label" (change)="markDirty()" placeholder="Floor Name">
@@ -8,8 +8,8 @@
     <input matInput name="objname" [(ngModel)]="singleSelectedObject.label" (change)="markDirty()" placeholder="Object Name">
 </mat-form-field>
 
-<mat-form-field *ngIf="(singleSelectedObject | type:'Stairs') || (singleSelectedObject | type:'Elevator')">
-    <mat-select [placeholder]="'Connect ' + (singleSelectedObject | type)"
+<mat-form-field *ngIf="(singleSelectedObject?.type == 'Stairs') || (singleSelectedObject?.type == 'Elevator')">
+    <mat-select [placeholder]="'Connect ' + (singleSelectedObject?.type)"
                 [value]="singleSelectedObject.group"
                 (change)="setTeleporterGroup(singleSelectedObject, $event.value)">
         <mat-option [value]="null">None</mat-option>

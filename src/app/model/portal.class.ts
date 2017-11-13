@@ -4,6 +4,7 @@ import { Selectable } from './selectable.interface';
 
 export class Portal extends Line implements Selectable {
     public label: string;
+    type = 'Portal';
 
     constructor(label: string, p1: Point, p2: Point) {
         super(p1, p2);

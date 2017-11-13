@@ -9,6 +9,7 @@ export class Stairs extends Portal implements Selectable, Teleporter {
     public canEnter: boolean;
     public canLeave: boolean;
     public group: number;
+    type = 'Stairs';
 
 
     public get width(): number {

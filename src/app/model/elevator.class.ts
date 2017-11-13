@@ -6,6 +6,7 @@ export class Elevator implements Selectable, Teleporter {
     group: number;
     label: string;
     center: Point;
+    type = 'Elevator';
 
     constructor(label: string, p: Point, group: number = null) {
         this.label = label;

@@ -4,6 +4,7 @@ export interface Selectable {
     label: string;
     center: Point;
     group?: number;
+    type: string;
 }
 
 

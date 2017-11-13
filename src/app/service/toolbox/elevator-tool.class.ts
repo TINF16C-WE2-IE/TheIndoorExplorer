@@ -16,7 +16,9 @@ export class ElevatorTool extends Tool {
     public onMouseDown(evt: MouseEvent) {
         const start = this.getFloorPointBelowCursor();
         this.point = start.clone();
-        this.floor.elevators.push(new Elevator('New Elevator', this.point));
+        const elevator = new Elevator('New Elevator', this.point);
+        this.floor.elevators.push(elevator);
+        this.modelSvc.selectedObjects = [elevator];
         this.markDirty();
     }
 
