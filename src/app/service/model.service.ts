@@ -133,7 +133,7 @@ export class ModelService {
         this.rqstSvc.delete(RequestService.DELETE_MAP + this.currentMapId, {})
             .subscribe(resp => {
                 console.log('got response map-delete:', resp);
-                if (resp.status >= 200 && resp.status <= 299 && resp.data && resp.data.mapId) {
+                if (resp.status >= 200 && resp.status <= 299) {
                     delete this.maps[this.currentMapId];
                     callback();
                 }
