@@ -138,8 +138,11 @@ export class ModelService {
                 resp => {
                     if (resp.status >= 200 && resp.status <= 299) {
                         this.msgSvc.notify('Map was successfully saved', 'Close');
-                        if (resp.data && resp.data.id) {
+                        if (resp.data && resp.data.id && this.currentMap.id === -1) {
                             this.currentMap.id = resp.data.id;
+                            this.maps[resp.data.id] = this.maps[-1];
+                            this.currentMapId = resp.data.id;
+                            delete this.maps[-1];
                             callback(resp.data.id);
                         }
                     }
