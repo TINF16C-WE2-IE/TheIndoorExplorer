@@ -57,6 +57,9 @@ export class DirectionsTool extends Tool {
                     }
                 }
             }
+            if (this.modelSvc.selectedObjects.length === 2) {
+                this.modelSvc.selectedObjects = [];
+            }
 
             if (this.modelSvc.selectedObjects.length) {
 
