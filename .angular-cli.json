@@ -18,7 +18,7 @@
       "prefix": "app",
       "styles": [
         "custom-mat-theme.scss",
-        "styles.css"
+        "styles.scss"
       ],
       "scripts": [
         "../node_modules/hammerjs/hammer.min.js"
@@ -36,7 +36,7 @@
     }
   ],
   "defaults": {
-    "styleExt": "css",
+    "styleExt": "scss",
     "component": {
     }
   },

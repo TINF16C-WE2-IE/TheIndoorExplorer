@@ -1,0 +1,20 @@
+@import "custom-mat-theme";
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    background-color: mat-color($custom-app-primary, 600);
+    height: 100%;
+    position: relative;
+}
+
+app-toolbar {
+    background-color: mat-color($custom-app-primary, 600);
+}
